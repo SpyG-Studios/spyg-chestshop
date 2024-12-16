@@ -1,0 +1,11 @@
+name: ChestShop
+main: hu.spyg.chestshop.ChestShop
+version: 1.0
+api-version: 1.16
+authors: [ikoli, Ris]
+depend: [Vault]
+
+
+commands:
+  chestshop:
+    aliases: [cs]
