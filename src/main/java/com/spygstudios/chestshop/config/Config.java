@@ -1,8 +1,9 @@
-package hu.spyg.chestshop.config;
+package com.spygstudios.chestshop.config;
 
 import java.util.Arrays;
 
-import hu.spyg.chestshop.ChestShop;
+import com.spygstudios.chestshop.ChestShop;
+
 import hu.spyg.spyglib.yamlmanager.YamlManager;
 
 public class Config extends YamlManager {

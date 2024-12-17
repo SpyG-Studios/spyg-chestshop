@@ -1,4 +1,4 @@
-package hu.spyg.chestshop.shop;
+package com.spygstudios.chestshop.shop;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,8 @@ import org.bukkit.block.sign.Side;
 import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
 
-import hu.spyg.chestshop.ChestShop;
+import com.spygstudios.chestshop.ChestShop;
+
 import hu.spyg.spyglib.color.TranslateColor;
 
 public class Shop {

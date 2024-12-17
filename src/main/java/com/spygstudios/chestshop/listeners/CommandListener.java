@@ -1,4 +1,4 @@
-package hu.spyg.chestshop.listeners;
+package com.spygstudios.chestshop.listeners;
 
 import java.util.Set;
 
@@ -11,9 +11,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
-import hu.spyg.chestshop.ChestShop;
-import hu.spyg.chestshop.config.Config;
-import hu.spyg.chestshop.shop.Shop;
+import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.config.Config;
+import com.spygstudios.chestshop.shop.Shop;
+
 import hu.spyg.spyglib.color.TranslateColor;
 
 public class CommandListener implements CommandExecutor, Listener {

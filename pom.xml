@@ -45,7 +45,8 @@
         <dependency>
             <groupId>io.github.ikolihu</groupId>
             <artifactId>spyglib</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>

@@ -1,10 +1,11 @@
-package hu.spyg.chestshop;
+package com.spygstudios.chestshop;
 
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import hu.spyg.chestshop.config.Config;
-import hu.spyg.chestshop.listeners.CommandListener;
+import com.spygstudios.chestshop.config.Config;
+import com.spygstudios.chestshop.listeners.CommandListener;
+
 import net.milkbowl.vault.economy.Economy;
 
 public class ChestShop extends JavaPlugin {

@@ -1,4 +1,4 @@
-package hu.spyg.chestshop.listeners;
+package com.spygstudios.chestshop.listeners;
 
 import java.util.Arrays;
 import java.util.List;
