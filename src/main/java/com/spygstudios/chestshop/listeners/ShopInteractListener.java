@@ -28,7 +28,7 @@ public class ShopInteractListener implements Listener {
             return;
         }
         Player player = event.getPlayer();
-        if (config.getStringList("disabled-worlds").contains(player.getWorld().getName())) {
+        if (Shop.isDisabledWorld(player.getWorld())) {
             return;
         }
         Location location = event.getClickedBlock().getLocation();
@@ -36,10 +36,15 @@ public class ShopInteractListener implements Listener {
         if (shop == null) {
             return;
         }
-        if (shop.getChestLocation().equals(location) && shop.getOwner().equals(player.getUniqueId())) {
+        if (shop.getChestLocation().equals(location) && !shop.getOwner().equals(player.getUniqueId())) {
+            player.sendMessage(config.getMessage("not-owner"));
+            event.setCancelled(true);
             return;
         }
-        event.setCancelled(true);
+        if (shop.getSignLocation().equals(location)) {
+            // shop.openShop(player);
+            event.setCancelled(true);
+        }
     }
 
 }

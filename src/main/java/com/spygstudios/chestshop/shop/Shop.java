@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
@@ -118,6 +119,19 @@ public class Shop {
         ShopFile.getShopFile(getOwner()).removeShop(getName());
         SHOPS.remove(this);
         signLocation.getBlock().setType(Material.AIR);
+    }
+
+    public static boolean isDisabledWorld(String worldName) {
+        return Bukkit.getWorld(worldName) != null && isDisabledWorld(Bukkit.getWorld(worldName));
+    }
+
+    public static boolean isDisabledWorld(World world) {
+        for (String worldName : plugin.getConf().getStringList("shops.disabled-worlds")) {
+            if (world.getName().equalsIgnoreCase(worldName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static Shop getShop(String name) {
