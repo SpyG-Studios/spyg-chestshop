@@ -104,6 +104,11 @@ public class Shop {
         return doNotify;
     }
 
+    public double getPriceForEach() {
+        return price / amount;
+    }
+
+
     public void setShopSign() {
         if (chestLocation.getBlock().getType() != Material.CHEST) {
             removeShop(this);

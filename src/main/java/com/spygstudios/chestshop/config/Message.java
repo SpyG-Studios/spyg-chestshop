@@ -25,6 +25,7 @@ public enum Message {
     SHOP_LIST_HEAD("shop.list.header", "%prefix% &aYour shops:"), 
     SHOP_LIST_SHOPS("shop.list.shops", "&7- &f%shop-name% &7(&f%material%&7) &7- &#1a652a$&f%price%&7/&f%amount%"),
     SHOP_NO_CHEST("shop.no-chest", "%prefix% &cYou need to look at a chest to create a shop!"), 
+    SHOP_EMPTY("shop.empty", "%prefix% &cThe shop is empty!"),
     SHOP_NO_PERMISSION("shop.no-permission", "%prefix% &cYou don't have permission to use this shop!"), 
     SHOP_NO_SHOPS("shop.no-shops", "%prefix% &cYou don't have any shops!"),
     SHOP_NOT_FOUND("shop.not-found", "%prefix% &cShop not found!"),
