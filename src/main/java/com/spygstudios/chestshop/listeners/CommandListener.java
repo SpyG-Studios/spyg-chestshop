@@ -1,5 +1,6 @@
 package com.spygstudios.chestshop.listeners;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,6 +50,20 @@ public class CommandListener implements CommandExecutor, Listener {
             if (args[0].equalsIgnoreCase("reload")) {
                 config.reloadConfig();
                 Message.CONFIG_RELOADED.sendMessage(player);
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("list")) {
+                ShopFile file = ShopFile.getShopFile(player);
+                if (file == null || file.getPlayerShops().isEmpty()) {
+                    Message.SHOP_NO_SHOPS.sendMessage(player);
+                    return true;
+                }
+                List<Shop> shops = Shop.getShops(player);
+                Message.SHOP_LIST_HEAD.sendMessage(player);
+                for (Shop shop : shops) {
+                    Message.SHOP_LIST_SHOPS.sendMessage(player,
+                            Map.of("%shop-name%", shop.getName(), "%material%", shop.getMaterialString(), "%price%", shop.getPrice() + "", "%amount%", shop.getAmount() + ""));
+                }
                 return true;
             }
         }

@@ -9,7 +9,7 @@ import org.bukkit.command.TabCompleter;
 
 public class TabListener implements TabCompleter {
 
-    private List<String> commands = Arrays.asList("create", "reload");
+    private List<String> commands = Arrays.asList("create", "reload", "list");
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {

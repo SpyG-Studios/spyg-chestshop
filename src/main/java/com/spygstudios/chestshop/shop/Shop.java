@@ -72,6 +72,10 @@ public class Shop {
         return material;
     }
 
+    public String getMaterialString() {
+        return material == null ? plugin.getConf().getString("shops.unknown-material") : material.toString();
+    }
+
     public Location getChestLocation() {
         return chestLocation;
     }
@@ -116,10 +120,9 @@ public class Shop {
             sign.setBlockData(directional);
         }
         SignSide side = sign.getSide(Side.FRONT);
-        String materialName = material == null ? plugin.getConf().getString("shops.unknown-material") : material.toString();
         for (int i = 0; i < 4; i++) {
             side.line(i, TranslateColor.translate(plugin.getConf().getString("shop.sign.line." + (i + 1)).replace("%owner%", Bukkit.getOfflinePlayer(owner).getName())
-                    .replace("%amount%", String.valueOf(amount)).replace("%price%", String.valueOf(price)).replace("%material%", materialName)));
+                    .replace("%amount%", String.valueOf(amount)).replace("%price%", String.valueOf(price)).replace("%material%", getMaterialString())));
         }
         sign.update();
         this.signLocation = signLocation;
@@ -151,6 +154,20 @@ public class Shop {
             }
         }
         return null;
+    }
+
+    public static List<Shop> getShops(Player owner) {
+        return getShops(owner.getUniqueId());
+    }
+
+    public static List<Shop> getShops(UUID ownerId) {
+        List<Shop> shops = new ArrayList<Shop>();
+        for (Shop shop : SHOPS) {
+            if (shop.getOwner().equals(ownerId)) {
+                 shops.add(shop);
+            }
+        }
+        return shops;
     }
 
     public static Shop getShop(Location location) {
