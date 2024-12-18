@@ -31,8 +31,8 @@ public class ShopFile extends YamlManager {
             return;
         }
         set("shops", null);
-        toSave = true;
         SHOPS_FILES.put(ownerId, this);
+        toSave = true;
     }
 
     public Set<String> getPlayerShops() {
@@ -57,17 +57,29 @@ public class ShopFile extends YamlManager {
         set("shops." + shop.getName() + ".amount", shop.getAmount());
         set("shops." + shop.getName() + ".material", shop.getMaterial() == null ? null : shop.getMaterial().name());
         set("shops." + shop.getName() + ".location", LocationUtils.fromLocation(shop.getChestLocation(), true));
+        set("shops." + shop.getName() + ".do-notify", shop.doNotify());
         set("shops." + shop.getName() + ".created", getDateString());
         toSave = true;
     }
 
-    private String getDateString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        return LocalDateTime.now().format(formatter);
-    }
-
     public UUID getOwnerId() {
         return ownerId;
+    }
+
+    private static void setDefaultValues(ShopFile shopFile) {
+        for (String shopName : shopFile.getPlayerShops()) {
+            String shopPath = "shops." + shopName;
+            shopFile.set(shopPath + ".price", 0);
+            shopFile.set(shopPath + ".amount", 0);
+            shopFile.set(shopPath + ".do-notify", false);
+            shopFile.set(shopPath + ".created", getDateString());
+        }
+        toSave = true;
+    }
+
+    private static String getDateString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return LocalDateTime.now().format(formatter);
     }
 
     public static void loadShopFiles(ChestShop plugin) {
@@ -81,6 +93,7 @@ public class ShopFile extends YamlManager {
                 try {
                     UUID ownerId = UUID.fromString(file.getName().replace(".yml", ""));
                     ShopFile shopFile = new ShopFile(plugin, ownerId);
+                    setDefaultValues(shopFile);
                     for (String shopName : shopFile.getPlayerShops()) {
                         String shopPath = "shops." + shopName;
                         String locationString = shopFile.getString(shopPath + ".location");
@@ -94,7 +107,8 @@ public class ShopFile extends YamlManager {
                         }
                         String materialString = shopFile.getString(shopPath + ".material");
 
-                        new Shop(ownerId, shopName, location, Material.getMaterial(materialString), shopFile.getInt(shopPath + ".amount"), shopFile.getDouble(shopPath + ".price"));
+                        new Shop(ownerId, shopName, location, Material.getMaterial(materialString), shopFile.getInt(shopPath + ".amount"), shopFile.getDouble(shopPath + ".price"),
+                                shopFile.getBoolean(shopPath + ".do-notify"));
                     }
                 } catch (IllegalArgumentException e) {
                     plugin.getLogger().warning("Invalid shop file: " + file.getName());

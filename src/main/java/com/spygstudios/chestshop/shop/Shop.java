@@ -31,21 +31,23 @@ public class Shop {
     private Location chestLocation;
     private Location signLocation;
     private String name;
+    private boolean doNotify;
 
     private static final List<Shop> SHOPS = new ArrayList<Shop>();
     private static ChestShop plugin = ChestShop.getInstance();
 
-    public Shop(Player owner, String name, Location chestLocation, Material material, int amount, double price) {
-        this(owner.getUniqueId(), name, chestLocation, material, amount, price);
+    public Shop(Player owner, String name, Location chestLocation, Material material, int amount, double price, boolean doNotify) {
+        this(owner.getUniqueId(), name, chestLocation, material, amount, price, doNotify);
     }
 
-    public Shop(UUID ownerId, String name, Location chestLocation, Material material, int amount, double price) {
+    public Shop(UUID ownerId, String name, Location chestLocation, Material material, int amount, double price, boolean doNotify) {
         this.owner = ownerId;
         this.name = name;
         this.material = material;
         this.amount = amount;
         this.price = price;
         this.chestLocation = chestLocation;
+        this.doNotify = doNotify;
         setShopSign();
         SHOPS.add(this);
     }
@@ -88,6 +90,14 @@ public class Shop {
 
     public void setMaterial(Material material) {
         this.material = material;
+    }
+
+    public void setDoNotify(boolean doNotify) {
+        this.doNotify = doNotify;
+    }
+
+    public boolean doNotify() {
+        return doNotify;
     }
 
     public void setShopSign() {
