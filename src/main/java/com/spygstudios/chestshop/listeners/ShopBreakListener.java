@@ -1,5 +1,7 @@
 package com.spygstudios.chestshop.listeners;
 
+import java.util.Map;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -9,17 +11,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.config.Config;
+import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
-import com.spygstudios.spyglib.color.TranslateColor;
+import com.spygstudios.spyglib.components.ComponentUtils;
 
 public class ShopBreakListener implements Listener {
 
-    private Config config;
-
     public ShopBreakListener(ChestShop plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        this.config = plugin.getConf();
     }
 
     @EventHandler
@@ -42,7 +41,7 @@ public class ShopBreakListener implements Listener {
             block.setType(Material.AIR);
         }
         shop.remove();
-        player.sendMessage(TranslateColor.translate(config.getString("messages.shop.removed").replaceAll("%shop-name%", shop.getName()).replace("%prefix%", config.getPrefix())));
+        player.sendMessage(ComponentUtils.replaceComponent(Message.SHOP_REMOVED.get(), Map.of("%shop-name%", shop.getName())));
     }
 
 }
