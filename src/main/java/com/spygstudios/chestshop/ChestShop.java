@@ -5,6 +5,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.listeners.CommandListener;
+import com.spygstudios.chestshop.listeners.ShopBreakListener;
+import com.spygstudios.chestshop.listeners.ShopInteractListener;
+import com.spygstudios.chestshop.shop.ShopFile;
 
 import net.milkbowl.vault.economy.Economy;
 
@@ -18,7 +21,10 @@ public class ChestShop extends JavaPlugin {
         instance = this;
         config = new Config(this);
         new CommandListener(this, "chestshop");
+        new ShopInteractListener(this);
+        new ShopBreakListener(this);
 
+        getLogger().info("Loading economy plugin...");
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
             getLogger().severe("Vault or economy plugin (e.g. Essentials) not found! Disabling plugin...");
@@ -26,6 +32,11 @@ public class ChestShop extends JavaPlugin {
             return;
         }
         economy = rsp.getProvider();
+        getLogger().info("Loaded economy plugin: " + economy.getName());
+
+        getLogger().info("Loading shops...");
+        ShopFile.loadShopFiles(instance);
+        getLogger().info("Shops loaded!");
 
         getLogger().info("<plugin> v. <version> plugin has been enabled!".replace("<plugin>", getName()).replace("<version>", getPluginMeta().getVersion()));
     }

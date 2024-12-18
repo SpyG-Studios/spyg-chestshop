@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.spygstudios</groupId>
-    <artifactId>chestshop</artifactId>
+    <artifactId>spyg-chestshop</artifactId>
     <version>1.0.0</version>
 
     <properties>
@@ -28,7 +28,6 @@
     </repositories>
 
     <dependencies>
-
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
@@ -43,9 +42,9 @@
         </dependency>
 
         <dependency>
-            <groupId>io.github.ikolihu</groupId>
+            <groupId>com.spygstudios</groupId>
             <artifactId>spyglib</artifactId>
-            <version>1.0</version>
+            <version>1.0.2</version>
             <scope>provided</scope>
         </dependency>
 
