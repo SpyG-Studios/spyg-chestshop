@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.sign.Side;
@@ -16,8 +16,7 @@ import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
 
 import com.spygstudios.chestshop.ChestShop;
-
-import hu.spyg.spyglib.color.TranslateColor;
+import com.spygstudios.spyglib.color.TranslateColor;
 
 public class Shop {
 
@@ -25,31 +24,25 @@ public class Shop {
     private double price;
     private int amount;
     private Material material;
-    private Location location;
+    private Location chestLocation;
+    private Location signLocation;
     private String name;
 
     private static final List<Shop> SHOPS = new ArrayList<Shop>();
     private static ChestShop plugin = ChestShop.getInstance();
 
-    public Shop(Player owner, String name, Chest chest) {
-        this.owner = owner.getUniqueId();
-        this.name = name;
-        this.location = chest.getLocation();
-        BlockFace chestFacing = getChestFace(chest.getBlock());
-        Location signLocation = chest.getLocation().clone().add(chestFacing.getModX(), chestFacing.getModY(), chestFacing.getModZ());
-        signLocation.getBlock().setType(Material.OAK_WALL_SIGN);
-        Sign signBlock = (Sign) signLocation.getBlock().getState();
-        if (signBlock.getBlockData() instanceof Directional directional) {
-            directional.setFacing(chestFacing);
-            signBlock.setBlockData(directional);
-        }
+    public Shop(Player owner, String name, Location chestLocation, Material material, int amount, double price) {
+        this(owner.getUniqueId(), name, chestLocation, material, amount, price);
+    }
 
-        SignSide side = signBlock.getSide(Side.FRONT);
-        for (int i = 0; i < 4; i++) {
-            side.line(i, TranslateColor.translate(
-                    plugin.getConf().getString("shop.sign.line." + (i + 1)).replace("%owner%", owner.getName()).replace("%amount%", String.valueOf(amount)).replace("%price%", String.valueOf(price))));
-        }
-        signBlock.update();
+    public Shop(UUID ownerId, String name, Location chestLocation, Material material, int amount, double price) {
+        this.owner = ownerId;
+        this.name = name;
+        this.material = material;
+        this.amount = amount;
+        this.price = price;
+        this.chestLocation = chestLocation;
+        setShopSign();
         SHOPS.add(this);
     }
 
@@ -73,8 +66,12 @@ public class Shop {
         return material;
     }
 
-    public Location getLocation() {
-        return location;
+    public Location getChestLocation() {
+        return chestLocation;
+    }
+
+    public Location getSignLocation() {
+        return signLocation;
     }
 
     public void setPrice(double price) {
@@ -89,8 +86,62 @@ public class Shop {
         this.material = material;
     }
 
+    public void setShopSign() {
+        if (chestLocation.getBlock().getType() != Material.CHEST) {
+            removeShop(this);
+            throw new IllegalArgumentException("Block is not a chest, Shop removed! Location: " + chestLocation);
+        }
+        BlockFace chestFacing = getChestFace(chestLocation.getBlock());
+        Location signLocation = chestLocation.clone().add(chestFacing.getModX(), chestFacing.getModY(), chestFacing.getModZ());
+        Block signBlock = signLocation.getBlock();
+        signBlock.setType(Material.OAK_WALL_SIGN);
+        // TODO handle if sign is blocked by a block
+        Sign sign = (Sign) signLocation.getBlock().getState();
+        if (sign.getBlockData() instanceof Directional directional) {
+            directional.setFacing(chestFacing);
+            sign.setBlockData(directional);
+        }
+        SignSide side = sign.getSide(Side.FRONT);
+        String materialName = material == null ? "-" : material.toString();
+        for (int i = 0; i < 4; i++) {
+            side.line(i, TranslateColor.translate(plugin.getConf().getString("shop.sign.line." + (i + 1)).replace("%owner%", Bukkit.getOfflinePlayer(owner).getName())
+                    .replace("%amount%", String.valueOf(amount)).replace("%price%", String.valueOf(price)).replace("%material%", materialName)));
+        }
+        sign.update();
+        this.signLocation = signLocation;
+    }
+
+    public void remove() {
+        ShopFile.getShopFile(getOwner()).removeShop(getName());
+        SHOPS.remove(this);
+        signLocation.getBlock().setType(Material.AIR);
+    }
+
+    public static Shop getShop(String name) {
+        for (Shop shop : SHOPS) {
+            if (shop.getName().equalsIgnoreCase(name)) {
+                return shop;
+            }
+        }
+        return null;
+    }
+
+    public static Shop getShop(Location location) {
+        for (Shop shop : SHOPS) {
+            if (shop.getChestLocation().equals(location) || shop.getSignLocation().equals(location)) {
+                return shop;
+            }
+        }
+        return null;
+    }
+
     public static List<Shop> getShops() {
         return new ArrayList<Shop>(SHOPS);
+    }
+
+    public static void removeShop(Shop shop) {
+        ShopFile.getShopFile(shop.getOwner()).removeShop(shop.getName());
+        SHOPS.remove(shop);
     }
 
     public static BlockFace getChestFace(Block chestBlock) {

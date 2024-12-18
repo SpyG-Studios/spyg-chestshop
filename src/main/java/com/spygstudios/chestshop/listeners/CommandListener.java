@@ -4,7 +4,6 @@ import java.util.Set;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,8 +13,8 @@ import org.bukkit.event.Listener;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.shop.Shop;
-
-import hu.spyg.spyglib.color.TranslateColor;
+import com.spygstudios.chestshop.shop.ShopFile;
+import com.spygstudios.spyglib.color.TranslateColor;
 
 public class CommandListener implements CommandExecutor, Listener {
 
@@ -60,8 +59,16 @@ public class CommandListener implements CommandExecutor, Listener {
                     return true;
                 }
                 String name = args[1].trim();
-                new Shop(player, name, (Chest) targetBlock.getState());
+                ShopFile file = ShopFile.getShopFile(player);
+                if (file == null) {
+                    file = new ShopFile(ChestShop.getInstance(), player);
+                } else if (file.getPlayerShops().contains(name)) {
+                    player.sendMessage(TranslateColor.translate(config.getString("messages.shop.already-exists").replaceAll("%shop-name%", name).replace("%prefix%", config.getPrefix())));
+                    return true;
+                }
 
+                file.addShop(new Shop(player, name, targetBlock.getLocation(), null, 0, 0));
+                player.sendMessage(config.getMessage("shop.created"));
                 return true;
             }
         }
