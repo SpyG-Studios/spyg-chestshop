@@ -21,9 +21,16 @@ public enum Message {
     SHOP_CREATED("shop.created", "%prefix% &aShop &f%shop-name% &acreated!"),
     SHOP_DISABLED_WORLD("shop.disabled-world", "%prefix% &cShops are disabled in this world!"), 
     SHOP_INVALID_PRICE("shop.invalid-price", "%prefix% &cInvalid price!"),
+    SHOP_INVALID_PAGE("shop.invalid-page", "%prefix% &cInvalid page! &7(&8%page%&7)"),
     SHOP_LIMIT_REACHED("shop.limit-reached", "%prefix% &cYou have reached the shop limit! (&e%shop-limit%&c)"), 
+    
     SHOP_LIST_HEAD("shop.list.header", "%prefix% &aYour shops:"), 
     SHOP_LIST_SHOPS("shop.list.shops", "&7- &f%shop-name% &7(&f%material%&7) &7- &#1a652a$&f%price%&7/&f%amount% &7items left: &8%items-left%"),
+    SHOP_LIST_CURRENT_PAGE("shop.list.current-page", "&7[&e&l%page%&r&7]"),
+    SHOP_LIST_NEXT("shop.list.next", " &7[&eNext&7]"),
+    SHOP_LIST_BACK("shop.list.back", "&7[&cBack&7]"),
+    SHOP_LIST_PAGE("shop.list.page", "&7[&e%page%&7]"),
+
     SHOP_NO_CHEST("shop.no-chest", "%prefix% &cYou need to look at a chest to create a shop!"), 
     SHOP_EMPTY("shop.empty", "%prefix% &cThe shop is empty!"),
     SHOP_NO_PERMISSION("shop.no-permission", "%prefix% &cYou don't have permission to use this shop!"), 
