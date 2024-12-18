@@ -15,6 +15,7 @@ import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.shop.ShopFile;
 import com.spygstudios.spyglib.color.TranslateColor;
+import com.spygstudios.spyglib.components.ComponentUtils;
 
 public class CommandListener implements CommandExecutor, Listener {
 
@@ -59,25 +60,37 @@ public class CommandListener implements CommandExecutor, Listener {
                     return true;
                 }
 
+                if (Shop.isDisabledWorld(player.getWorld())) {
+                    player.sendMessage(config.getMessage("disabled-world"));
+                    return true;
+                }
+
                 String name = args[1].trim();
                 ShopFile file = ShopFile.getShopFile(player);
                 if (file == null) {
                     file = new ShopFile(ChestShop.getInstance(), player);
                 } else if (file.getPlayerShops().contains(name)) {
-                    player.sendMessage(TranslateColor.translate(config.getString("messages.shop.already-exists").replaceAll("%shop-name%", name).replace("%prefix%", config.getPrefix())));
+                    player.sendMessage(ComponentUtils.replaceComponent(config.getMessage("shop.already-exists"), "%shop-name%", name));
                     return true;
                 }
+
                 if (Shop.getShop(targetBlock.getLocation()) != null || (Shop.isDoubleChest(targetBlock) && Shop.getShop(Shop.getAdjacentChest(targetBlock).getLocation()) != null)) {
                     player.sendMessage(config.getMessage("shop.chest-already-shop"));
                     return true;
                 }
+
                 if (!Shop.isChestFaceFree(targetBlock)) {
                     player.sendMessage(config.getMessage("chest-face-not-free"));
                     return true;
                 }
 
+                if (config.getInt("shops.max-shops") != 0 && file.getPlayerShops().size() >= config.getInt("shops.max-shops")) {
+                    player.sendMessage(ComponentUtils.replaceComponent(config.getMessage("shop.limit-reached"), "%shop-limit%", String.valueOf(config.getInt("shops.max-shops"))));
+                    return true;
+                }
+
                 file.addShop(new Shop(player, name, targetBlock.getLocation(), null, 0, 0));
-                player.sendMessage(TranslateColor.translate(config.getString("messages.shop.created").replaceAll("%shop-name%", name).replace("%prefix%", config.getPrefix())));
+                player.sendMessage(ComponentUtils.replaceComponent(config.getMessage("shop.created"), "%shop-name%", name));
                 return true;
             }
         }
