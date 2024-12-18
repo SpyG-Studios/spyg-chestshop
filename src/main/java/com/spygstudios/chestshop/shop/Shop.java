@@ -22,16 +22,39 @@ import org.bukkit.inventory.Inventory;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.spyglib.color.TranslateColor;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class Shop {
 
+    @Getter
     private UUID owner;
+
+    @Getter
+    @Setter
     private double price;
+
+    @Getter
+    @Setter
     private int amount;
+
+    @Getter
+    @Setter
     private Material material;
+
+    @Getter
     private Location chestLocation;
+
+    @Getter
     private Location signLocation;
+
+    @Getter
+    @Setter
     private String name;
-    private boolean doNotify;
+
+    @Getter
+    @Setter
+    private boolean isNotify;
 
     private static final List<Shop> SHOPS = new ArrayList<Shop>();
     private static ChestShop plugin = ChestShop.getInstance();
@@ -47,65 +70,18 @@ public class Shop {
         this.amount = amount;
         this.price = price;
         this.chestLocation = chestLocation;
-        this.doNotify = doNotify;
+        this.isNotify = doNotify;
         setShopSign();
         SHOPS.add(this);
     }
 
-    public UUID getOwner() {
-        return owner;
+    public double getPriceForEach() {
+        return price / amount;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public int getAmount() {
-        return amount;
-    }
-
-    public Material getMaterial() {
-        return material;
-    }
 
     public String getMaterialString() {
         return material == null ? plugin.getConf().getString("shops.unknown-material") : material.toString();
-    }
-
-    public Location getChestLocation() {
-        return chestLocation;
-    }
-
-    public Location getSignLocation() {
-        return signLocation;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public void setAmount(int amount) {
-        this.amount = amount;
-    }
-
-    public void setMaterial(Material material) {
-        this.material = material;
-    }
-
-    public void setDoNotify(boolean doNotify) {
-        this.doNotify = doNotify;
-    }
-
-    public boolean doNotify() {
-        return doNotify;
-    }
-
-    public double getPriceForEach() {
-        return price / amount;
     }
 
 

@@ -57,7 +57,7 @@ public class ShopFile extends YamlManager {
         set("shops." + shop.getName() + ".amount", shop.getAmount());
         set("shops." + shop.getName() + ".material", shop.getMaterial() == null ? null : shop.getMaterial().name());
         set("shops." + shop.getName() + ".location", LocationUtils.fromLocation(shop.getChestLocation(), true));
-        set("shops." + shop.getName() + ".do-notify", shop.doNotify());
+        set("shops." + shop.getName() + ".do-notify", shop.isNotify());
         set("shops." + shop.getName() + ".created", getDateString());
         toSave = true;
     }

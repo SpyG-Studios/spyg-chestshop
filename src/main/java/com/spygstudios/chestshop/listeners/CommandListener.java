@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,6 +19,7 @@ import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.shop.ShopFile;
 import com.spygstudios.spyglib.color.TranslateColor;
+import com.spygstudios.spyglib.inventory.InventoryUtils;
 
 public class CommandListener implements CommandExecutor, Listener {
 
@@ -61,8 +63,10 @@ public class CommandListener implements CommandExecutor, Listener {
                 List<Shop> shops = Shop.getShops(player);
                 Message.SHOP_LIST_HEAD.sendMessage(player);
                 for (Shop shop : shops) {
+                    Chest chest = (Chest) shop.getChestLocation().getBlock().getState();
+                    String itemsLeft = String.valueOf(InventoryUtils.countItems(chest.getInventory(), shop.getMaterial()));
                     Message.SHOP_LIST_SHOPS.sendMessage(player,
-                            Map.of("%shop-name%", shop.getName(), "%material%", shop.getMaterialString(), "%price%", shop.getPrice() + "", "%amount%", shop.getAmount() + ""));
+                            Map.of("%shop-name%", shop.getName(), "%material%", shop.getMaterialString(), "%price%", shop.getPrice() + "", "%amount%", shop.getAmount() + "", "%items-left%",  itemsLeft));
                 }
                 return true;
             }

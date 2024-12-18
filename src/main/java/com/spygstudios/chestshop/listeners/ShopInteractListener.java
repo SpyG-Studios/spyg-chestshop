@@ -64,24 +64,24 @@ public class ShopInteractListener implements Listener {
         }
         Chest chest = (Chest) shop.getChestLocation().getBlock().getState();
 
-        int itemCount = InventoryUtils.countItems(chest.getInventory(), shop.getMaterial());
-
+        int itemCount, itemsLeft;
+        itemCount = itemsLeft = InventoryUtils.countItems(chest.getInventory(), shop.getMaterial());
         if (itemCount == 0) {
             Message.SHOP_EMPTY.sendMessage(player);
             return;
         }
-
         itemCount = shop.getAmount() > itemCount ? itemCount : shop.getAmount();
+        itemsLeft -= itemCount;
         double price = shop.getPriceForEach() * itemCount;
         EconomyResponse response = ChestShop.getInstance().getEconomy().withdrawPlayer(player, shop.getPrice());
         if (response.transactionSuccess()) {
             ChestShop.getInstance().getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner()), price);
             player.getInventory().addItem(new ItemStack(shop.getMaterial(), itemCount));
             chest.getInventory().removeItem(new ItemStack(shop.getMaterial(), itemCount));
-            Message.SHOP_BOUGHT.sendMessage(player, Map.of("%price%", String.valueOf(price), "%material%", shop.getMaterial().name()));
+            Message.SHOP_BOUGHT.sendMessage(player, Map.of("%price%", String.valueOf(price), "%material%", shop.getMaterial().name(), "%items-left%", String.valueOf(itemsLeft)));
             Player owner = Bukkit.getPlayer(shop.getOwner());
-            if (shop.doNotify() && owner != null) {
-                Message.SHOP_SOLD.sendMessage(owner, Map.of("%price%", String.valueOf(price), "%material%", shop.getMaterial().name(), "%player-name%", player.getName()));
+            if (shop.isNotify() && owner != null) {
+                Message.SHOP_SOLD.sendMessage(owner, Map.of("%price%", String.valueOf(price), "%material%", shop.getMaterial().name(), "%player-name%", player.getName(), "%items-left%", String.valueOf(itemsLeft)));
             }
             return;
         }

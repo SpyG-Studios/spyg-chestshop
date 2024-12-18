@@ -15,7 +15,7 @@ public enum Message {
     NOT_ENOUGH_MONEY("not-enough-money", "%prefix% &cYou don't have enough money! ($%price%)"), 
     PLAYER_ONLY("player-only", "&cOnly players can use this command!"),
     SHOP_ALREADY_EXISTS("shop.already-exists", "%prefix% &cShop with name &f%shop-name% &calready exists!"), 
-    SHOP_BOUGHT("shop.bought", "%prefix% &aYou bought &f%material% &afor &f$%price%&a!"), 
+    SHOP_BOUGHT("shop.bought", "%prefix% &aYou bought &f%material% &afor &f$%price%&a! &7(&8%items-left%&7)"), 
     SHOP_CHEST_ALREADY_SHOP("shop.chest-already-shop", "%prefix% &cThis chest is already a shop!"),
     SHOP_CHEST_FACE_NOT_FREE("shop.chest-face-not-free", "%prefix% &cThe face of the chest is not free!"),
     SHOP_CREATED("shop.created", "%prefix% &aShop &f%shop-name% &acreated!"),
@@ -23,7 +23,7 @@ public enum Message {
     SHOP_INVALID_PRICE("shop.invalid-price", "%prefix% &cInvalid price!"),
     SHOP_LIMIT_REACHED("shop.limit-reached", "%prefix% &cYou have reached the shop limit! (&e%shop-limit%&c)"), 
     SHOP_LIST_HEAD("shop.list.header", "%prefix% &aYour shops:"), 
-    SHOP_LIST_SHOPS("shop.list.shops", "&7- &f%shop-name% &7(&f%material%&7) &7- &#1a652a$&f%price%&7/&f%amount%"),
+    SHOP_LIST_SHOPS("shop.list.shops", "&7- &f%shop-name% &7(&f%material%&7) &7- &#1a652a$&f%price%&7/&f%amount% &7items left: &8%items-left%"),
     SHOP_NO_CHEST("shop.no-chest", "%prefix% &cYou need to look at a chest to create a shop!"), 
     SHOP_EMPTY("shop.empty", "%prefix% &cThe shop is empty!"),
     SHOP_NO_PERMISSION("shop.no-permission", "%prefix% &cYou don't have permission to use this shop!"), 
@@ -32,7 +32,7 @@ public enum Message {
     SHOP_NOT_OWNER("shop.not-owner", "%prefix% &cYou are not the owner of this shop!"),
     SHOP_REMOVED("shop.removed", "%prefix% &cShop &f%shop-name% &cremoved!"), 
     SHOP_SETUP_NEEDED("shop.setup-needed", "%prefix% &cThis shop is not set up properly!"),
-    SHOP_SOLD("shop.sold", "%prefix% &aYou sold &f%material% &afor &f$%price%&a, to %player-name%!");
+    SHOP_SOLD("shop.sold", "%prefix% &aYou sold &f%material% &afor &f$%price%&a, to %player-name%! &7(&8%items-left%&7)"),;
 
     private String node;
     private String defaultMessage;
