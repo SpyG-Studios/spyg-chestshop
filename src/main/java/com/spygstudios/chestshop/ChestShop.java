@@ -4,6 +4,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.spygstudios.chestshop.config.Config;
+import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.listeners.CommandListener;
 import com.spygstudios.chestshop.listeners.ShopBreakListener;
 import com.spygstudios.chestshop.listeners.ShopInteractListener;
@@ -38,6 +39,7 @@ public class ChestShop extends JavaPlugin {
         ShopFile.loadShopFiles(instance);
         getLogger().info("Shops loaded!");
 
+        Message.init(config);
         ShopFile.startSaveScheduler(instance);
         getLogger().info("<plugin> v. <version> plugin has been enabled!".replace("<plugin>", getName()).replace("<version>", getPluginMeta().getVersion()));
     }

@@ -11,19 +11,15 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.config.Config;
+import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
-import com.spygstudios.spyglib.components.ComponentUtils;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class ShopInteractListener implements Listener {
 
-    private Config config;
-
     public ShopInteractListener(ChestShop plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        this.config = plugin.getConf();
     }
 
     @EventHandler
@@ -57,11 +53,11 @@ public class ShopInteractListener implements Listener {
         // Buyer
         event.setCancelled(true);
         if (shop.getChestLocation().equals(location)) {
-            player.sendMessage(config.getMessage("shop.not-owner"));
+            Message.SHOP_NOT_OWNER.sendMessage(player);
             return;
         }
         if (shop.getMaterial() == null || shop.getAmount() == 0) {
-            player.sendMessage(config.getMessage("shop.setup-needed"));
+            Message.SHOP_SETUP_NEEDED.sendMessage(player);
             return;
         }
 
@@ -69,15 +65,14 @@ public class ShopInteractListener implements Listener {
         if (response.transactionSuccess()) {
             ChestShop.getInstance().getEconomy().depositPlayer(Bukkit.getOfflinePlayer(shop.getOwner()), shop.getPrice());
             player.getInventory().addItem(new ItemStack(shop.getMaterial(), shop.getAmount()));
-            player.sendMessage(ComponentUtils.replaceComponent(config.getMessage("shop.bought"), Map.of("%price%", String.valueOf(shop.getPrice()), "%material%", shop.getMaterial().name())));
-            if (shop.doNotify() && Bukkit.getPlayer(shop.getOwner()) != null) {
-                Bukkit.getPlayer(shop.getOwner()).sendMessage(ComponentUtils.replaceComponent(config.getMessage("shop.sold"),
-                        Map.of("%price%", String.valueOf(shop.getPrice()), "%material%", shop.getMaterial().name(), "%player-name%", player.getName())));
+            Message.SHOP_BOUGHT.sendMessage(player, Map.of("%price%", String.valueOf(shop.getPrice()), "%material%", shop.getMaterial().name()));
+            Player owner = Bukkit.getPlayer(shop.getOwner());
+            if (shop.doNotify() && owner != null) {
+                Message.SHOP_SOLD.sendMessage(owner, Map.of("%price%", String.valueOf(shop.getPrice()), "%material%", shop.getMaterial().name(), "%player-name%", player.getName()));
             }
             return;
         }
-        player.sendMessage(ComponentUtils.replaceComponent(config.getMessage("not-enough-money"), Map.of("%price%", String.valueOf(shop.getPrice()))));
-
+        Message.NOT_ENOUGH_MONEY.sendMessage(player, Map.of("%price%", String.valueOf(shop.getPrice())));
     }
 
 }

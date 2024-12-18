@@ -1,5 +1,6 @@
 package com.spygstudios.chestshop.listeners;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Material;
@@ -12,10 +13,10 @@ import org.bukkit.event.Listener;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
+import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.shop.ShopFile;
 import com.spygstudios.spyglib.color.TranslateColor;
-import com.spygstudios.spyglib.components.ComponentUtils;
 
 public class CommandListener implements CommandExecutor, Listener {
 
@@ -31,7 +32,7 @@ public class CommandListener implements CommandExecutor, Listener {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(config.getMessage("player-only"));
+            Message.PLAYER_ONLY.sendMessage(sender);
             return true;
         }
 
@@ -47,7 +48,7 @@ public class CommandListener implements CommandExecutor, Listener {
             }
             if (args[0].equalsIgnoreCase("reload")) {
                 config.reloadConfig();
-                player.sendMessage(config.getMessage("config-reloaded"));
+                Message.CONFIG_RELOADED.sendMessage(player);
                 return true;
             }
         }
@@ -56,12 +57,12 @@ public class CommandListener implements CommandExecutor, Listener {
             if (args[0].equalsIgnoreCase("create")) {
                 Block targetBlock = player.getTargetBlock((Set<Material>) null, 4);
                 if (targetBlock == null || targetBlock.getType() != Material.CHEST) {
-                    player.sendMessage(config.getMessage("no-chest"));
+                    Message.SHOP_NO_CHEST.sendMessage(player);
                     return true;
                 }
 
                 if (Shop.isDisabledWorld(player.getWorld())) {
-                    player.sendMessage(config.getMessage("disabled-world"));
+                    Message.SHOP_DISABLED_WORLD.sendMessage(player);
                     return true;
                 }
 
@@ -70,27 +71,27 @@ public class CommandListener implements CommandExecutor, Listener {
                 if (file == null) {
                     file = new ShopFile(ChestShop.getInstance(), player);
                 } else if (file.getPlayerShops().contains(name)) {
-                    player.sendMessage(ComponentUtils.replaceComponent(config.getMessage("shop.already-exists"), "%shop-name%", name));
+                    Message.SHOP_ALREADY_EXISTS.sendMessage(player, Map.of("%shop-name%", name));
                     return true;
                 }
 
                 if (Shop.getShop(targetBlock.getLocation()) != null || (Shop.isDoubleChest(targetBlock) && Shop.getShop(Shop.getAdjacentChest(targetBlock).getLocation()) != null)) {
-                    player.sendMessage(config.getMessage("shop.chest-already-shop"));
+                    Message.SHOP_CHEST_ALREADY_SHOP.sendMessage(player);
                     return true;
                 }
 
                 if (!Shop.isChestFaceFree(targetBlock)) {
-                    player.sendMessage(config.getMessage("chest-face-not-free"));
+                    Message.SHOP_CHEST_FACE_NOT_FREE.sendMessage(player);
                     return true;
                 }
 
                 if (config.getInt("shops.max-shops") != 0 && file.getPlayerShops().size() >= config.getInt("shops.max-shops")) {
-                    player.sendMessage(ComponentUtils.replaceComponent(config.getMessage("shop.limit-reached"), "%shop-limit%", String.valueOf(config.getInt("shops.max-shops"))));
+                    Message.SHOP_LIMIT_REACHED.sendMessage(player, Map.of("%shop-limit%", String.valueOf(config.getInt("shops.max-shops"))));
                     return true;
                 }
 
-                file.addShop(new Shop(player, name, targetBlock.getLocation(), null, 0, 0));
-                player.sendMessage(ComponentUtils.replaceComponent(config.getMessage("shop.created"), "%shop-name%", name));
+                file.addShop(new Shop(player, name, targetBlock.getLocation(), null, 0, 0, false));
+                Message.SHOP_CREATED.sendMessage(player, Map.of("%shop-name%", name));
                 return true;
             }
         }
