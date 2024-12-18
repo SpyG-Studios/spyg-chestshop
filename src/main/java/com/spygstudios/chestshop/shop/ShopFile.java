@@ -1,8 +1,11 @@
 package com.spygstudios.chestshop.shop;
 
 import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -28,12 +31,15 @@ public class ShopFile extends YamlManager {
         if (SHOPS_FILES.containsKey(ownerId)) {
             return;
         }
-        set("shops", Arrays.asList());
+        set("shops", null);
         saveConfig();
         SHOPS_FILES.put(ownerId, this);
     }
 
     public Set<String> getPlayerShops() {
+        if (getConfigurationSection("shops") == null) {
+            return new HashSet<String>();
+        }
         return getConfigurationSection("shops").getKeys(false);
     }
 
@@ -52,7 +58,13 @@ public class ShopFile extends YamlManager {
         set("shops." + shop.getName() + ".amount", shop.getAmount());
         set("shops." + shop.getName() + ".material", shop.getMaterial() == null ? null : shop.getMaterial().name());
         set("shops." + shop.getName() + ".location", LocationUtils.fromLocation(shop.getChestLocation(), true));
+        set("shops." + shop.getName() + ".created", getDateString());
         saveConfig();
+    }
+
+    private String getDateString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return LocalDateTime.now().format(formatter);
     }
 
     public UUID getOwnerId() {

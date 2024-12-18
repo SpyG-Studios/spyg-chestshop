@@ -44,6 +44,11 @@ public class CommandListener implements CommandExecutor, Listener {
                 player.sendMessage(TranslateColor.translate("&cUsage: /chestshop create <name>"));
                 return true;
             }
+            if (args[0].equalsIgnoreCase("reload")) {
+                config.reloadConfig();
+                player.sendMessage(config.getMessage("config-reloaded"));
+                return true;
+            }
         }
 
         if (args.length == 2) {
@@ -54,10 +59,6 @@ public class CommandListener implements CommandExecutor, Listener {
                     return true;
                 }
 
-                if (!Shop.isChestFaceFree(targetBlock)) {
-                    player.sendMessage(config.getMessage("chest-face-not-free"));
-                    return true;
-                }
                 String name = args[1].trim();
                 ShopFile file = ShopFile.getShopFile(player);
                 if (file == null) {
@@ -66,9 +67,17 @@ public class CommandListener implements CommandExecutor, Listener {
                     player.sendMessage(TranslateColor.translate(config.getString("messages.shop.already-exists").replaceAll("%shop-name%", name).replace("%prefix%", config.getPrefix())));
                     return true;
                 }
+                if (Shop.getShop(targetBlock.getLocation()) != null || (Shop.isDoubleChest(targetBlock) && Shop.getShop(Shop.getAdjacentChest(targetBlock).getLocation()) != null)) {
+                    player.sendMessage(config.getMessage("shop.chest-already-shop"));
+                    return true;
+                }
+                if (!Shop.isChestFaceFree(targetBlock)) {
+                    player.sendMessage(config.getMessage("chest-face-not-free"));
+                    return true;
+                }
 
                 file.addShop(new Shop(player, name, targetBlock.getLocation(), null, 0, 0));
-                player.sendMessage(config.getMessage("shop.created"));
+                player.sendMessage(TranslateColor.translate(config.getString("messages.shop.created").replaceAll("%shop-name%", name).replace("%prefix%", config.getPrefix())));
                 return true;
             }
         }

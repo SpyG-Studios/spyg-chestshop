@@ -11,6 +11,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.spyglib.color.TranslateColor;
 
 public class ShopBreakListener implements Listener {
 
@@ -41,7 +42,7 @@ public class ShopBreakListener implements Listener {
             block.setType(Material.AIR);
         }
         shop.remove();
-        player.sendMessage(config.getMessage("shop.removed"));
+        player.sendMessage(TranslateColor.translate(config.getString("messages.shop.removed").replaceAll("%shop-name%", shop.getName()).replace("%prefix%", config.getPrefix())));
     }
 
 }

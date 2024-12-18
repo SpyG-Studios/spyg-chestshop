@@ -9,11 +9,14 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.sign.Side;
 import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.DoubleChestInventory;
+import org.bukkit.inventory.Inventory;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.spyglib.color.TranslateColor;
@@ -102,7 +105,7 @@ public class Shop {
             sign.setBlockData(directional);
         }
         SignSide side = sign.getSide(Side.FRONT);
-        String materialName = material == null ? "-" : material.toString();
+        String materialName = material == null ? plugin.getConf().getString("shops.unknown-material") : material.toString();
         for (int i = 0; i < 4; i++) {
             side.line(i, TranslateColor.translate(plugin.getConf().getString("shop.sign.line." + (i + 1)).replace("%owner%", Bukkit.getOfflinePlayer(owner).getName())
                     .replace("%amount%", String.valueOf(amount)).replace("%price%", String.valueOf(price)).replace("%material%", materialName)));
@@ -149,6 +152,27 @@ public class Shop {
             throw new IllegalArgumentException("Block is not a chest!");
         }
         return directional.getFacing();
+    }
+
+    public static boolean isDoubleChest(Block block) {
+        if (!(block.getState() instanceof Chest chest)) {
+            return false;
+        }
+        Inventory inv = chest.getInventory();
+        if (inv instanceof DoubleChestInventory) {
+            return true;
+        }
+        return false;
+    }
+
+    public static Block getAdjacentChest(Block block) {
+        for (BlockFace face : new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST }) {
+            Block relativeBlock = block.getRelative(face);
+            if (relativeBlock.getState() instanceof Chest) {
+                return relativeBlock;
+            }
+        }
+        return null;
     }
 
     public static boolean isChestFaceFree(Block chestBlock) {

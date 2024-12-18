@@ -10,4 +10,4 @@ libraries:
 
 commands:
   spygchestshop:
-    aliases: [cs, chestshop]
+    aliases: [chestshop, scs, chests]
