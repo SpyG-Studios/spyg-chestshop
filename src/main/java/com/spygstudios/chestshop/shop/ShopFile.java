@@ -65,27 +65,25 @@ public class ShopFile extends YamlManager {
             shopsFolder.mkdirs();
             return;
         }
-        if (shopsFolder.isDirectory()) {
-            for (File file : shopsFolder.listFiles()) {
-                if (file.isFile() && file.getName().endsWith(".yml")) {
-                    try {
-                        UUID ownerId = UUID.fromString(file.getName().replace(".yml", ""));
-                        ShopFile shopFile = new ShopFile(plugin, ownerId);
-                        for (String shopName : shopFile.getPlayerShops()) {
-                            String shopPath = "shops." + shopName;
-                            String locationString = shopFile.getString(shopPath + ".location");
-                            if (locationString == null) {
-                                plugin.getLogger().warning("Invalid shop file: " + file.getName());
-                                continue;
-                            }
-                            Location location = LocationUtils.toLocation(locationString);
-                            String materialString = shopFile.getString(shopPath + ".material");
-
-                            new Shop(ownerId, shopName, location, Material.getMaterial(materialString), shopFile.getInt(shopPath + ".amount"), shopFile.getDouble(shopPath + ".price"));
+        for (File file : shopsFolder.listFiles()) {
+            if (file.isFile() && file.getName().endsWith(".yml")) {
+                try {
+                    UUID ownerId = UUID.fromString(file.getName().replace(".yml", ""));
+                    ShopFile shopFile = new ShopFile(plugin, ownerId);
+                    for (String shopName : shopFile.getPlayerShops()) {
+                        String shopPath = "shops." + shopName;
+                        String locationString = shopFile.getString(shopPath + ".location");
+                        if (locationString == null) {
+                            plugin.getLogger().warning("Invalid shop file: " + file.getName());
+                            continue;
                         }
-                    } catch (IllegalArgumentException e) {
-                        plugin.getLogger().warning("Invalid shop file: " + file.getName());
+                        Location location = LocationUtils.toLocation(locationString);
+                        String materialString = shopFile.getString(shopPath + ".material");
+
+                        new Shop(ownerId, shopName, location, Material.getMaterial(materialString), shopFile.getInt(shopPath + ".amount"), shopFile.getDouble(shopPath + ".price"));
                     }
+                } catch (IllegalArgumentException e) {
+                    plugin.getLogger().warning("Invalid shop file: " + file.getName());
                 }
             }
         }

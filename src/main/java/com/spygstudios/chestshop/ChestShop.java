@@ -20,7 +20,7 @@ public class ChestShop extends JavaPlugin {
     public void onEnable() {
         instance = this;
         config = new Config(this);
-        new CommandListener(this, "chestshop");
+        new CommandListener(this, "spygchestshop");
         new ShopInteractListener(this);
         new ShopBreakListener(this);
 

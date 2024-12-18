@@ -21,16 +21,14 @@ public class ShopInteractListener implements Listener {
 
     @EventHandler
     public void onInteractWithShop(PlayerInteractEvent event) {
+        if (event.getClickedBlock() == null) {
+            return;
+        }
         if (event.getAction().isLeftClick()) {
             return;
         }
         Player player = event.getPlayer();
-        for (String disabledWorlds : config.getStringList("disabled-worlds")) {
-            if (player.getWorld().getName().equalsIgnoreCase(disabledWorlds)) {
-                return;
-            }
-        }
-        if (event.getClickedBlock() == null) {
+        if (config.getStringList("disabled-worlds").contains(player.getWorld().getName())) {
             return;
         }
         Location location = event.getClickedBlock().getLocation();

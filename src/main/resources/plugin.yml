@@ -9,5 +9,5 @@ libraries:
   - com.spygstudios:spyglib:1.0.2
 
 commands:
-  chestshop:
-    aliases: [cs]
+  spygchestshop:
+    aliases: [cs, chestshop]

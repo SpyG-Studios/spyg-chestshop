@@ -24,10 +24,8 @@ public class ShopBreakListener implements Listener {
     @EventHandler
     public void onInteractWithShop(BlockBreakEvent event) {
         Player player = event.getPlayer();
-        for (String disabledWorlds : config.getStringList("disabled-worlds")) {
-            if (player.getWorld().getName().equalsIgnoreCase(disabledWorlds)) {
-                return;
-            }
+        if (config.getStringList("disabled-worlds").contains(player.getWorld().getName())) {
+            return;
         }
         Block block = event.getBlock();
         Location location = block.getLocation();
