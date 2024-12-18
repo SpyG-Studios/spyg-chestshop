@@ -38,10 +38,12 @@ public class ChestShop extends JavaPlugin {
         ShopFile.loadShopFiles(instance);
         getLogger().info("Shops loaded!");
 
+        ShopFile.startSaveScheduler(instance);
         getLogger().info("<plugin> v. <version> plugin has been enabled!".replace("<plugin>", getName()).replace("<version>", getPluginMeta().getVersion()));
     }
 
     public void onDisable() {
+        ShopFile.saveShops();
         getLogger().info("<plugin> v. <version> plugin has been disabled!".replace("<plugin>", getName()).replace("<version>", getPluginMeta().getVersion()));
     }
 

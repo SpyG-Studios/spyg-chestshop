@@ -3,7 +3,6 @@ package com.spygstudios.chestshop.shop;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,7 +18,7 @@ import com.spygstudios.spyglib.location.LocationUtils;
 import com.spygstudios.spyglib.yamlmanager.YamlManager;
 
 public class ShopFile extends YamlManager {
-
+    private static boolean toSave = false;
     private UUID ownerId;
 
     public ShopFile(ChestShop plugin, Player owner) {
@@ -32,7 +31,7 @@ public class ShopFile extends YamlManager {
             return;
         }
         set("shops", null);
-        saveConfig();
+        toSave = true;
         SHOPS_FILES.put(ownerId, this);
     }
 
@@ -47,7 +46,7 @@ public class ShopFile extends YamlManager {
         for (String shop : getPlayerShops()) {
             if (shop.equalsIgnoreCase(shopName)) {
                 overwriteSet("shops." + shop, null);
-                saveConfig();
+                toSave = true;
                 return;
             }
         }
@@ -59,7 +58,7 @@ public class ShopFile extends YamlManager {
         set("shops." + shop.getName() + ".material", shop.getMaterial() == null ? null : shop.getMaterial().name());
         set("shops." + shop.getName() + ".location", LocationUtils.fromLocation(shop.getChestLocation(), true));
         set("shops." + shop.getName() + ".created", getDateString());
-        saveConfig();
+        toSave = true;
     }
 
     private String getDateString() {
@@ -90,6 +89,9 @@ public class ShopFile extends YamlManager {
                             continue;
                         }
                         Location location = LocationUtils.toLocation(locationString);
+                        if (Shop.isDisabledWorld(location.getWorld())) {
+                            continue;
+                        }
                         String materialString = shopFile.getString(shopPath + ".material");
 
                         new Shop(ownerId, shopName, location, Material.getMaterial(materialString), shopFile.getInt(shopPath + ".amount"), shopFile.getDouble(shopPath + ".price"));
@@ -122,4 +124,19 @@ public class ShopFile extends YamlManager {
     }
 
     private static final Map<UUID, ShopFile> SHOPS_FILES = new HashMap<>();
+
+    public static void startSaveScheduler(ChestShop plugin) {
+        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+            saveShops();
+        }, 0, 20 * plugin.getConf().getInt("shops.save-interval", 60));
+    }
+
+    public static void saveShops() {
+        if (toSave) {
+            for (ShopFile shopFile : SHOPS_FILES.values()) {
+                shopFile.saveConfig();
+            }
+            toSave = false;
+        }
+    }
 }
