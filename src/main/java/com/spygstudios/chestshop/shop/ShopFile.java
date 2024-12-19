@@ -22,7 +22,6 @@ import lombok.Getter;
 public class ShopFile extends YamlManager {
     @Getter
     private UUID ownerId;
-    @Getter
     private boolean isSaved;
 
     public ShopFile(ChestShop plugin, Player owner) {
@@ -56,18 +55,23 @@ public class ShopFile extends YamlManager {
         }
     }
 
-    public void addShop(Shop shop) {
-        set("shops." + shop.getName() + ".price", shop.getPrice());
-        set("shops." + shop.getName() + ".amount", shop.getAmount());
-        set("shops." + shop.getName() + ".material", shop.getMaterial() == null ? null : shop.getMaterial().name());
-        set("shops." + shop.getName() + ".location", LocationUtils.fromLocation(shop.getChestLocation(), true));
-        set("shops." + shop.getName() + ".do-notify", shop.isNotify());
-        set("shops." + shop.getName() + ".created", getDateString());
+    public void addShop(Player owner, String name, Location chestLocation) {
+        set("shops." + name + ".price", 0);
+        set("shops." + name + ".amount", 0);
+        set("shops." + name + ".material", null);
+        set("shops." + name + ".location", LocationUtils.fromLocation(chestLocation, true));
+        set("shops." + name + ".do-notify", false);
+        set("shops." + name + ".created", getDateString());
+        new Shop(owner.getUniqueId(), name, this);
         isSaved = false;
     }
 
     public void setMaterial(String shopName, Material material) {
         overwriteSet("shops." + shopName + ".material", material == null ? null : material.name());
+        isSaved = false;
+    }
+
+    public void save() {
         isSaved = false;
     }
 
@@ -77,6 +81,8 @@ public class ShopFile extends YamlManager {
             shopFile.set(shopPath + ".price", 0);
             shopFile.set(shopPath + ".amount", 0);
             shopFile.set(shopPath + ".do-notify", false);
+            shopFile.set(shopPath + ".sold-items", 0);
+            shopFile.set(shopPath + ".money-earned", 0);
             shopFile.set(shopPath + ".created", getDateString());
             shopFile.isSaved = false;
         }
@@ -112,10 +118,7 @@ public class ShopFile extends YamlManager {
                         if (Shop.isDisabledWorld(location.getWorld())) {
                             continue;
                         }
-                        String materialString = shopFile.getString(shopPath + ".material");
-
-                        new Shop(ownerId, shopName, location, Material.getMaterial(materialString), shopFile.getInt(shopPath + ".amount"), shopFile.getDouble(shopPath + ".price"),
-                                shopFile.getBoolean(shopPath + ".do-notify"));
+                        new Shop(ownerId, shopName, shopFile);
                     }
                 } catch (IllegalArgumentException e) {
                     plugin.getLogger().warning("Invalid shop file: " + file.getName());
@@ -155,7 +158,7 @@ public class ShopFile extends YamlManager {
 
     public static void saveShops() {
         for (ShopFile shopFile : SHOPS_FILES.values()) {
-            if (shopFile.isSaved()) {
+            if (shopFile.isSaved) {
                 continue;
             }
             shopFile.saveConfig();

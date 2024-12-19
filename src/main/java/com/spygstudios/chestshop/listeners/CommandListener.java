@@ -153,7 +153,7 @@ public class CommandListener implements CommandExecutor, Listener {
                     return true;
                 }
 
-                file.addShop(new Shop(player, name, targetBlock.getLocation(), null, 0, 0, false));
+                file.addShop(player, name, targetBlock.getLocation());
                 Message.SHOP_CREATED.sendMessage(player, Map.of("%shop-name%", name));
                 return true;
             }
