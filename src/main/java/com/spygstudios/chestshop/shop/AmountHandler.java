@@ -14,6 +14,7 @@ public class AmountHandler {
     @Getter
     private Player player;
 
+    @Getter
     private double amount;
 
     public AmountHandler(Player player) {

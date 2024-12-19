@@ -1,15 +1,13 @@
 package com.spygstudios.chestshop.listeners.gui;
 
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.gui.MainGui.ShopHolder;
-import com.spygstudios.spyglib.inventory.InventoryUtils;
+import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
+import com.spygstudios.chestshop.shop.Shop;
 
 public class InventoryCloseListener implements Listener {
 
@@ -20,51 +18,20 @@ public class InventoryCloseListener implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
 
-        if (event.getInventory().getHolder() instanceof ShopHolder) {
-            itemAdding(event);
+        if (event.getInventory().getHolder() instanceof ShopHolder holder) {
+            itemAdding(event, holder);
             return;
         }
 
     }
 
-    private void itemAdding(InventoryCloseEvent event) {
-
-        ItemStack[] contents = event.getInventory().getContents();
-
-        Material material = Material.getMaterial(((ShopHolder) event.getInventory().getHolder()).getMaterial());
-
-        boolean hasTheMaterial = true;
-
-        for (ItemStack item : contents) {
-
-            if (item == null) {
-                continue;
-            }
-
-            if (item.getType() == material) {
-                hasTheMaterial = false;
-                break;
-            }
-
-            if (item.getType() != material) {
-                hasTheMaterial = true;
-            }
-
+    private void itemAdding(InventoryCloseEvent event, ShopHolder holdder) {
+        Material material = event.getInventory().getItem(13).getType();
+        Shop shop = holdder.getShop();
+        if (material == Material.AIR || material.equals(shop.getMaterial())) {
+            return;
         }
-
-        Player player = ((ShopHolder) event.getInventory().getHolder()).getPlayer();
-        int amountRequested = ((ShopHolder) event.getInventory().getHolder()).getAmount();
-        int givenAmount = InventoryUtils.countItems(event.getInventory(), material);
-
-        for (ItemStack item : contents) {
-            if (item == null) {
-                continue;
-            }
-
-            if (item.getType() != material) {
-                player.getInventory().addItem(item);
-            }
-        }
+        shop.setMaterial(material);
     }
 
 }

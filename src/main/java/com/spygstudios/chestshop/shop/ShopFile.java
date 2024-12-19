@@ -66,6 +66,11 @@ public class ShopFile extends YamlManager {
         isSaved = false;
     }
 
+    public void setMaterial(String shopName, Material material) {
+        overwriteSet("shops." + shopName + ".material", material == null ? null : material.name());
+        isSaved = false;
+    }
+
     private static void setDefaultValues(ShopFile shopFile) {
         for (String shopName : shopFile.getPlayerShops()) {
             String shopPath = "shops." + shopName;

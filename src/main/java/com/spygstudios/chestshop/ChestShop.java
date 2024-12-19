@@ -4,11 +4,14 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.spygstudios.chestshop.config.Config;
-import com.spygstudios.chestshop.config.GuisConfig;
+import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.listeners.CommandListener;
 import com.spygstudios.chestshop.listeners.ShopBreakListener;
 import com.spygstudios.chestshop.listeners.ShopInteractListener;
+import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
+import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
+import com.spygstudios.chestshop.listeners.gui.PlayerChatListener;
 import com.spygstudios.chestshop.shop.ShopFile;
 
 import lombok.Getter;
@@ -23,15 +26,18 @@ public class ChestShop extends JavaPlugin {
     private Economy economy;
 
     @Getter
-    private GuisConfig guisConfig;
+    private GuiConfig guisConfig;
 
     public void onEnable() {
         instance = this;
         conf = new Config(this);
-        guisConfig = new GuisConfig(this);
+        guisConfig = new GuiConfig(this);
         new CommandListener(this, "spygchestshop");
         new ShopInteractListener(this);
         new ShopBreakListener(this);
+        new InventoryClickListener(instance);
+        new InventoryCloseListener(instance);
+        new PlayerChatListener(instance);
 
         getLogger().info("Loading economy plugin...");
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);

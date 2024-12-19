@@ -4,11 +4,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.gui.MainGui;
-import com.spygstudios.chestshop.gui.MainGui.ShopHolder;
+import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.spyglib.persistentdata.PersistentData;
 
 public class InventoryClickListener implements Listener {
@@ -22,48 +23,49 @@ public class InventoryClickListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getClickedInventory() == null || event.getClickedInventory().getType().equals(InventoryType.PLAYER)) {
+            return;
+        }
+        event.setCancelled(true);
 
-        if (event.getClickedInventory() == null) {
+        ItemStack clickedItem = event.getCurrentItem();
+        if (clickedItem == null) {
             return;
         }
 
-        ItemStack item = event.getCurrentItem();
-
-        if (item == null) {
-            return;
-        }
-
-        if (event.getInventory().getHolder() instanceof MainGui) {
-            mainGui(event);
+        if (event.getInventory().getHolder() instanceof ShopHolder) {
+            shopGui(event);
             return;
         }
     }
 
-    private void requestingGui(InventoryClickEvent event) {
-
-        int slot = event.getSlot();
-
-        // if (slot != 13 && event.getClickedInventory().getHolder() instanceof
-        // ItemRequestingHolder) {
-        // event.setCancelled(true);
-        // }
-
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent event) {
+        if (event.getCursor() == null) {
+            return;
+        }
+        System.out.println(event.getCursor().getType());
     }
 
-    private void mainGui(InventoryClickEvent event) {
+    private void shopGui(InventoryClickEvent event) {
         PersistentData data = new PersistentData(plugin, event.getCurrentItem());
-
         String action = data.getString("action");
-
         if (action == null) {
             return;
         }
 
-        event.setCancelled(true);
-
         Player player = ((ShopHolder) event.getInventory().getHolder()).getPlayer();
 
         switch (action) {
+        case "change-material":
+            if (event.getCursor() == null || event.getCursor().getType().isAir() || event.getCursor().getType().equals(event.getCurrentItem().getType())) {
+                return;
+            }
+            event.getInventory().setItem(13, new ItemStack(event.getCursor()));
+            PersistentData newData = new PersistentData(plugin, event.getInventory().getItem(13));
+            newData.set("action", "change-material");
+            newData.save();
+            break;
         case "close":
             player.closeInventory();
             break;

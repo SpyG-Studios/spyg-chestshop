@@ -39,7 +39,6 @@ public class Shop {
     private int amount;
 
     @Getter
-    @Setter
     private Material material;
 
     @Getter
@@ -82,6 +81,12 @@ public class Shop {
 
     public String getMaterialString() {
         return material == null ? plugin.getConf().getString("shops.unknown-material") : material.toString();
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
+        setShopSign();
+        ShopFile.getShopFile(owner).setMaterial(name, material);
     }
 
 

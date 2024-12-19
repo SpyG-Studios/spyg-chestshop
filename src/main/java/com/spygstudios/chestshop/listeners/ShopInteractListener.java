@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.chestshop.gui.ShopGui;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
 
@@ -20,8 +21,11 @@ import net.milkbowl.vault.economy.EconomyResponse;
 
 public class ShopInteractListener implements Listener {
 
+    private final ChestShop plugin;
+
     public ShopInteractListener(ChestShop plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        this.plugin = plugin;
     }
 
     @EventHandler
@@ -47,7 +51,7 @@ public class ShopInteractListener implements Listener {
             if (shop.getChestLocation().equals(location)) {
                 return;
             }
-            // shop.openShop(player);
+            ShopGui.open(plugin, player, shop);
             event.setCancelled(true);
             return;
         }
