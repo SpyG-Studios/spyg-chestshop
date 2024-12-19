@@ -7,8 +7,9 @@ import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.listeners.CommandListener;
-import com.spygstudios.chestshop.listeners.ShopBreakListener;
-import com.spygstudios.chestshop.listeners.ShopInteractListener;
+import com.spygstudios.chestshop.listeners.ExplosionListener;
+import com.spygstudios.chestshop.listeners.BreakListener;
+import com.spygstudios.chestshop.listeners.InteractListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
 import com.spygstudios.chestshop.listeners.gui.PlayerChatListener;
@@ -26,18 +27,19 @@ public class ChestShop extends JavaPlugin {
     private Economy economy;
 
     @Getter
-    private GuiConfig guisConfig;
+    private GuiConfig guiConfig;
 
     public void onEnable() {
         instance = this;
         conf = new Config(this);
-        guisConfig = new GuiConfig(this);
+        guiConfig = new GuiConfig(this);
         new CommandListener(this, "spygchestshop");
-        new ShopInteractListener(this);
-        new ShopBreakListener(this);
+        new InteractListener(this);
+        new BreakListener(this);
         new InventoryClickListener(instance);
         new InventoryCloseListener(instance);
         new PlayerChatListener(instance);
+        new ExplosionListener(instance);
 
         getLogger().info("Loading economy plugin...");
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);

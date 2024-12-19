@@ -12,7 +12,7 @@ import net.kyori.adventure.text.Component;
 public enum Message {
     ENTER_AMOUNT_CANCELLED("enter-amount-cancelled", "%prefix% &cAmount entering cancelled!"),
     ENTER_AMOUNT_INVALID("enter-amount-invalid", "%prefix% &cInvalid amount! (&e%entered%&c)"),
-    ENTER_AMOUNT("enter-amount-prompt", "%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel)::"),
+    ENTER_AMOUNT("enter-amount-prompt", "%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel):"),
 
     CONFIG_RELOADED("config-reloaded", "%prefix% &aConfig reloaded successfully!"), 
     NO_PERMISSION("no-permission", "%prefix% &cYou don't have permission to do that!"), 
@@ -37,13 +37,14 @@ public enum Message {
 
     SHOP_NO_CHEST("shop.no-chest", "%prefix% &cYou need to look at a chest to create a shop!"), 
     SHOP_EMPTY("shop.empty", "%prefix% &cThe shop is empty!"),
+    SHOP_EXPLODED("shop.exploded", "%prefix% &cYour %shop-name% shop exploded! &7&o(&f%shop-location%&7)"),
     SHOP_NO_PERMISSION("shop.no-permission", "%prefix% &cYou don't have permission to use this shop!"), 
     SHOP_NO_SHOPS("shop.no-shops", "%prefix% &cYou don't have any shops!"),
     SHOP_NOT_FOUND("shop.not-found", "%prefix% &cShop not found!"),
     SHOP_NOT_OWNER("shop.not-owner", "%prefix% &cYou are not the owner of this shop!"),
     SHOP_REMOVED("shop.removed", "%prefix% &cShop &f%shop-name% &cremoved!"), 
     SHOP_SETUP_NEEDED("shop.setup-needed", "%prefix% &cThis shop is not set up properly!"),
-    SHOP_SOLD("shop.sold", "%prefix% &aYou sold &f%material% &afor &f$%price%&a, to %player-name%! &7(&8%items-left%&7)"),;
+    SHOP_SOLD("shop.sold", "%prefix% &aYou sold &f%material% &afor &f$%price%&a, to %player-name%! &7(&8%items-left%&7)");
 
     private String node;
     private String defaultMessage;

@@ -15,9 +15,9 @@ import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.components.ComponentUtils;
 
-public class ShopBreakListener implements Listener {
+public class BreakListener implements Listener {
 
-    public ShopBreakListener(ChestShop plugin) {
+    public BreakListener(ChestShop plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
@@ -33,7 +33,7 @@ public class ShopBreakListener implements Listener {
         if (shop == null) {
             return;
         }
-        if (!shop.getOwner().equals(player.getUniqueId())) {
+        if (!shop.getOwnerId().equals(player.getUniqueId())) {
             event.setCancelled(true);
             return;
         }
