@@ -1,5 +1,6 @@
 package com.spygstudios.chestshop.gui;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -10,11 +11,12 @@ import com.spygstudios.spyglib.color.TranslateColor;
 
 import lombok.Getter;
 
-public class MainGui {
-    public static void open(ChestShop plugin, Player player, String material, int amount, double price) {
+public class ShopGui {
+    public static void open(ChestShop plugin, Player player, Material material, int amount, double price) {
         GuisConfig config = plugin.getGuisConfig();
+        material = material == null ? Material.AIR : material;
         Inventory inventory = player.getServer().createInventory(new ShopHolder(player, material, amount, price), 27,
-                TranslateColor.translate(config.getString("item_adding.title").replace("%material%", material).replace("%amount%", String.valueOf(amount))));
+                TranslateColor.translate(config.getString("item_adding.title").replace("%material%", material.name()).replace("%amount%", String.valueOf(amount))));
 
         player.openInventory(inventory);
     }
@@ -25,7 +27,7 @@ public class MainGui {
         private final Player player;
 
         @Getter
-        private final String material;
+        private final Material material;
 
         @Getter
         private final int amount;
@@ -33,7 +35,7 @@ public class MainGui {
         @Getter
         private final double price;
 
-        public ShopHolder(Player player, String material, int amount, double price) {
+        public ShopHolder(Player player, Material material, int amount, double price) {
             this.player = player;
             this.material = material;
             this.amount = amount;
