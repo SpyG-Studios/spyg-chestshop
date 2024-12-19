@@ -1,9 +1,9 @@
 package com.spygstudios.chestshop.listeners.gui;
 
-import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
@@ -26,12 +26,12 @@ public class InventoryCloseListener implements Listener {
     }
 
     private void itemAdding(InventoryCloseEvent event, ShopHolder holdder) {
-        Material material = event.getInventory().getItem(13).getType();
+        ItemStack item = event.getInventory().getItem(13);
         Shop shop = holdder.getShop();
-        if (material == Material.AIR || material.equals(shop.getMaterial())) {
+        if (item == null || item.getType().equals(shop.getMaterial())) {
             return;
         }
-        shop.setMaterial(material);
+        shop.setMaterial(item.getType());
     }
 
 }
