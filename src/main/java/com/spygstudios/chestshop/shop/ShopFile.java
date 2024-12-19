@@ -17,9 +17,13 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.spyglib.location.LocationUtils;
 import com.spygstudios.spyglib.yamlmanager.YamlManager;
 
+import lombok.Getter;
+
 public class ShopFile extends YamlManager {
-    private static boolean toSave = false;
+    @Getter
     private UUID ownerId;
+    @Getter
+    private boolean isSaved;
 
     public ShopFile(ChestShop plugin, Player owner) {
         this(plugin, owner.getUniqueId());
@@ -32,7 +36,7 @@ public class ShopFile extends YamlManager {
         }
         set("shops", null);
         SHOPS_FILES.put(ownerId, this);
-        toSave = true;
+        isSaved = true;
     }
 
     public Set<String> getPlayerShops() {
@@ -46,7 +50,7 @@ public class ShopFile extends YamlManager {
         for (String shop : getPlayerShops()) {
             if (shop.equalsIgnoreCase(shopName)) {
                 overwriteSet("shops." + shop, null);
-                toSave = true;
+                isSaved = false;
                 return;
             }
         }
@@ -59,11 +63,7 @@ public class ShopFile extends YamlManager {
         set("shops." + shop.getName() + ".location", LocationUtils.fromLocation(shop.getChestLocation(), true));
         set("shops." + shop.getName() + ".do-notify", shop.isNotify());
         set("shops." + shop.getName() + ".created", getDateString());
-        toSave = true;
-    }
-
-    public UUID getOwnerId() {
-        return ownerId;
+        isSaved = false;
     }
 
     private static void setDefaultValues(ShopFile shopFile) {
@@ -73,8 +73,8 @@ public class ShopFile extends YamlManager {
             shopFile.set(shopPath + ".amount", 0);
             shopFile.set(shopPath + ".do-notify", false);
             shopFile.set(shopPath + ".created", getDateString());
+            shopFile.isSaved = false;
         }
-        toSave = true;
     }
 
     private static String getDateString() {
@@ -83,9 +83,11 @@ public class ShopFile extends YamlManager {
     }
 
     public static void loadShopFiles(ChestShop plugin) {
+        plugin.getLogger().info("Loading shops...");
         File shopsFolder = new File(plugin.getDataFolder(), "shops");
         if (!shopsFolder.exists()) {
             shopsFolder.mkdirs();
+            plugin.getLogger().info("Shops loaded!");
             return;
         }
         for (File file : shopsFolder.listFiles()) {
@@ -115,6 +117,7 @@ public class ShopFile extends YamlManager {
                 }
             }
         }
+        plugin.getLogger().info("Shops loaded!");
     }
 
     public static ShopFile getShopFile(UUID ownerId) {
@@ -146,11 +149,12 @@ public class ShopFile extends YamlManager {
     }
 
     public static void saveShops() {
-        if (toSave) {
-            for (ShopFile shopFile : SHOPS_FILES.values()) {
-                shopFile.saveConfig();
+        for (ShopFile shopFile : SHOPS_FILES.values()) {
+            if (shopFile.isSaved()) {
+                continue;
             }
-            toSave = false;
+            shopFile.saveConfig();
+            shopFile.isSaved = true;
         }
     }
 }

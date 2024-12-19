@@ -58,6 +58,10 @@ public class ShopInteractListener implements Listener {
             Message.SHOP_NOT_OWNER.sendMessage(player);
             return;
         }
+        if (shop.getSignLocation().equals(location)) {
+            Message.SHOP_NO_PERMISSION.sendMessage(player);
+            return;
+        }
         if (shop.getMaterial() == null || shop.getAmount() == 0) {
             Message.SHOP_SETUP_NEEDED.sendMessage(player);
             return;
@@ -81,7 +85,8 @@ public class ShopInteractListener implements Listener {
             Message.SHOP_BOUGHT.sendMessage(player, Map.of("%price%", String.valueOf(price), "%material%", shop.getMaterial().name(), "%items-left%", String.valueOf(itemsLeft)));
             Player owner = Bukkit.getPlayer(shop.getOwner());
             if (shop.isNotify() && owner != null) {
-                Message.SHOP_SOLD.sendMessage(owner, Map.of("%price%", String.valueOf(price), "%material%", shop.getMaterial().name(), "%player-name%", player.getName(), "%items-left%", String.valueOf(itemsLeft)));
+                Message.SHOP_SOLD.sendMessage(owner,
+                        Map.of("%price%", String.valueOf(price), "%material%", shop.getMaterial().name(), "%player-name%", player.getName(), "%items-left%", String.valueOf(itemsLeft)));
             }
             return;
         }

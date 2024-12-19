@@ -10,6 +10,10 @@ import com.spygstudios.spyglib.components.ComponentUtils;
 import net.kyori.adventure.text.Component;
 
 public enum Message {
+    ENTER_AMOUNT_CANCELLED("enter-amount-cancelled", "%prefix% &cAmount entering cancelled!"),
+    ENTER_AMOUNT_INVALID("enter-amount-invalid", "%prefix% &cInvalid amount! (&e%entered%&c)"),
+    ENTER_AMOUNT("enter-amount-prompt", "%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel)::"),
+
     CONFIG_RELOADED("config-reloaded", "%prefix% &aConfig reloaded successfully!"), 
     NO_PERMISSION("no-permission", "%prefix% &cYou don't have permission to do that!"), 
     NOT_ENOUGH_MONEY("not-enough-money", "%prefix% &cYou don't have enough money! ($%price%)"), 

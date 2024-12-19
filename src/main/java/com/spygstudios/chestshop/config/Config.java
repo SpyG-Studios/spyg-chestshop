@@ -11,6 +11,7 @@ public class Config extends YamlManager {
         super("config.yml", plugin);
 
         set("prefix", "&8[&#ffbc1fChest&#ff711fShop&8] &7»&f");
+        set("cancle", "cancel");
 
         set("shops.disabled-worlds", Arrays.asList("disabled_world"));
         set("shops.unknown-material", "-", Arrays.asList("The material text to use when the material is unknown."));
