@@ -44,6 +44,7 @@ public enum Message {
     SHOP_NOT_OWNER("shop.not-owner", "%prefix% &cYou are not the owner of this shop!"),
     SHOP_REMOVED("shop.removed", "%prefix% &cShop &f%shop-name% &cremoved!"), 
     SHOP_SETUP_NEEDED("shop.setup-needed", "%prefix% &cThis shop is not set up properly!"),
+    SHOP_NAME_TOO_SHORT("shop.name-too-short", "%prefix% &cShop name is too short!"),
     SHOP_SOLD("shop.sold", "%prefix% &aYou sold &f%material% &afor &f$%price%&a, to %player-name%! &7(&8%items-left%&7)");
 
     private String node;

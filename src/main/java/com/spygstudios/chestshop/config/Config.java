@@ -19,6 +19,7 @@ public class Config extends YamlManager {
         set("shops.save-interval", 60, Arrays.asList("The interval in seconds to save the shops data."));
 
         set("shop.anti-explosion", true, Arrays.asList("Prevent shops from being destroyed by explosions."));
+        set("shop.triggers", Arrays.asList("[chestshop]", "[cs]"), Arrays.asList("The sign text that triggers a shop."));
         set("shop.sign.line.1", "&7[&aShop&7]", Arrays.asList("You can customize the sign lines here."));
         set("shop.sign.line.2", "%owner%");
         set("shop.sign.line.3", "&#1a652a$&0%price%/%amount%");

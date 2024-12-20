@@ -111,7 +111,8 @@ public class ShopFile extends YamlManager {
                         String shopPath = "shops." + shopName;
                         String locationString = shopFile.getString(shopPath + ".location");
                         if (locationString == null) {
-                            plugin.getLogger().warning("Invalid shop file: " + file.getName());
+                            plugin.getLogger().warning("Invalid shop file: " + file.getName() + " (location is null) removing shop...");
+                            shopFile.removeShop(shopName);
                             continue;
                         }
                         Location location = LocationUtils.toLocation(locationString);
@@ -121,7 +122,7 @@ public class ShopFile extends YamlManager {
                         new Shop(ownerId, shopName, shopFile);
                     }
                 } catch (IllegalArgumentException e) {
-                    plugin.getLogger().warning("Invalid shop file: " + file.getName());
+                    plugin.getLogger().warning("Invalid shop file: " + file.getName() + " (invalid UUID)");
                 }
             }
         }

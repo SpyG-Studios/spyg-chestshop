@@ -14,6 +14,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.block.sign.Side;
 import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
@@ -123,21 +124,16 @@ public class Shop {
             removeShop(this);
             throw new IllegalArgumentException("Block is not a chest, Shop removed! Location: " + chestLocation);
         }
-        System.out.println("Setting shop sign");
         BlockFace chestFacing = getChestFace(chestLocation.getBlock());
         Location signLocation = chestLocation.clone().add(chestFacing.getModX(), chestFacing.getModY(), chestFacing.getModZ());
         Block signBlock = signLocation.getBlock();
-        if (signBlock.getType() != Material.OAK_WALL_SIGN && signBlock.getType() != Material.AIR) {
+        if (!(signBlock.getBlockData() instanceof WallSign) && signBlock.getType() != Material.AIR) {
             Bukkit.getLogger().warning("Shop sign is not a sign or air, removing shop! " + getName() + " at " + getChestLocationString());
             remove();
             return;
         }
-        signBlock.setType(Material.OAK_WALL_SIGN);
+
         Sign sign = (Sign) signLocation.getBlock().getState();
-        if (sign.getBlockData() instanceof Directional directional) {
-            directional.setFacing(chestFacing);
-            sign.setBlockData(directional);
-        }
         SignSide side = sign.getSide(Side.FRONT);
         for (int i = 0; i < 4; i++) {
             side.line(i, TranslateColor.translate(plugin.getConf().getString("shop.sign.line." + (i + 1)).replace("%owner%", Bukkit.getOfflinePlayer(ownerId).getName())

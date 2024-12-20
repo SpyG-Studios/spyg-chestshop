@@ -2,11 +2,8 @@ package com.spygstudios.chestshop.listeners;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -116,48 +113,6 @@ public class CommandListener implements CommandExecutor, Listener {
             }
         }
 
-        if (args.length == 2) {
-            if (args[0].equalsIgnoreCase("create")) {
-                Block targetBlock = player.getTargetBlock((Set<Material>) null, 4);
-                if (targetBlock == null || targetBlock.getType() != Material.CHEST) {
-                    Message.SHOP_NO_CHEST.sendMessage(player);
-                    return true;
-                }
-
-                if (Shop.isDisabledWorld(player.getWorld())) {
-                    Message.SHOP_DISABLED_WORLD.sendMessage(player);
-                    return true;
-                }
-
-                String name = args[1].trim();
-                ShopFile file = ShopFile.getShopFile(player);
-                if (file == null) {
-                    file = new ShopFile(ChestShop.getInstance(), player);
-                } else if (file.getPlayerShops().contains(name)) {
-                    Message.SHOP_ALREADY_EXISTS.sendMessage(player, Map.of("%shop-name%", name));
-                    return true;
-                }
-
-                if (Shop.getShop(targetBlock.getLocation()) != null || (Shop.isDoubleChest(targetBlock) && Shop.getShop(Shop.getAdjacentChest(targetBlock).getLocation()) != null)) {
-                    Message.SHOP_CHEST_ALREADY_SHOP.sendMessage(player);
-                    return true;
-                }
-
-                if (!Shop.isChestFaceFree(targetBlock)) {
-                    Message.SHOP_CHEST_FACE_NOT_FREE.sendMessage(player);
-                    return true;
-                }
-
-                if (config.getInt("shops.max-shops") != 0 && file.getPlayerShops().size() >= config.getInt("shops.max-shops")) {
-                    Message.SHOP_LIMIT_REACHED.sendMessage(player, Map.of("%shop-limit%", String.valueOf(config.getInt("shops.max-shops"))));
-                    return true;
-                }
-
-                file.addShop(player, name, targetBlock.getLocation());
-                Message.SHOP_CREATED.sendMessage(player, Map.of("%shop-name%", name));
-                return true;
-            }
-        }
         return true;
     }
 

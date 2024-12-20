@@ -10,6 +10,7 @@ import com.spygstudios.chestshop.listeners.CommandListener;
 import com.spygstudios.chestshop.listeners.ExplosionListener;
 import com.spygstudios.chestshop.listeners.BreakListener;
 import com.spygstudios.chestshop.listeners.InteractListener;
+import com.spygstudios.chestshop.listeners.SignListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
 import com.spygstudios.chestshop.listeners.gui.PlayerChatListener;
@@ -40,6 +41,7 @@ public class ChestShop extends JavaPlugin {
         new InventoryCloseListener(instance);
         new PlayerChatListener(instance);
         new ExplosionListener(instance);
+        new SignListener(instance);
 
         getLogger().info("Loading economy plugin...");
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
