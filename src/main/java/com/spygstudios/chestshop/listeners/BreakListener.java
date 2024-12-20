@@ -3,7 +3,6 @@ package com.spygstudios.chestshop.listeners;
 import java.util.Map;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,11 +33,9 @@ public class BreakListener implements Listener {
             return;
         }
         if (!shop.getOwnerId().equals(player.getUniqueId())) {
+            Message.SHOP_NOT_OWNER.sendMessage(player);
             event.setCancelled(true);
             return;
-        }
-        if (block.getType().equals(Material.OAK_WALL_SIGN)) {
-            block.setType(Material.AIR);
         }
         shop.remove();
         player.sendMessage(ComponentUtils.replaceComponent(Message.SHOP_REMOVED.get(), Map.of("%shop-name%", shop.getName())));

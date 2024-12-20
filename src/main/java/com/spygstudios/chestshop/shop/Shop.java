@@ -146,10 +146,6 @@ public class Shop {
 
     public void remove() {
         Shop.removeShop(this);
-        if (signLocation == null) {
-            return;
-        }
-        signLocation.getBlock().setType(Material.AIR);
     }
 
     public void sell(Player buyer) {
