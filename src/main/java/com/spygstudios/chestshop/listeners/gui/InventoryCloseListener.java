@@ -31,6 +31,10 @@ public class InventoryCloseListener implements Listener {
         if (item == null || item.getType().equals(shop.getMaterial())) {
             return;
         }
+
+        if (item.getItemMeta().displayName() != null) {
+            return;
+        }
         shop.setMaterial(item.getType());
     }
 
