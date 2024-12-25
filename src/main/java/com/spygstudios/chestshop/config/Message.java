@@ -29,7 +29,8 @@ public enum Message {
     SHOP_LIMIT_REACHED("shop.limit-reached", "%prefix% &cYou have reached the shop limit! (&e%shop-limit%&c)"), 
     
     SHOP_LIST_HEAD("shop.list.header", "%prefix% &aYour shops:"), 
-    SHOP_LIST_SHOPS("shop.list.shops", "&7- &f%shop-name% &7(&f%material%&7) &7- &#1a652a$&f%price%&7/&f%amount% &7items left: &8%items-left%"),
+    SHOP_LIST_SHOPS("shop.list.shops", "&7- &f%shop-name%"),
+    SHOP_LIST_SHOPS_HOVER("shop.list.shops-hover", " &8- &7material: &f%material%\n &8- &7price: &f$%price%\n &8- &7amount: &f%amount%\n &8- &7items left: &f%items-left%\n &8- &7location: &f%location%\n &8- &7created at: &f%created%"),
     SHOP_LIST_CURRENT_PAGE("shop.list.current-page", "&7[&e&l%page%&r&7]"),
     SHOP_LIST_NEXT("shop.list.next", " &7[&eNext&7]"),
     SHOP_LIST_BACK("shop.list.back", "&7[&cBack&7]"),

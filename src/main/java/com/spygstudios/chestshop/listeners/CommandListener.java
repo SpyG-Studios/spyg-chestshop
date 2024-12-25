@@ -23,6 +23,7 @@ import com.spygstudios.spyglib.inventory.InventoryUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent.Builder;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.event.ClickEvent.Action;
 
 public class CommandListener implements CommandExecutor, Listener {
@@ -77,9 +78,12 @@ public class CommandListener implements CommandExecutor, Listener {
 
                 for (Shop shop : shops) {
                     Chest chest = (Chest) shop.getChestLocation().getBlock().getState();
+
                     String itemsLeft = String.valueOf(InventoryUtils.countItems(chest.getInventory(), shop.getMaterial()));
-                    Message.SHOP_LIST_SHOPS.sendMessage(player, Map.of("%shop-name%", shop.getName(), "%material%", shop.getMaterialString(), "%price%", shop.getPrice() + "", "%amount%",
-                            shop.getAmount() + "", "%items-left%", itemsLeft));
+                    Component hoverMessage = ComponentUtils.replaceComponent(Message.SHOP_LIST_SHOPS_HOVER.get(),
+                            Map.of("%shop-name%", shop.getName(), "%material%", shop.getMaterialString(), "%price%", shop.getPrice() + "", "%amount%", shop.getAmount() + "", "%items-left%", itemsLeft,
+                                    "%location%", shop.getChestLocationString(), "%created%", shop.getCreatedAt()));
+                    player.sendMessage(ComponentUtils.replaceComponent(Message.SHOP_LIST_SHOPS.get(), "%shop-name%", shop.getName()).hoverEvent(HoverEvent.showText(hoverMessage)));
                 }
 
                 int pages = (int) Math.ceil((double) file.getPlayerShops().size() / 10);
