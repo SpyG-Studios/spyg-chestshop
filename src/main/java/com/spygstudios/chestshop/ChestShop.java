@@ -3,12 +3,12 @@ package com.spygstudios.chestshop;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.spygstudios.chestshop.commands.CommandHandler;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
-import com.spygstudios.chestshop.listeners.CommandListener;
-import com.spygstudios.chestshop.listeners.ExplosionListener;
 import com.spygstudios.chestshop.listeners.BreakListener;
+import com.spygstudios.chestshop.listeners.ExplosionListener;
 import com.spygstudios.chestshop.listeners.InteractListener;
 import com.spygstudios.chestshop.listeners.SignListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
@@ -30,11 +30,14 @@ public class ChestShop extends JavaPlugin {
     @Getter
     private GuiConfig guiConfig;
 
+    @Getter
+    private CommandHandler commandHandler;
+
     public void onEnable() {
         instance = this;
         conf = new Config(this);
         guiConfig = new GuiConfig(this);
-        new CommandListener(this, "spygchestshop");
+        commandHandler = new CommandHandler(instance);
         new InteractListener(this);
         new BreakListener(this);
         new InventoryClickListener(instance);
@@ -61,6 +64,7 @@ public class ChestShop extends JavaPlugin {
     }
 
     public void onDisable() {
+        commandHandler.unregister();
         ShopFile.saveShops();
         getLogger().info("<plugin> v. <version> plugin has been disabled!".replace("<plugin>", getName()).replace("<version>", getPluginMeta().getVersion()));
     }

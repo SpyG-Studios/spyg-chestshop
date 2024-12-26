@@ -44,12 +44,12 @@ public class PlayerChatListener implements Listener {
         try {
             amount = Double.parseDouble(message);
         } catch (NumberFormatException e) {
-            Message.ENTER_AMOUNT_INVALID.sendMessage(player, Map.of("%entered%", message));
+            Message.INVALID_NUMBER.sendMessage(player, Map.of("%entered%", message));
             return;
         }
 
         if (amount < 0) {
-            Message.ENTER_AMOUNT_INVALID.sendMessage(player, Map.of("%entered%", message));
+            Message.INVALID_NUMBER.sendMessage(player, Map.of("%entered%", message));
             return;
         }
        

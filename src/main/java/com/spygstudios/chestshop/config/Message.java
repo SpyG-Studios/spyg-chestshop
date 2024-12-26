@@ -11,8 +11,9 @@ import net.kyori.adventure.text.Component;
 
 public enum Message {
     ENTER_AMOUNT_CANCELLED("enter-amount-cancelled", "%prefix% &cAmount entering cancelled!"),
-    ENTER_AMOUNT_INVALID("enter-amount-invalid", "%prefix% &cInvalid amount! (&e%entered%&c)"),
     ENTER_AMOUNT("enter-amount-prompt", "%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel):"),
+    
+    INVALID_NUMBER("invalid-number", "%prefix% &cInvalid number! (&e%entered%&c)"),
 
     CONFIG_RELOADED("config-reloaded", "%prefix% &aConfig reloaded successfully!"), 
     NO_PERMISSION("no-permission", "%prefix% &cYou don't have permission to do that!"), 
@@ -38,6 +39,7 @@ public enum Message {
 
     SHOP_NO_CHEST("shop.no-chest", "%prefix% &cYou need to look at a chest to create a shop!"), 
     SHOP_EMPTY("shop.empty", "%prefix% &cThe shop is empty!"),
+    SHOP_INVENTORY_FULL("shop.inventory-full", "%prefix% &cYour inventory is full!"),
     SHOP_EXPLODED("shop.exploded", "%prefix% &cYour %shop-name% shop exploded! &7&o(&f%shop-location%&7)"),
     SHOP_NO_PERMISSION("shop.no-permission", "%prefix% &cYou don't have permission to use this shop!"), 
     SHOP_NO_SHOPS("shop.no-shops", "%prefix% &cYou don't have any shops!"),
