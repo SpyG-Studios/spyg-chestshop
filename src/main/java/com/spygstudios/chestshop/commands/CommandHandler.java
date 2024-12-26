@@ -6,6 +6,7 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.commands.arguments.IntegerArgument;
 
 import dev.rollczi.litecommands.LiteCommands;
+import dev.rollczi.litecommands.adventure.LiteAdventureExtension;
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory;
 import lombok.Getter;
 
@@ -15,8 +16,8 @@ public class CommandHandler {
     private LiteCommands<CommandSender> commands;
 
     public CommandHandler(ChestShop plugin) {
-        commands = LiteBukkitFactory.builder("spygchestshop", plugin).commands(new Reload(plugin), new ShopList()).invalidUsage(new InvUsageHandler()).argument(Integer.class, new IntegerArgument())
-                .build();
+        commands = LiteBukkitFactory.builder("spygchestshop", plugin).commands(new Reload(plugin), new ShopList()).invalidUsage(new InvUsageHandler()).extension(new LiteAdventureExtension<>())
+                .argument(Integer.class, new IntegerArgument()).build();
     }
 
     public void unregister() {

@@ -84,6 +84,7 @@ public class Shop {
         createdAt = shopFile.getString("shops." + name + ".created");
         isNotify = shopFile.getBoolean("shops." + name + ".do-notify");
 
+        SHOPS.add(this);
         setShopSign();
     }
 
@@ -141,7 +142,6 @@ public class Shop {
         }
         sign.update();
         this.signLocation = signLocation;
-        SHOPS.add(this);
     }
 
     public void remove() {
