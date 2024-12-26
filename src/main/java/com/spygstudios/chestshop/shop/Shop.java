@@ -163,6 +163,10 @@ public class Shop {
         }
         itemCount = getAmount() > itemCount ? itemCount : getAmount();
         itemsLeft -= itemCount;
+        if (!InventoryUtils.hasFreeSlot(buyer)) {
+            Message.SHOP_INVENTORY_FULL.sendMessage(buyer);
+            return;
+        }
         double price = getPriceForEach() * itemCount;
         EconomyResponse response = plugin.getEconomy().withdrawPlayer(buyer, getPrice());
         if (response.transactionSuccess()) {
