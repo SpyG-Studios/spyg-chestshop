@@ -2,6 +2,8 @@ package com.spygstudios.chestshop.commands;
 
 import org.bukkit.command.CommandSender;
 
+import com.spygstudios.spyglib.color.TranslateColor;
+
 import dev.rollczi.litecommands.handler.result.ResultHandlerChain;
 import dev.rollczi.litecommands.invalidusage.InvalidUsage;
 import dev.rollczi.litecommands.invalidusage.InvalidUsageHandler;
@@ -15,15 +17,21 @@ public class InvUsageHandler implements InvalidUsageHandler<CommandSender> {
         Schematic schematic = result.getSchematic();
         CommandSender sender = invocation.sender();
         if (schematic.isOnlyFirst()) {
-            sender.sendMessage("Ez így nem fain");
+            sender.sendMessage(TranslateColor.translate("&cHelytelen használat!"));
             return;
         }
 
         sender.sendMessage("Összes parancs:");
         for (String scheme : schematic.all()) {
-            sender.sendMessage("§8 - §7" + scheme);
+            sender.sendMessage(TranslateColor.translate("&8- " + getCommand(scheme, invocation.label())));
         }
 
+    }
+
+    private String getCommand(String scheme, String label) {
+        String[] args = scheme.split(" ");
+        args[0] = "&7/" + label;
+        return String.join(" ", args);
     }
 
 }

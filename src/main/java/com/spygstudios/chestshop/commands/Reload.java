@@ -1,6 +1,6 @@
 package com.spygstudios.chestshop.commands;
 
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
@@ -24,7 +24,7 @@ public class Reload {
     }
 
     @Execute
-    public void onReload(@Context Player player) {
+    public void onReload(@Context CommandSender player) {
         config.reloadConfig();
         guiConfig.reloadConfig();
         Message.CONFIG_RELOADED.sendMessage(player);

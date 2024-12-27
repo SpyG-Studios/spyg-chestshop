@@ -37,6 +37,7 @@ public class ChestShop extends JavaPlugin {
         instance = this;
         conf = new Config(this);
         guiConfig = new GuiConfig(this);
+        Message.init(conf);
         commandHandler = new CommandHandler(instance);
         new InteractListener(this);
         new BreakListener(this);
@@ -58,13 +59,14 @@ public class ChestShop extends JavaPlugin {
 
         ShopFile.loadShopFiles(instance);
 
-        Message.init(conf);
         ShopFile.startSaveScheduler(instance);
         getLogger().info("<plugin> v. <version> plugin has been enabled!".replace("<plugin>", getName()).replace("<version>", getPluginMeta().getVersion()));
     }
 
     public void onDisable() {
-        commandHandler.unregister();
+        if (commandHandler != null) {
+            commandHandler.unregister();
+        }
         ShopFile.saveShops();
         getLogger().info("<plugin> v. <version> plugin has been disabled!".replace("<plugin>", getName()).replace("<version>", getPluginMeta().getVersion()));
     }
