@@ -30,7 +30,7 @@ public class InvUsageHandler implements InvalidUsageHandler<CommandSender> {
 
     private String getCommand(String scheme, String label) {
         String[] args = scheme.split(" ");
-        args[0] = "&7/" + label;
+        args[0] = "&7/" + label + "&f";
         return String.join(" ", args);
     }
 
