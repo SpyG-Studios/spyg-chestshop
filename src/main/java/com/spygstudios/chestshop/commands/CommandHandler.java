@@ -20,7 +20,7 @@ public class CommandHandler {
 
     public CommandHandler(ChestShop plugin) {
         commands = LiteBukkitFactory.builder("spygchestshop", plugin).commands(new Reload(plugin), new ShopList()).message(LiteBukkitMessages.PLAYER_ONLY, Message.PLAYER_ONLY.get())
-                .message(LiteMessages.MISSING_PERMISSIONS, Message.NO_PERMISSION.get()).invalidUsage(new InvUsageHandler()).extension(new LiteAdventureExtension<>())
+                .message(LiteMessages.MISSING_PERMISSIONS, Message.NO_PERMISSION.get()).invalidUsage(new InvalUsage()).extension(new LiteAdventureExtension<>())
                 .argument(Integer.class, new IntegerArgument()).build();
     }
 

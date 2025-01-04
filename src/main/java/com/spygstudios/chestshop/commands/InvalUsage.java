@@ -10,7 +10,7 @@ import dev.rollczi.litecommands.invalidusage.InvalidUsageHandler;
 import dev.rollczi.litecommands.invocation.Invocation;
 import dev.rollczi.litecommands.schematic.Schematic;
 
-public class InvUsageHandler implements InvalidUsageHandler<CommandSender> {
+public class InvalUsage implements InvalidUsageHandler<CommandSender> {
 
     @Override
     public void handle(Invocation<CommandSender> invocation, InvalidUsage<CommandSender> result, ResultHandlerChain<CommandSender> chain) {
