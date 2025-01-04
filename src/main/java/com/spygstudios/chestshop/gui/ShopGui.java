@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.GuiConfig;
+import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.item.ItemUtils;
@@ -40,7 +41,7 @@ public class ShopGui {
         }
         inventory.setItem(13, shopMaterial);
         PersistentData materialData = new PersistentData(plugin, inventory.getItem(13));
-        materialData.set("action", "change-material");
+        materialData.set("action", GuiAction.SET_MATERIAL.name());
         materialData.save();
 
         // info item
@@ -55,25 +56,25 @@ public class ShopGui {
         ItemStack notifyItem = ItemUtils.create(Material.BELL, config.getString("shop.notify.title"),
                 Arrays.asList(shop.isNotify() ? config.getString("shop.notify.on") : config.getString("shop.notify.off")));
         PersistentData notifyData = new PersistentData(plugin, notifyItem);
-        notifyData.set("action", "toggle-notify");
+        notifyData.set("action", GuiAction.TOGGLE_NOTIFY.name());
         notifyData.set("shop", shop.getName());
         notifyData.save();
         inventory.setItem(0, notifyItem);
 
         // money item
         ItemStack moneyItem = ItemUtils.create(Material.GOLD_INGOT, config.getString("shop.money.title"), config.getStringList("shop.money.lore"));
-        // PersistentData moneyData = new PersistentData(plugin, moneyItem);
-        // moneyData.set("action", "toggle-notify");
-        // moneyData.set("shop", shop.getName());
-        // moneyData.save();
+        PersistentData moneyData = new PersistentData(plugin, moneyItem);
+        moneyData.set("action", GuiAction.SET_ITEM_PRICE.name());
+        moneyData.set("shop", shop.getName());
+        moneyData.save();
         inventory.setItem(11, moneyItem);
 
         // amount item
         ItemStack amountItem = ItemUtils.create(Material.CHEST, config.getString("shop.amount.title"), config.getStringList("shop.amount.lore"));
-        // PersistentData moneyData = new PersistentData(plugin, moneyItem);
-        // moneyData.set("action", "toggle-notify");
-        // moneyData.set("shop", shop.getName());
-        // moneyData.save();
+        PersistentData amountData = new PersistentData(plugin, amountItem);
+        amountData.set("action", GuiAction.SET_ITEM_AMOUNT.name());
+        amountData.set("shop", shop.getName());
+        amountData.save();
         inventory.setItem(15, amountItem);
     }
 

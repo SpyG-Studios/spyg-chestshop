@@ -38,11 +38,9 @@ public class Shop {
     private UUID ownerId;
 
     @Getter
-    @Setter
-    private double price;
+    private int price;
 
     @Getter
-    @Setter
     private int amount;
 
     @Getter
@@ -77,7 +75,7 @@ public class Shop {
         this.ownerId = ownerId;
         this.name = name;
         this.shopFile = shopFile;
-        price = shopFile.getDouble("shops." + name + ".price");
+        price = shopFile.getInt("shops." + name + ".price");
         amount = shopFile.getInt("shops." + name + ".amount");
         material = Material.getMaterial(shopFile.getString("shops." + name + ".material"));
         chestLocation = LocationUtils.toLocation(shopFile.getString("shops." + name + ".location"));
@@ -88,8 +86,8 @@ public class Shop {
         setShopSign();
     }
 
-    public double getPriceForEach() {
-        return price / amount;
+    public int getPriceForEach() {
+        return (int) Math.round(((double) price / amount));
     }
 
     public String getMaterialString() {
@@ -100,8 +98,8 @@ public class Shop {
         return shopFile.getInt("shops." + name + ".sold-items");
     }
 
-    public double getMoneyEarned() {
-        return shopFile.getDouble("shops." + name + ".money-earned");
+    public int getMoneyEarned() {
+        return shopFile.getInt("shops." + name + ".money-earned");
     }
 
     public String getChestLocationString() {
@@ -110,8 +108,20 @@ public class Shop {
 
     public void setMaterial(Material material) {
         this.material = material;
-        setShopSign();
         ShopFile.getShopFile(ownerId).setMaterial(name, material);
+        setShopSign();
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+        ShopFile.getShopFile(ownerId).setAmount(name, amount);
+        setShopSign();
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+        ShopFile.getShopFile(ownerId).setPrice(name, price);
+        setShopSign();
     }
 
     public void setNotify(boolean notify) {
@@ -167,7 +177,7 @@ public class Shop {
             Message.SHOP_INVENTORY_FULL.sendMessage(buyer);
             return;
         }
-        double price = getPriceForEach() * itemCount;
+        int price = getPriceForEach() * itemCount;
         EconomyResponse response = plugin.getEconomy().withdrawPlayer(buyer, getPrice());
         if (response.transactionSuccess()) {
             ChestShop.getInstance().getEconomy().depositPlayer(Bukkit.getOfflinePlayer(getOwnerId()), price);

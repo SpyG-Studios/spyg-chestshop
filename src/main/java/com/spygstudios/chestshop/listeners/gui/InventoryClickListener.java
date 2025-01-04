@@ -11,7 +11,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
+import com.spygstudios.chestshop.shop.AmountHandler;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.persistentdata.PersistentData;
@@ -47,7 +49,6 @@ public class InventoryClickListener implements Listener {
             return;
         }
         shopGui(event);
-
     }
 
     private void shopGui(InventoryClickEvent event) {
@@ -59,13 +60,13 @@ public class InventoryClickListener implements Listener {
         }
 
         Player player = ((ShopHolder) event.getInventory().getHolder()).getPlayer();
-
-        switch (action) {
-        case "change-material":
+        Shop shop = Shop.getShop(data.getString("shop"));
+        GuiAction guiAction = GuiAction.valueOf(action);
+        switch (guiAction) {
+        case SET_MATERIAL:
             changeShopMaterial(event);
             break;
-        case "toggle-notify":
-            Shop shop = Shop.getShop(data.getString("shop"));
+        case TOGGLE_NOTIFY:
             shop.setNotify(!shop.isNotify());
             ItemStack notifyItem = clickedItem;
             ItemMeta notifyMeta = notifyItem.getItemMeta();
@@ -73,7 +74,15 @@ public class InventoryClickListener implements Listener {
             notifyItem.setItemMeta(notifyMeta);
             player.updateInventory();
             break;
-        case "close":
+        case SET_ITEM_PRICE:
+            new AmountHandler(player, shop, guiAction);
+            event.getInventory().close();
+            break;
+        case SET_ITEM_AMOUNT:
+            new AmountHandler(player, shop, guiAction);
+            event.getInventory().close();
+            break;
+        case CLOSE:
             player.closeInventory();
             break;
         }
@@ -85,7 +94,7 @@ public class InventoryClickListener implements Listener {
         }
         event.getInventory().setItem(13, new ItemStack(event.getCursor().getType()));
         PersistentData newData = new PersistentData(plugin, event.getInventory().getItem(13));
-        newData.set("action", "change-material");
+        newData.set("action", GuiAction.SET_MATERIAL.name());
         newData.save();
     }
 

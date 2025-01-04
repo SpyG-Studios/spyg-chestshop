@@ -11,7 +11,8 @@ import net.kyori.adventure.text.Component;
 
 public enum Message {
     ENTER_AMOUNT_CANCELLED("enter-amount-cancelled", "%prefix% &cAmount entering cancelled!"),
-    ENTER_AMOUNT("enter-amount-prompt", "%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel):"),
+    ENTER_AMOUNT("enter-amount-prompt", "%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel)"),
+    ENTER_AMOUNT_SUCCESS("enter-amount-success", "%prefix% &aAmount set successfully!"),
     
     INVALID_NUMBER("invalid-number", "%prefix% &cInvalid number! (&e%entered%&c)"),
 

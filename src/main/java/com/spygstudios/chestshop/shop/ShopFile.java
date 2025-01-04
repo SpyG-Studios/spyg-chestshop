@@ -71,6 +71,16 @@ public class ShopFile extends YamlManager {
         isSaved = false;
     }
 
+    public void setPrice(String shopName, int price) {
+        overwriteSet("shops." + shopName + ".price", price);
+        isSaved = false;
+    }
+
+    public void setAmount(String shopName, int amount) {
+        overwriteSet("shops." + shopName + ".amount", amount);
+        isSaved = false;
+    }
+
     public void save() {
         isSaved = false;
     }
