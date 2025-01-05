@@ -33,7 +33,7 @@ public class BreakListener implements Listener {
             return;
         }
         if (!shop.getOwnerId().equals(player.getUniqueId())) {
-            Message.SHOP_NOT_OWNER.sendMessage(player);
+            Message.SHOP_NOT_OWNER.send(player);
             event.setCancelled(true);
             return;
         }

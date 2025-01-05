@@ -27,6 +27,6 @@ public class Reload {
     public void onReload(@Context CommandSender player) {
         config.reloadConfig();
         guiConfig.reloadConfig();
-        Message.CONFIG_RELOADED.sendMessage(player);
+        Message.CONFIG_RELOADED.send(player);
     }
 }

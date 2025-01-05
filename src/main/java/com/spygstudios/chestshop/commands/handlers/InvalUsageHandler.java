@@ -2,6 +2,7 @@ package com.spygstudios.chestshop.commands.handlers;
 
 import org.bukkit.command.CommandSender;
 
+import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.spyglib.color.TranslateColor;
 
 import dev.rollczi.litecommands.handler.result.ResultHandlerChain;
@@ -21,7 +22,7 @@ public class InvalUsageHandler implements InvalidUsageHandler<CommandSender> {
             return;
         }
 
-        sender.sendMessage("Összes parancs:");
+        Message.COMMANDS.send(sender);
         for (String scheme : schematic.all()) {
             sender.sendMessage(TranslateColor.translate("&8- " + getCommand(scheme, invocation.label())));
         }

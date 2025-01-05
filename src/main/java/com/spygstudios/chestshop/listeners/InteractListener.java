@@ -51,7 +51,7 @@ public class InteractListener implements Listener {
         // Buyer
         event.setCancelled(true);
         if (shop.getChestLocation().equals(location)) {
-            Message.SHOP_NOT_OWNER.sendMessage(player);
+            Message.SHOP_NOT_OWNER.send(player);
             return;
         }
         shop.sell(player);

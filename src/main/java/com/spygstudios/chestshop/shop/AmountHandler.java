@@ -47,7 +47,7 @@ public class AmountHandler {
         } else if (type.equals(GuiAction.SET_ITEM_AMOUNT)) {
             shop.setAmount(amount);
         }
-        Message.ENTER_AMOUNT_SUCCESS.sendMessage(player);
+        Message.ENTER_AMOUNT_SUCCESS.send(player);
         this.amount = amount;
         cancel();
     }

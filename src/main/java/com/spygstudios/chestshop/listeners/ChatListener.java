@@ -32,7 +32,7 @@ public class ChatListener implements Listener {
         String message = ComponentUtils.fromComponent(event.message());
         if (message.equalsIgnoreCase(config.getString("cancel"))) {
             pendingAmount.cancel();
-            Message.ENTER_AMOUNT_CANCELLED.sendMessage(player);
+            Message.ENTER_AMOUNT_CANCELLED.send(player);
             return;
         }
 

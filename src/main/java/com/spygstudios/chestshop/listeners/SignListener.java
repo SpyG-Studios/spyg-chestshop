@@ -41,35 +41,35 @@ public class SignListener implements Listener {
         Player player = event.getPlayer();
         Block targetBlock = getAttachedChest(event.getBlock());
         if (targetBlock == null || targetBlock.getType() != Material.CHEST) {
-            Message.SHOP_NO_CHEST.sendMessage(player);
+            Message.SHOP_NO_CHEST.send(player);
             return;
         }
 
         if (Shop.isDisabledWorld(player.getWorld())) {
-            Message.SHOP_DISABLED_WORLD.sendMessage(player);
+            Message.SHOP_DISABLED_WORLD.send(player);
             return;
         }
 
         String name = ComponentUtils.fromComponent(event.line(1)).trim();
         if (name.length() < 3) {
-            Message.SHOP_NAME_TOO_SHORT.sendMessage(player);
+            Message.SHOP_NAME_TOO_SHORT.send(player);
             return;
         }
         ShopFile file = ShopFile.getShopFile(player);
         if (file == null) {
             file = new ShopFile(ChestShop.getInstance(), player);
         } else if (file.getPlayerShops().contains(name)) {
-            Message.SHOP_ALREADY_EXISTS.sendMessage(player, Map.of("%shop-name%", name));
+            Message.SHOP_ALREADY_EXISTS.send(player, Map.of("%shop-name%", name));
             return;
         }
 
         if (Shop.getShop(targetBlock.getLocation()) != null || (Shop.isDoubleChest(targetBlock) && Shop.getShop(Shop.getAdjacentChest(targetBlock).getLocation()) != null)) {
-            Message.SHOP_CHEST_ALREADY_SHOP.sendMessage(player);
+            Message.SHOP_CHEST_ALREADY_SHOP.send(player);
             return;
         }
 
         if (config.getInt("shops.max-shops") != 0 && file.getPlayerShops().size() >= config.getInt("shops.max-shops")) {
-            Message.SHOP_LIMIT_REACHED.sendMessage(player, Map.of("%shop-limit%", String.valueOf(config.getInt("shops.max-shops"))));
+            Message.SHOP_LIMIT_REACHED.send(player, Map.of("%shop-limit%", String.valueOf(config.getInt("shops.max-shops"))));
             return;
         }
 
@@ -78,7 +78,7 @@ public class SignListener implements Listener {
             event.line(i, TranslateColor
                     .translate(config.getString("shop.sign.line." + (i + 1)).replace("%owner%", player.getName()).replace("%amount%", "0").replace("%price%", "0.0").replace("%material%", "-")));
         }
-        Message.SHOP_CREATED.sendMessage(player, Map.of("%shop-name%", name));
+        Message.SHOP_CREATED.send(player, Map.of("%shop-name%", name));
     }
 
     private boolean isSignInFrontOfChest(Block signBlock) {

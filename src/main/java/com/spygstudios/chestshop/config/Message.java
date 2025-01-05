@@ -10,6 +10,8 @@ import com.spygstudios.spyglib.components.ComponentUtils;
 import net.kyori.adventure.text.Component;
 
 public enum Message {
+    COMMANDS("commands", "%prefix% &7Commands:"),
+
     ENTER_AMOUNT_CANCELLED("enter-amount-cancelled", "%prefix% &cAmount entering cancelled!"),
     ENTER_AMOUNT("enter-amount-prompt", "%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel)"),
     ENTER_AMOUNT_SUCCESS("enter-amount-success", "%prefix% &aAmount set successfully!"),
@@ -60,19 +62,19 @@ public enum Message {
         this.defaultMessage = defaultMessage;
     }
 
-    public void sendMessage(Player player) {
+    public void send(Player player) {
         player.sendMessage(get());
     }
 
-    public void sendMessage(CommandSender sender) {
+    public void send(CommandSender sender) {
         sender.sendMessage(get());
     }
 
-    public void sendMessage(Player player, Map<String, String> placeholders) {
+    public void send(Player player, Map<String, String> placeholders) {
         player.sendMessage(ComponentUtils.replaceComponent(get(), placeholders));
     }
 
-    public void sendMessage(CommandSender sender, Map<String, String> placeholders) {
+    public void send(CommandSender sender, Map<String, String> placeholders) {
         sender.sendMessage(ComponentUtils.replaceComponent(get(), placeholders));
     }
 

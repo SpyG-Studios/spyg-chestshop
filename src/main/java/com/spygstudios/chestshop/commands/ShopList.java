@@ -34,7 +34,7 @@ public class ShopList {
 
         ShopFile file = ShopFile.getShopFile(player);
         if (file == null || file.getPlayerShops().isEmpty()) {
-            Message.SHOP_NO_SHOPS.sendMessage(player);
+            Message.SHOP_NO_SHOPS.send(player);
             return;
         }
 
@@ -44,7 +44,7 @@ public class ShopList {
             return;
         }
 
-        Message.SHOP_LIST_HEAD.sendMessage(player);
+        Message.SHOP_LIST_HEAD.send(player);
         List<Shop> shops = Shop.getShops(player).stream().sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).skip((page - 1) * 10).limit(10).collect(Collectors.toList());
         for (Shop shop : shops) {
             Chest chest = (Chest) shop.getChestLocation().getBlock().getState();

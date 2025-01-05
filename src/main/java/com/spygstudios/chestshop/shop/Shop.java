@@ -160,7 +160,7 @@ public class Shop {
 
     public void sell(Player buyer) {
         if (getMaterial() == null || getAmount() == 0) {
-            Message.SHOP_SETUP_NEEDED.sendMessage(buyer);
+            Message.SHOP_SETUP_NEEDED.send(buyer);
             return;
         }
         Chest chest = (Chest) getChestLocation().getBlock().getState();
@@ -168,13 +168,13 @@ public class Shop {
         int itemCount, itemsLeft;
         itemCount = itemsLeft = InventoryUtils.countItems(chest.getInventory(), getMaterial());
         if (itemCount == 0) {
-            Message.SHOP_EMPTY.sendMessage(buyer);
+            Message.SHOP_EMPTY.send(buyer);
             return;
         }
         itemCount = getAmount() > itemCount ? itemCount : getAmount();
         itemsLeft -= itemCount;
         if (!InventoryUtils.hasFreeSlot(buyer)) {
-            Message.SHOP_INVENTORY_FULL.sendMessage(buyer);
+            Message.SHOP_INVENTORY_FULL.send(buyer);
             return;
         }
         int price = getPriceForEach() * itemCount;
@@ -183,18 +183,18 @@ public class Shop {
             ChestShop.getInstance().getEconomy().depositPlayer(Bukkit.getOfflinePlayer(getOwnerId()), price);
             buyer.getInventory().addItem(new ItemStack(getMaterial(), itemCount));
             chest.getInventory().removeItem(new ItemStack(getMaterial(), itemCount));
-            Message.SHOP_BOUGHT.sendMessage(buyer, Map.of("%price%", String.valueOf(price), "%material%", getMaterial().name(), "%items-left%", String.valueOf(itemsLeft)));
+            Message.SHOP_BOUGHT.send(buyer, Map.of("%price%", String.valueOf(price), "%material%", getMaterial().name(), "%items-left%", String.valueOf(itemsLeft)));
             shopFile.overwriteSet("shops." + getName() + ".sold-items", shopFile.getInt("shops." + getName() + ".sold-items") + itemCount);
             shopFile.overwriteSet("shops." + getName() + ".money-earned", shopFile.getDouble("shops." + getName() + ".money-earned") + price);
             shopFile.save();
             Player owner = Bukkit.getPlayer(getOwnerId());
             if (isNotify() && owner != null) {
-                Message.SHOP_SOLD.sendMessage(owner,
+                Message.SHOP_SOLD.send(owner,
                         Map.of("%price%", String.valueOf(price), "%material%", getMaterial().name(), "%player-name%", buyer.getName(), "%items-left%", String.valueOf(itemsLeft)));
             }
             return;
         }
-        Message.NOT_ENOUGH_MONEY.sendMessage(buyer, Map.of("%price%", String.valueOf(price)));
+        Message.NOT_ENOUGH_MONEY.send(buyer, Map.of("%price%", String.valueOf(price)));
     }
 
     public static boolean isDisabledWorld(String worldName) {
