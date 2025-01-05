@@ -1,8 +1,10 @@
-package com.spygstudios.chestshop.commands;
+package com.spygstudios.chestshop.commands.handlers;
 
 import org.bukkit.command.CommandSender;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.commands.Reload;
+import com.spygstudios.chestshop.commands.ShopList;
 import com.spygstudios.chestshop.commands.arguments.IntegerArgument;
 import com.spygstudios.chestshop.config.Message;
 
@@ -20,7 +22,7 @@ public class CommandHandler {
 
     public CommandHandler(ChestShop plugin) {
         commands = LiteBukkitFactory.builder("spygchestshop", plugin).commands(new Reload(plugin), new ShopList()).message(LiteBukkitMessages.PLAYER_ONLY, Message.PLAYER_ONLY.get())
-                .message(LiteMessages.MISSING_PERMISSIONS, Message.NO_PERMISSION.get()).invalidUsage(new InvalUsage()).extension(new LiteAdventureExtension<>())
+                .message(LiteMessages.MISSING_PERMISSIONS, Message.NO_PERMISSION.get()).invalidUsage(new InvalUsageHandler()).extension(new LiteAdventureExtension<>())
                 .argument(Integer.class, new IntegerArgument()).build();
     }
 

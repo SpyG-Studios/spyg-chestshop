@@ -9,7 +9,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.spygstudios.chestshop.commands.CommandHandler;
+import com.spygstudios.chestshop.commands.handlers.CommandHandler;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;

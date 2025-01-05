@@ -1,4 +1,4 @@
-package com.spygstudios.chestshop.commands;
+package com.spygstudios.chestshop.commands.handlers;
 
 import org.bukkit.command.CommandSender;
 
@@ -10,7 +10,7 @@ import dev.rollczi.litecommands.invalidusage.InvalidUsageHandler;
 import dev.rollczi.litecommands.invocation.Invocation;
 import dev.rollczi.litecommands.schematic.Schematic;
 
-public class InvalUsage implements InvalidUsageHandler<CommandSender> {
+public class InvalUsageHandler implements InvalidUsageHandler<CommandSender> {
 
     @Override
     public void handle(Invocation<CommandSender> invocation, InvalidUsage<CommandSender> result, ResultHandlerChain<CommandSender> chain) {
