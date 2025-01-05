@@ -13,7 +13,7 @@ import dev.rollczi.litecommands.annotations.execute.Execute;
 import dev.rollczi.litecommands.annotations.permission.Permission;
 
 @Command(name = "spygchestshop reload", aliases = { "spcs reload", "chestshop reload", "scs reload" })
-@Permission("spygchestshop.reload")
+@Permission({ "chestshop.admin.reload", "chestshop.admin" })
 public class Reload {
     Config config;
     GuiConfig guiConfig;

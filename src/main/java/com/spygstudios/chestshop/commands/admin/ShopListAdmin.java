@@ -1,9 +1,10 @@
-package com.spygstudios.chestshop.commands;
+package com.spygstudios.chestshop.commands.admin;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 
@@ -14,30 +15,35 @@ import com.spygstudios.chestshop.shop.ShopFile;
 import com.spygstudios.spyglib.components.ComponentUtils;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
 
+import dev.rollczi.litecommands.annotations.argument.Arg;
 import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.execute.Execute;
 import dev.rollczi.litecommands.annotations.optional.OptionalArg;
+import dev.rollczi.litecommands.annotations.permission.Permission;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 
-@Command(name = "spygchestshop list", aliases = { "spcs list", "chestshop list", "scs list" })
-public class ShopList {
+@Command(name = "spygchestshop admin list", aliases = { "spcs admin list", "chestshop admin list", "scs admin list" })
+@Permission({ "chestshop.admin.list", "chestshop.admin" })
+public class ShopListAdmin {
 
     @Execute
-    public void onList(@Context Player player, @OptionalArg Integer page) {
+    public void onList(@Context Player player, @Arg OfflinePlayer target, @OptionalArg Integer page) {
         if (page == null) {
             page = 1;
         }
 
-        ShopFile file = ShopFile.getShopFile(player);
+        // TODO New messages
+
+        ShopFile file = ShopFile.getShopFile(target.getUniqueId());
         if (file == null || file.getPlayerShops().isEmpty()) {
             Message.SHOP_NO_SHOPS.send(player);
             return;
         }
 
         Message.SHOP_LIST_HEAD.send(player);
-        List<Shop> shops = Shop.getShops(player).stream().sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).skip((page - 1) * 10).limit(10).collect(Collectors.toList());
+        List<Shop> shops = Shop.getShops(target.getUniqueId()).stream().sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).skip((page - 1) * 10).limit(10).collect(Collectors.toList());
         for (Shop shop : shops) {
             Chest chest = (Chest) shop.getChestLocation().getBlock().getState();
             String itemsLeft = String.valueOf(InventoryUtils.countItems(chest.getInventory(), shop.getMaterial()));

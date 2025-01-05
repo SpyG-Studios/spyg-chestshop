@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.commands.Reload;
 import com.spygstudios.chestshop.commands.ShopList;
+import com.spygstudios.chestshop.commands.admin.ShopListAdmin;
 import com.spygstudios.chestshop.commands.arguments.IntegerArgument;
 import com.spygstudios.chestshop.config.Message;
 
@@ -21,9 +22,9 @@ public class CommandHandler {
     private LiteCommands<CommandSender> commands;
 
     public CommandHandler(ChestShop plugin) {
-        commands = LiteBukkitFactory.builder("spygchestshop", plugin).commands(new Reload(plugin), new ShopList()).message(LiteBukkitMessages.PLAYER_ONLY, Message.PLAYER_ONLY.get())
-                .message(LiteMessages.MISSING_PERMISSIONS, Message.NO_PERMISSION.get()).invalidUsage(new InvalUsageHandler()).extension(new LiteAdventureExtension<>())
-                .argument(Integer.class, new IntegerArgument()).build();
+        commands = LiteBukkitFactory.builder("spygchestshop", plugin).commands(new Reload(plugin), new ShopList(), new ShopListAdmin())
+                .message(LiteBukkitMessages.PLAYER_ONLY, Message.PLAYER_ONLY.get()).message(LiteMessages.MISSING_PERMISSIONS, Message.NO_PERMISSION.get()).invalidUsage(new InvalUsageHandler())
+                .extension(new LiteAdventureExtension<>()).argument(Integer.class, new IntegerArgument()).build();
     }
 
     public void unregister() {
