@@ -3,11 +3,15 @@ package com.spygstudios.chestshop.commands.handlers;
 import org.bukkit.command.CommandSender;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.commands.AddPlayer;
 import com.spygstudios.chestshop.commands.Reload;
+import com.spygstudios.chestshop.commands.RemovePlayer;
 import com.spygstudios.chestshop.commands.ShopList;
 import com.spygstudios.chestshop.commands.admin.ShopListAdmin;
 import com.spygstudios.chestshop.commands.arguments.IntegerArgument;
+import com.spygstudios.chestshop.commands.arguments.ShopArgument;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.chestshop.shop.Shop;
 
 import dev.rollczi.litecommands.LiteCommands;
 import dev.rollczi.litecommands.adventure.LiteAdventureExtension;
@@ -22,9 +26,19 @@ public class CommandHandler {
     private LiteCommands<CommandSender> commands;
 
     public CommandHandler(ChestShop plugin) {
-        commands = LiteBukkitFactory.builder("spygchestshop", plugin).commands(new Reload(plugin), new ShopList(), new ShopListAdmin())
-                .message(LiteBukkitMessages.PLAYER_ONLY, Message.PLAYER_ONLY.get()).message(LiteMessages.MISSING_PERMISSIONS, Message.NO_PERMISSION.get()).invalidUsage(new InvalUsageHandler())
-                .extension(new LiteAdventureExtension<>()).argument(Integer.class, new IntegerArgument()).build();
+        commands = LiteBukkitFactory.builder("spygchestshop", plugin)
+
+                .commands(new Reload(plugin), new ShopList(), new ShopListAdmin(), new AddPlayer(plugin), new RemovePlayer(plugin))
+
+                .message(LiteBukkitMessages.PLAYER_ONLY, Message.PLAYER_ONLY.get())
+
+                .message(LiteMessages.MISSING_PERMISSIONS, Message.NO_PERMISSION.get())
+
+                .invalidUsage(new InvalUsageHandler(plugin)).extension(new LiteAdventureExtension<>())
+
+                .argument(Shop.class, new ShopArgument())
+
+                .argument(Integer.class, new IntegerArgument()).build();
     }
 
     public void unregister() {

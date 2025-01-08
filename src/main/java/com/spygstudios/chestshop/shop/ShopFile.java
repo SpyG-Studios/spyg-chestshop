@@ -3,8 +3,10 @@ package com.spygstudios.chestshop.shop;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -38,6 +40,27 @@ public class ShopFile extends YamlManager {
         isSaved = true;
     }
 
+    public void setPlayers(List<UUID> players, String shopName) {
+        overwriteSet("shops." + shopName + ".added-players", players.stream().map(UUID::toString).toList());
+        isSaved = false;
+    }
+
+    public void addPlayer(UUID player, String shopName) {
+        List<UUID> players = getAddedUuids(shopName);
+        players.add(player);
+        setPlayers(players, shopName);
+    }
+
+    public void removePlayer(UUID player, String shopName) {
+        List<UUID> players = getAddedUuids(shopName);
+        players.remove(player);
+        setPlayers(players, shopName);
+    }
+
+    public List<UUID> getAddedUuids(String shopName) {
+        return new ArrayList<>(getStringList("shops." + shopName + ".added-players").stream().map(UUID::fromString).toList());
+    }
+
     public Set<String> getPlayerShops() {
         if (getConfigurationSection("shops") == null) {
             return new HashSet<String>();
@@ -62,6 +85,7 @@ public class ShopFile extends YamlManager {
         set("shops." + name + ".location", LocationUtils.fromLocation(chestLocation, true));
         set("shops." + name + ".do-notify", false);
         set("shops." + name + ".created", getDateString());
+        set("shops." + name + ".added-players", new ArrayList<String>());
         new Shop(owner.getUniqueId(), name, this);
         isSaved = false;
     }

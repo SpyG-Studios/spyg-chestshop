@@ -82,6 +82,9 @@ public class InventoryClickListener implements Listener {
             new AmountHandler(player, shop, guiAction);
             event.getInventory().close();
             break;
+        case OPEN_PLAYERS:
+
+            break;
         case CLOSE:
             player.closeInventory();
             break;

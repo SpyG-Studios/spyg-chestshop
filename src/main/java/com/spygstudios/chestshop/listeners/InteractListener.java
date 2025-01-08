@@ -48,6 +48,10 @@ public class InteractListener implements Listener {
             return;
         }
 
+        if (shop.getChestLocation().equals(location) && shop.getAddedPlayers().contains(player.getUniqueId())) {
+            return;
+        }
+
         // Buyer
         event.setCancelled(true);
         if (shop.getChestLocation().equals(location)) {

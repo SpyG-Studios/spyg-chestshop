@@ -13,6 +13,12 @@ public class Config extends YamlManager {
         set("prefix", "&8[&#ffbc1fChest&#ff711fShop&8] &7»&f");
         set("cancel", "cancel");
 
+        set("colors.command.required-arg", " &c");
+        set("colors.command.optional-arg", " &7");
+        set("colors.command.list", "&8- ");
+        set("colors.command.label", "&7");
+        set("colors.command.args", "&f");
+
         set("shops.disabled-worlds", Arrays.asList("disabled_world"));
         set("shops.unknown-material", "-", Arrays.asList("The material text to use when the material is unknown."));
         set("shops.max-shops", 0, Arrays.asList("The maximum amount of shops a player can have. Set to 0 for unlimited."));

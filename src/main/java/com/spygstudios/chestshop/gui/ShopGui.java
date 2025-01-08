@@ -76,6 +76,13 @@ public class ShopGui {
         amountData.set("shop", shop.getName());
         amountData.save();
         inventory.setItem(15, amountItem);
+
+        // player item
+        ItemStack playrItem = ItemUtils.create(Material.PLAYER_HEAD, config.getString("shop.player.title"), config.getStringList("shop.player.lore"));
+        PersistentData playerData = new PersistentData(plugin, playrItem);
+        playerData.set("action", GuiAction.OPEN_PLAYERS.name());
+        playerData.save();
+        inventory.setItem(22, playrItem);
     }
 
     public static class ShopHolder implements InventoryHolder {

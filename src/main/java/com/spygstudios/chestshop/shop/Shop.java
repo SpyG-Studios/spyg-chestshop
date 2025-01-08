@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -25,6 +26,7 @@ import org.bukkit.inventory.ItemStack;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.spyglib.color.TranslateColor;
+import com.spygstudios.spyglib.components.ComponentUtils;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
 import com.spygstudios.spyglib.location.LocationUtils;
 
@@ -64,6 +66,9 @@ public class Shop {
 
     private ShopFile shopFile;
 
+    @Getter
+    private List<UUID> addedPlayers;
+
     private static final List<Shop> SHOPS = new ArrayList<Shop>();
     private static ChestShop plugin = ChestShop.getInstance();
 
@@ -81,6 +86,7 @@ public class Shop {
         chestLocation = LocationUtils.toLocation(shopFile.getString("shops." + name + ".location"));
         createdAt = shopFile.getString("shops." + name + ".created");
         isNotify = shopFile.getBoolean("shops." + name + ".do-notify");
+        addedPlayers = shopFile.getAddedUuids(name);
 
         SHOPS.add(this);
         setShopSign();
@@ -128,6 +134,35 @@ public class Shop {
         isNotify = notify;
         shopFile.overwriteSet("shops." + name + ".do-notify", notify);
         shopFile.save();
+    }
+
+    public void addPlayer(OfflinePlayer player) {
+        addPlayer(player.getUniqueId());
+    }
+
+    public void addPlayer(UUID uuid) {
+        if (addedPlayers.contains(uuid)) {
+            Bukkit.getPlayer(ownerId).sendMessage(ComponentUtils.replaceComponent(Message.PLAYER_ALREADY_ADDED.get(), "%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
+            ;
+            return;
+        }
+        addedPlayers.add(uuid);
+        shopFile.addPlayer(uuid, name);
+        Bukkit.getPlayer(ownerId).sendMessage(ComponentUtils.replaceComponent(Message.PLAYER_ADDED.get(), "%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
+    }
+
+    public void removePlayer(OfflinePlayer player) {
+        removePlayer(player.getUniqueId());
+    }
+
+    public void removePlayer(UUID uuid) {
+        if (!addedPlayers.contains(uuid)) {
+            Bukkit.getPlayer(ownerId).sendMessage(ComponentUtils.replaceComponent(Message.PLAYER_NOT_ADDED.get(), "%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
+            return;
+        }
+        addedPlayers.remove(uuid);
+        shopFile.removePlayer(uuid, name);
+        Bukkit.getPlayer(ownerId).sendMessage(ComponentUtils.replaceComponent(Message.PLAYER_REMOVED.get(), "%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
     }
 
     public void setShopSign() {

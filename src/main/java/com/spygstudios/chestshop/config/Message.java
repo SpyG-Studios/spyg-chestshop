@@ -18,10 +18,17 @@ public enum Message {
     
     INVALID_NUMBER("invalid-number", "%prefix% &cInvalid number! (&e%entered%&c)"),
 
+    CANNOT_ADD_YOURSELF("cannot-add-yourself", "%prefix% &cYou can't add yourself to the shop!"),
+    USAGE("usage", "%prefix% &7%usage%"),
+
     CONFIG_RELOADED("config-reloaded", "%prefix% &aConfig reloaded successfully!"), 
     NO_PERMISSION("no-permission", "%prefix% &cYou don't have permission to do that!"), 
     NOT_ENOUGH_MONEY("not-enough-money", "%prefix% &cYou don't have enough money! ($%price%)"), 
     PLAYER_ONLY("player-only", "&cOnly players can use this command!"),
+    PLAYER_ALREADY_ADDED("player-already-added", "%prefix% &cPlayer &f%player-name% &cis already added to the shop!"),
+    PLAYER_NOT_ADDED("player-not-added", "%prefix% &cPlayer &f%player-name% &cis not added to the shop!"),
+    PLAYER_ADDED("player-added", "%prefix% &aPlayer &f%player-name% &aadded to the shop!"),
+    PLAYER_REMOVED("player-removed", "%prefix% &aPlayer &f%player-name% &aremoved from the shop!"),
     SHOP_ALREADY_EXISTS("shop.already-exists", "%prefix% &cShop with name &f%shop-name% &calready exists!"), 
     SHOP_BOUGHT("shop.bought", "%prefix% &aYou bought &f%material% &afor &f$%price%&a! &7(&8%items-left%&7)"), 
     SHOP_CHEST_ALREADY_SHOP("shop.chest-already-shop", "%prefix% &cThis chest is already a shop!"),
@@ -95,6 +102,10 @@ public enum Message {
             config.set("messages." + node, defaultMessage);
         }
         config.saveConfig();
+    }
+
+    public static String getPrefix() {
+        return config.getString("prefix");
     }
 
     public static void init(Config conf) {
