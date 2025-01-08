@@ -81,6 +81,7 @@ public class ShopGui {
         ItemStack playrItem = ItemUtils.create(Material.PLAYER_HEAD, config.getString("shop.player.title"), config.getStringList("shop.player.lore"));
         PersistentData playerData = new PersistentData(plugin, playrItem);
         playerData.set("action", GuiAction.OPEN_PLAYERS.name());
+        playerData.set("shop", shop.getName());
         playerData.save();
         inventory.setItem(22, playrItem);
     }

@@ -10,6 +10,7 @@ public class GuiConfig extends YamlManager {
     public GuiConfig(ChestShop plugin) {
         super("guis.yml", plugin);
 
+        set("players.title", "&8[&6%shop-name%&8] ");
         set("shop.title", "&8[&6%shop-name%&8] &7» &8%player-name%");
         set("shop.filleritem.name", "-");
         set("shop.filleritem.material", "GRAY_STAINED_GLASS_PANE");

@@ -12,6 +12,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.enums.GuiAction;
+import com.spygstudios.chestshop.gui.PlayersGui;
+import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.shop.AmountHandler;
 import com.spygstudios.chestshop.shop.Shop;
@@ -28,7 +30,7 @@ public class InventoryClickListener implements Listener {
     }
 
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
+    public void onShopGuiClick(InventoryClickEvent event) {
         if (!(event.getInventory().getHolder() instanceof ShopHolder)) {
             return;
         }
@@ -49,6 +51,15 @@ public class InventoryClickListener implements Listener {
             return;
         }
         shopGui(event);
+    }
+
+    @EventHandler
+    public void onPlayersGuiClick(InventoryClickEvent event) {
+        if (!(event.getInventory().getHolder() instanceof PlayersHolder)) {
+            return;
+        }
+
+        event.setCancelled(true);
     }
 
     private void shopGui(InventoryClickEvent event) {
@@ -83,7 +94,7 @@ public class InventoryClickListener implements Listener {
             event.getInventory().close();
             break;
         case OPEN_PLAYERS:
-
+            PlayersGui.open(plugin, player, shop);
             break;
         case CLOSE:
             player.closeInventory();
