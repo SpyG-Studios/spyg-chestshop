@@ -25,31 +25,29 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 
 @Command(name = "spygchestshop admin list", aliases = { "spcs admin list", "chestshop admin list", "scs admin list" })
-@Permission({ "chestshop.admin.list", "chestshop.admin" })
 public class ShopListAdmin {
 
     @Execute
+    @Permission({ "spygchestshop.admin.list", "spygchestshop.admin" })
     public void onList(@Context Player player, @Arg OfflinePlayer target, @OptionalArg Integer page) {
         if (page == null) {
             page = 1;
         }
 
-        // TODO New messages
-
         ShopFile file = ShopFile.getShopFile(target.getUniqueId());
         if (file == null || file.getPlayerShops().isEmpty()) {
-            Message.SHOP_NO_SHOPS.send(player);
+            player.sendMessage(ComponentUtils.replaceComponent(Message.ADMIN_NO_SHOPS.get(), "%player-name%", target.getName()));
             return;
         }
 
-        Message.SHOP_LIST_HEAD.send(player);
+        player.sendMessage(ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_HEAD.get(), "%player-name%", target.getName()));
         List<Shop> shops = Shop.getShops(target.getUniqueId()).stream().sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).skip((page - 1) * 10).limit(10).collect(Collectors.toList());
         for (Shop shop : shops) {
             Chest chest = (Chest) shop.getChestLocation().getBlock().getState();
             String itemsLeft = String.valueOf(InventoryUtils.countItems(chest.getInventory(), shop.getMaterial()));
-            Component hoverMessage = ComponentUtils.replaceComponent(Message.SHOP_LIST_SHOPS_HOVER.get(), Map.of("%shop-name%", shop.getName(), "%material%", shop.getMaterialString(), "%price%",
+            Component hoverMessage = ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS_HOVER.get(), Map.of("%shop-name%", shop.getName(), "%material%", shop.getMaterialString(), "%price%",
                     shop.getPrice() + "", "%amount%", shop.getAmount() + "", "%items-left%", itemsLeft, "%location%", shop.getChestLocationString(), "%created%", shop.getCreatedAt()));
-            player.sendMessage(ComponentUtils.replaceComponent(Message.SHOP_LIST_SHOPS.get(), "%shop-name%", shop.getName()).hoverEvent(HoverEvent.showText(hoverMessage)));
+            player.sendMessage(ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS.get(), "%shop-name%", shop.getName()).hoverEvent(HoverEvent.showText(hoverMessage)));
         }
 
         player.sendMessage(PageUtil.getPages(page, file.getPlayerShops().size(), "/spygchestshop list"));

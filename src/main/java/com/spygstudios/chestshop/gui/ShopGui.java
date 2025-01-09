@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.GuiConfig;
@@ -16,6 +17,7 @@ import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.item.ItemUtils;
+import com.spygstudios.spyglib.item.PlayerHeads;
 import com.spygstudios.spyglib.persistentdata.PersistentData;
 import com.spygstudios.spyglib.placeholder.ParseListPlaceholder;
 
@@ -78,12 +80,15 @@ public class ShopGui {
         inventory.setItem(15, amountItem);
 
         // player item
-        ItemStack playrItem = ItemUtils.create(Material.PLAYER_HEAD, config.getString("shop.player.title"), config.getStringList("shop.player.lore"));
+        ItemStack playrItem = PlayerHeads.getOnlinePlayerHead(Bukkit.getOfflinePlayer(shop.getOwnerId()).getUniqueId());
+        ItemMeta playrMeta = playrItem.getItemMeta();
+        playrMeta.displayName(TranslateColor.translate(config.getString("shop.player.title").replace("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName())));
+        playrItem.setItemMeta(playrMeta);
         PersistentData playerData = new PersistentData(plugin, playrItem);
         playerData.set("action", GuiAction.OPEN_PLAYERS.name());
         playerData.set("shop", shop.getName());
         playerData.save();
-        inventory.setItem(22, playrItem);
+        inventory.setItem(18, playrItem);
     }
 
     public static class ShopHolder implements InventoryHolder {

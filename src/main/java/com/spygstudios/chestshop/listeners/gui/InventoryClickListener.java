@@ -1,7 +1,10 @@
 package com.spygstudios.chestshop.listeners.gui;
 
 import java.util.Arrays;
+import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,6 +17,7 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.gui.PlayersGui;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
+import com.spygstudios.chestshop.gui.ShopGui;
 import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.shop.AmountHandler;
 import com.spygstudios.chestshop.shop.Shop;
@@ -58,8 +62,32 @@ public class InventoryClickListener implements Listener {
         if (!(event.getInventory().getHolder() instanceof PlayersHolder)) {
             return;
         }
-
+        ItemStack clickedItem = event.getCurrentItem();
+        if (clickedItem == null) {
+            return;
+        }
         event.setCancelled(true);
+        PersistentData data = new PersistentData(plugin, clickedItem);
+        String action = data.getString("action");
+        if (action == null) {
+            return;
+        }
+        PlayersHolder holder = (PlayersHolder) event.getInventory().getHolder();
+        Player player = holder.getPlayer();
+        Shop shop = holder.getShop();
+        GuiAction guiAction = GuiAction.valueOf(action);
+        switch (guiAction) {
+        case REMOVE_PLAYER:
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(data.getString("uuid")));
+            shop.removePlayer(offlinePlayer.getUniqueId());
+            PlayersGui.open(plugin, player, shop);
+            break;
+        case BACK:
+            ShopGui.open(plugin, player, shop);
+            break;
+        default:
+            break;
+        }
     }
 
     private void shopGui(InventoryClickEvent event) {
@@ -98,6 +126,8 @@ public class InventoryClickListener implements Listener {
             break;
         case CLOSE:
             player.closeInventory();
+            break;
+        default:
             break;
         }
     }

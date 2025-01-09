@@ -39,7 +39,7 @@ public class InteractListener implements Listener {
         }
 
         // Owner
-        if (shop.getOwnerId().equals(player.getUniqueId()) || (event.getAction().isRightClick() && player.isSneaking() && player.hasPermission("chestshop.admin"))) {
+        if (shop.getOwnerId().equals(player.getUniqueId()) || (event.getAction().isRightClick() && player.isSneaking() && player.hasPermission("spygchestshop.admin"))) {
             if (shop.getChestLocation().equals(location)) {
                 return;
             }

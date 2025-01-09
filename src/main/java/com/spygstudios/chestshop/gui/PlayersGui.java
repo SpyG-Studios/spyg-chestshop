@@ -13,9 +13,11 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.GuiConfig;
+import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.item.PlayerHeads;
+import com.spygstudios.spyglib.persistentdata.PersistentData;
 
 import lombok.Getter;
 
@@ -30,11 +32,14 @@ public class PlayersGui {
             if (Bukkit.getOfflinePlayer(uuid).getName() == null) {
                 continue;
             }
+
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             ItemStack skull = offlinePlayer.isOnline() ? PlayerHeads.getOnlinePlayerHead(uuid) : new ItemStack(Material.PLAYER_HEAD);
-            SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
-            skullMeta.displayName(TranslateColor.translate(config.getString("shop.player.head.title").replace("%player-name%", offlinePlayer.getName())));
-            skull.setItemMeta(skullMeta);
+            skull.setItemMeta(getPlayerHeadMeta(skull, offlinePlayer));
+            PersistentData skullData = new PersistentData(plugin, skull);
+            skullData.set("action", GuiAction.REMOVE_PLAYER.name());
+            skullData.set("uuid", offlinePlayer.getUniqueId().toString());
+            skullData.save();
             inventory.addItem(skull);
 
             if (offlinePlayer.isOnline()) {
@@ -45,16 +50,25 @@ public class PlayersGui {
                 ItemStack head = PlayerHeads.getOfflinePlayerHead(uuid);
 
                 Bukkit.getScheduler().runTask(plugin, () -> {
-                    SkullMeta meta = (SkullMeta) head.getItemMeta();
-                    meta.displayName(TranslateColor.translate(config.getString("shop.player.head.title").replace("%player-name%", offlinePlayer.getName())));
-                    head.setItemMeta(meta);
                     inventory.remove(skull);
+                    head.setItemMeta(getPlayerHeadMeta(head, offlinePlayer));
+                    PersistentData headData = new PersistentData(plugin, head);
+                    headData.set("action", GuiAction.REMOVE_PLAYER.name());
+                    headData.set("uuid", offlinePlayer.getUniqueId().toString());
+                    headData.save();
                     inventory.addItem(head);
                 });
             });
         }
 
         player.openInventory(inventory);
+    }
+
+    private static SkullMeta getPlayerHeadMeta(ItemStack skull, OfflinePlayer offlinePlayer) {
+        SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
+        skullMeta.displayName(TranslateColor.translate(config.getString("players.player.title").replace("%player-name%", offlinePlayer.getName())));
+        skullMeta.lore(TranslateColor.translate(config.getStringList("players.player.lore")));
+        return skullMeta;
     }
 
     public static class PlayersHolder implements InventoryHolder {

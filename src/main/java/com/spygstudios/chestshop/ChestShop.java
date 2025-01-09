@@ -13,6 +13,7 @@ import com.spygstudios.chestshop.commands.handlers.CommandHandler;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.listeners.BreakListener;
 import com.spygstudios.chestshop.listeners.ChatListener;
@@ -79,11 +80,11 @@ public class ChestShop extends JavaPlugin {
         List<Object> guis = new ArrayList<>() {
             {
                 add(ShopHolder.class);
+                add(PlayersHolder.class);
             }
         };
         for (Player player : Bukkit.getOnlinePlayers()) {
             InventoryHolder holder = player.getOpenInventory().getTopInventory().getHolder();
-            System.out.println(holder.getClass());
             if (guis.contains(holder.getClass())) {
                 player.closeInventory();
             }
