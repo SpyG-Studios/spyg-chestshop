@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -80,7 +81,8 @@ public class ShopGui {
         inventory.setItem(15, amountItem);
 
         // player item
-        ItemStack playrItem = PlayerHeads.getOnlinePlayerHead(Bukkit.getOfflinePlayer(shop.getOwnerId()).getUniqueId());
+        OfflinePlayer owner = Bukkit.getOfflinePlayer(shop.getOwnerId());
+        ItemStack playrItem = owner.isOnline() ? PlayerHeads.getOnlinePlayerHead(owner.getUniqueId()) : PlayerHeads.getOfflinePlayerHead(owner.getUniqueId());
         ItemMeta playrMeta = playrItem.getItemMeta();
         playrMeta.displayName(TranslateColor.translate(config.getString("shop.player.title").replace("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName())));
         playrItem.setItemMeta(playrMeta);

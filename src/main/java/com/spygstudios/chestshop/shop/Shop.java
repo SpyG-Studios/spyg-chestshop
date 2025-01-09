@@ -173,7 +173,7 @@ public class Shop {
         BlockFace chestFacing = getChestFace(chestLocation.getBlock());
         Location signLocation = chestLocation.clone().add(chestFacing.getModX(), chestFacing.getModY(), chestFacing.getModZ());
         Block signBlock = signLocation.getBlock();
-        if (!(signBlock.getBlockData() instanceof WallSign) && signBlock.getType() != Material.AIR) {
+        if (!(signBlock.getBlockData() instanceof WallSign) || signBlock.getType() == Material.AIR) {
             Bukkit.getLogger().warning("Shop sign is not a sign or air, removing shop! " + getName() + " at " + getChestLocationString());
             remove();
             return;

@@ -32,7 +32,7 @@ public class GuiConfig extends YamlManager {
         set("shop.info.lore", Arrays.asList("&7owner: &e%player-name%", "&7material: &e%material%", "&7sell amount: &e%amount%", "&7price: &6$&e%price%", "&7money earnd: &6$&e%money-earnd%",
                 "&7sold items: &e%sold-items%", "&7location: &e%location%", "&7created: &e%created%"));
 
-        set("shop.notify.title", "&e&lNotifications");
+        set("shop.notify.title", "&e&lBuy Notifications");
         set("shop.notify.on", "&2ON");
         set("shop.notify.off", "&4OFF");
 

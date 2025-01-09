@@ -32,7 +32,9 @@ public class BreakListener implements Listener {
         if (shop == null) {
             return;
         }
-        if (!shop.getOwnerId().equals(player.getUniqueId())) {
+
+        boolean isAdmin = (player.hasPermission("spygchestshop.admin") || player.hasPermission("spygchestshop.admin.break")) && player.isSneaking();
+        if (!shop.getOwnerId().equals(player.getUniqueId()) && !isAdmin) {
             Message.SHOP_NOT_OWNER.send(player);
             event.setCancelled(true);
             return;
