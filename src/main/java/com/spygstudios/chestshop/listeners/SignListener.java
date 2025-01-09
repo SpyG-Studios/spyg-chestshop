@@ -76,7 +76,7 @@ public class SignListener implements Listener {
         file.addShop(player, name, targetBlock.getLocation());
         for (int i = 0; i < 4; i++) {
             event.line(i, TranslateColor
-                    .translate(config.getString("shop.sign.line." + (i + 1)).replace("%owner%", player.getName()).replace("%amount%", "0").replace("%price%", "0.0").replace("%material%", "-")));
+                    .translate(config.getString("shop.sign.line." + (i + 1)).replace("%owner%", player.getName()).replace("%amount%", "0").replace("%price%", "0").replace("%material%", "-")));
         }
         Message.SHOP_CREATED.send(player, Map.of("%shop-name%", name));
     }

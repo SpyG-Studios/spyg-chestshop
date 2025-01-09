@@ -36,6 +36,10 @@ public class AddPlayer {
             sender.sendMessage(ComponentUtils.replaceComponent(Message.PLAYER_NOT_PLAYED_BEFORE.get(), "%player-name%", player.getName()));
             return;
         }
+        if (shop.getAddedPlayers().size() >= config.getInt("shops.max-players")) {
+            sender.sendMessage(ComponentUtils.replaceComponent(Message.SHOP_PLAYER_LIMIT_REACHED.get(), "%max-players%", String.valueOf(config.getInt("shops.max-players"))));
+            return;
+        }
 
         shop.addPlayer(player.getUniqueId());
     }

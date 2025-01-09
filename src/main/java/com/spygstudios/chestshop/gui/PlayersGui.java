@@ -20,7 +20,9 @@ import com.spygstudios.spyglib.item.PlayerHeads;
 import com.spygstudios.spyglib.persistentdata.PersistentData;
 
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class PlayersGui {
     private static GuiConfig config;
 

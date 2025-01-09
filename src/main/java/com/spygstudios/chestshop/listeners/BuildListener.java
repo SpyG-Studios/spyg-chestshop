@@ -7,21 +7,21 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.components.ComponentUtils;
 
-public class BreakListener implements Listener {
+public class BuildListener implements Listener {
 
-    public BreakListener(ChestShop plugin) {
+    public BuildListener(ChestShop plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
-    public void onInteractWithShop(BlockBreakEvent event) {
+    public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
         if (Shop.isDisabledWorld(player.getWorld())) {
             return;
@@ -29,7 +29,7 @@ public class BreakListener implements Listener {
         Block block = event.getBlock();
         Location location = block.getLocation();
         Shop shop = Shop.getShop(location);
-        if (shop == null || (shop.isDoubleChest() && !shop.getAdjacentChest().equals(event.getBlock()))) {
+        if (shop == null) {
             return;
         }
 

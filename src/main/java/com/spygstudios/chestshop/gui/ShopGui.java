@@ -23,7 +23,9 @@ import com.spygstudios.spyglib.persistentdata.PersistentData;
 import com.spygstudios.spyglib.placeholder.ParseListPlaceholder;
 
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class ShopGui {
     private static GuiConfig config;
 

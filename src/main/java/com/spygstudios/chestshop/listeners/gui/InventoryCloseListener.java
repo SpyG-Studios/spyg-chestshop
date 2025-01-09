@@ -28,15 +28,12 @@ public class InventoryCloseListener implements Listener {
         InventoryHolder invHolder = event.getInventory().getHolder();
 
         if (invHolder instanceof PlayersHolder holder && (event.getPlayer().getOpenInventory() == null || !(event.getPlayer().getOpenInventory().getTopInventory() instanceof PlayersHolder))) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                ShopGui.open(plugin, (Player) event.getPlayer(), holder.getShop());
-            }, 1);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> ShopGui.open(plugin, (Player) event.getPlayer(), holder.getShop()), 1);
             return;
         }
 
         if (invHolder instanceof ShopHolder holder) {
             itemAdding(event, holder);
-            return;
         }
 
     }

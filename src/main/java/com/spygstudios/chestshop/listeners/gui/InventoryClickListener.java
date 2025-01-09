@@ -113,11 +113,7 @@ public class InventoryClickListener implements Listener {
             notifyItem.setItemMeta(notifyMeta);
             player.updateInventory();
             break;
-        case SET_ITEM_PRICE:
-            new AmountHandler(player, shop, guiAction);
-            event.getInventory().close();
-            break;
-        case SET_ITEM_AMOUNT:
+        case SET_ITEM_AMOUNT, SET_ITEM_PRICE:
             new AmountHandler(player, shop, guiAction);
             event.getInventory().close();
             break;

@@ -5,11 +5,13 @@ import java.util.Map;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.spyglib.components.ComponentUtils;
 
+import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent.Builder;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.ClickEvent.Action;
 
+@UtilityClass
 public class PageUtil {
 
     public static Component getPages(int page, int maxPage, String command) {

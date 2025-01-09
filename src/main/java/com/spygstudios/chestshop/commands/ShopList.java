@@ -2,7 +2,6 @@ package com.spygstudios.chestshop.commands;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
@@ -37,7 +36,7 @@ public class ShopList {
         }
 
         Message.SHOP_LIST_HEAD.send(player);
-        List<Shop> shops = Shop.getShops(player).stream().sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).skip((page - 1) * 10).limit(10).collect(Collectors.toList());
+        List<Shop> shops = Shop.getShops(player).stream().sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).skip((page - 1) * 10L).limit(10).toList();
         for (Shop shop : shops) {
             Chest chest = (Chest) shop.getChestLocation().getBlock().getState();
             String itemsLeft = String.valueOf(InventoryUtils.countItems(chest.getInventory(), shop.getMaterial()));

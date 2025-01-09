@@ -63,7 +63,7 @@ public class ShopFile extends YamlManager {
 
     public Set<String> getPlayerShops() {
         if (getConfigurationSection("shops") == null) {
-            return new HashSet<String>();
+            return new HashSet<>();
         }
         return getConfigurationSection("shops").getKeys(false);
     }
@@ -136,28 +136,31 @@ public class ShopFile extends YamlManager {
             return;
         }
         for (File file : shopsFolder.listFiles()) {
-            if (file.isFile() && file.getName().endsWith(".yml")) {
-                try {
-                    UUID ownerId = UUID.fromString(file.getName().replace(".yml", ""));
-                    ShopFile shopFile = new ShopFile(plugin, ownerId);
-                    setDefaultValues(shopFile);
-                    for (String shopName : shopFile.getPlayerShops()) {
-                        String shopPath = "shops." + shopName;
-                        String locationString = shopFile.getString(shopPath + ".location");
-                        if (locationString == null) {
-                            plugin.getLogger().warning("Invalid shop file: " + file.getName() + " (location is null) removing shop...");
-                            shopFile.removeShop(shopName);
-                            continue;
-                        }
-                        Location location = LocationUtils.toLocation(locationString);
-                        if (Shop.isDisabledWorld(location.getWorld())) {
-                            continue;
-                        }
-                        new Shop(ownerId, shopName, shopFile);
-                    }
-                } catch (IllegalArgumentException e) {
-                    plugin.getLogger().warning("Invalid shop file: " + file.getName() + " (invalid UUID)");
+            if (!file.isFile() || !file.getName().endsWith(".yml")) {
+                continue;
+            }
+            UUID ownerId;
+            try {
+                ownerId = UUID.fromString(file.getName().replace(".yml", ""));
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("Invalid shop file: " + file.getName() + " (invalid UUID)");
+                continue;
+            }
+            ShopFile shopFile = new ShopFile(plugin, ownerId);
+            setDefaultValues(shopFile);
+            for (String shopName : shopFile.getPlayerShops()) {
+                String shopPath = "shops." + shopName;
+                String locationString = shopFile.getString(shopPath + ".location");
+                if (locationString == null) {
+                    plugin.getLogger().warning("Invalid shop file: " + file.getName() + " (location is null) removing shop...");
+                    shopFile.removeShop(shopName);
+                    continue;
                 }
+                Location location = LocationUtils.toLocation(locationString);
+                if (Shop.isDisabledWorld(location.getWorld())) {
+                    continue;
+                }
+                new Shop(ownerId, shopName, shopFile);
             }
         }
         plugin.getLogger().info("Shops loaded!");
@@ -186,9 +189,7 @@ public class ShopFile extends YamlManager {
     private static final Map<UUID, ShopFile> SHOPS_FILES = new HashMap<>();
 
     public static void startSaveScheduler(ChestShop plugin) {
-        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
-            saveShops();
-        }, 0, 20 * plugin.getConf().getInt("shops.save-interval", 60));
+        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, ShopFile::saveShops, 0, 20L * plugin.getConf().getInt("shops.save-interval", 60));
     }
 
     public static void saveShops() {
