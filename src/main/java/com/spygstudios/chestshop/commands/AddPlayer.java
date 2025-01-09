@@ -8,6 +8,7 @@ import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.spyglib.components.ComponentUtils;
 
 import dev.rollczi.litecommands.annotations.argument.Arg;
 import dev.rollczi.litecommands.annotations.async.Async;
@@ -29,6 +30,10 @@ public class AddPlayer {
     public void onAdd(@Context Player sender, @Arg Shop shop, @Async @Arg OfflinePlayer player) {
         if (sender.getUniqueId().equals(player.getUniqueId())) {
             Message.CANNOT_ADD_YOURSELF.send(sender);
+            return;
+        }
+        if (!player.isOnline() && !player.hasPlayedBefore()) {
+            sender.sendMessage(ComponentUtils.replaceComponent(Message.PLAYER_NOT_PLAYED_BEFORE.get(), "%player-name%", player.getName()));
             return;
         }
 

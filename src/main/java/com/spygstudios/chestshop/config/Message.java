@@ -29,6 +29,7 @@ public enum Message {
     PLAYER_NOT_ADDED("player-not-added", "%prefix% &cPlayer &f%player-name% &cis not added to the shop!"),
     PLAYER_ADDED("player-added", "%prefix% &aPlayer &f%player-name% &aadded to the shop!"),
     PLAYER_REMOVED("player-removed", "%prefix% &aPlayer &f%player-name% &aremoved from the shop!"),
+    PLAYER_NOT_PLAYED_BEFORE("player-not-played-before", "%prefix% &cPlayer &f%player-name% &chas never played before on this server!"),
     SHOP_ALREADY_EXISTS("shop.already-exists", "%prefix% &cShop with name &f%shop-name% &calready exists!"), 
     SHOP_BOUGHT("shop.bought", "%prefix% &aYou bought &f%material% &afor &f$%price%&a! &7(&8%items-left%&7)"), 
     SHOP_CHEST_ALREADY_SHOP("shop.chest-already-shop", "%prefix% &cThis chest is already a shop!"),
