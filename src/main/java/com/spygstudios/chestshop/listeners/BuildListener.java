@@ -1,8 +1,5 @@
 package com.spygstudios.chestshop.listeners;
 
-import java.util.Map;
-
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,7 +9,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
-import com.spygstudios.spyglib.components.ComponentUtils;
 
 public class BuildListener implements Listener {
 
@@ -27,20 +23,17 @@ public class BuildListener implements Listener {
             return;
         }
         Block block = event.getBlock();
-        Location location = block.getLocation();
-        Shop shop = Shop.getShop(location);
-        if (shop == null) {
+        Block connectedChest = Shop.getAdjacentChest(block);
+        if (connectedChest == null || (connectedChest != null && Shop.getShop(connectedChest.getLocation()) == null)) {
             return;
         }
+        Shop shop = Shop.getShop(connectedChest.getLocation());
+        if (shop.getOwnerId().equals(player.getUniqueId())) {
+            return;
+        }
+        Message.SHOP_NOT_OWNER.send(player);
 
-        boolean isAdmin = (player.hasPermission("spygchestshop.admin") || player.hasPermission("spygchestshop.admin.break")) && player.isSneaking();
-        if (!shop.getOwnerId().equals(player.getUniqueId()) && !isAdmin) {
-            Message.SHOP_NOT_OWNER.send(player);
-            event.setCancelled(true);
-            return;
-        }
-        shop.remove();
-        player.sendMessage(ComponentUtils.replaceComponent(Message.SHOP_REMOVED.get(), Map.of("%shop-name%", shop.getName())));
+        event.setCancelled(true);
     }
 
 }
