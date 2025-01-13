@@ -4,6 +4,7 @@ import org.bukkit.command.CommandSender;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.commands.AddPlayer;
+import com.spygstudios.chestshop.commands.Create;
 import com.spygstudios.chestshop.commands.Reload;
 import com.spygstudios.chestshop.commands.RemovePlayer;
 import com.spygstudios.chestshop.commands.ShopList;
@@ -28,7 +29,7 @@ public class CommandHandler {
     public CommandHandler(ChestShop plugin) {
         commands = LiteBukkitFactory.builder("spygchestshop", plugin)
 
-                .commands(new Reload(plugin), new ShopList(), new ShopListAdmin(), new AddPlayer(plugin), new RemovePlayer(plugin))
+                .commands(new Reload(plugin), new ShopList(), new ShopListAdmin(), new AddPlayer(plugin), new RemovePlayer(plugin), new Create())
 
                 .message(LiteBukkitMessages.PLAYER_ONLY, Message.PLAYER_ONLY.get())
 

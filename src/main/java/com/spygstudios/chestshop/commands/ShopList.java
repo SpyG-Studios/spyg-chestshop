@@ -41,7 +41,7 @@ public class ShopList {
             Chest chest = (Chest) shop.getChestLocation().getBlock().getState();
             String itemsLeft = String.valueOf(InventoryUtils.countItems(chest.getInventory(), shop.getMaterial()));
             Component hoverMessage = ComponentUtils.replaceComponent(Message.SHOP_LIST_SHOPS_HOVER.get(), Map.of("%shop-name%", shop.getName(), "%material%", shop.getMaterialString(), "%price%",
-                    shop.getPrice() + "", "%amount%", shop.getAmount() + "", "%items-left%", itemsLeft, "%location%", shop.getChestLocationString(), "%created%", shop.getCreatedAt()));
+                    shop.getPrice() + "", "%items-left%", itemsLeft, "%location%", shop.getChestLocationString(), "%created%", shop.getCreatedAt()));
             player.sendMessage(ComponentUtils.replaceComponent(Message.SHOP_LIST_SHOPS.get(), "%shop-name%", shop.getName()).hoverEvent(HoverEvent.showText(hoverMessage)));
         }
 

@@ -19,11 +19,12 @@ import com.spygstudios.chestshop.listeners.BreakListener;
 import com.spygstudios.chestshop.listeners.BuildListener;
 import com.spygstudios.chestshop.listeners.ChatListener;
 import com.spygstudios.chestshop.listeners.ExplosionListener;
+import com.spygstudios.chestshop.listeners.HopperListener;
 import com.spygstudios.chestshop.listeners.InteractListener;
-import com.spygstudios.chestshop.listeners.SignListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
 import com.spygstudios.chestshop.shop.ShopFile;
+import com.spygstudios.spyglib.hologram.HologramManager;
 
 import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
@@ -32,13 +33,13 @@ public class ChestShop extends JavaPlugin {
     @Getter
     private static ChestShop instance;
     @Getter
+    private Economy economy;
+    @Getter
     private Config conf;
     @Getter
-    private Economy economy;
-
-    @Getter
     private GuiConfig guiConfig;
-
+    @Getter
+    private HologramManager hologramManager;
     @Getter
     private CommandHandler commandHandler;
 
@@ -51,6 +52,7 @@ public class ChestShop extends JavaPlugin {
         conf = new Config(this);
         guiConfig = new GuiConfig(this);
         Message.init(conf);
+        hologramManager = HologramManager.getManager(instance);
         commandHandler = new CommandHandler(instance);
         new InteractListener(this);
         new BreakListener(this);
@@ -58,8 +60,8 @@ public class ChestShop extends JavaPlugin {
         new InventoryClickListener(instance);
         new InventoryCloseListener(instance);
         new ExplosionListener(instance);
-        new SignListener(instance);
         new ChatListener(instance);
+        new HopperListener(instance);
 
         getLogger().info("Loading economy plugin...");
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
@@ -92,6 +94,7 @@ public class ChestShop extends JavaPlugin {
                 player.closeInventory();
             }
         }
+
         String info = String.format("%s v. %s plugin has been disabled!", getName(), getPluginMeta().getVersion());
         getLogger().info(info);
     }

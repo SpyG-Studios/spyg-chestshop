@@ -23,7 +23,7 @@ public class Reload {
     }
 
     @Execute
-    @Permission({ "spygchestshop.admin.reload", "spygchestshop.admin" })
+    @Permission("spygchestshop.admin.reload")
     public void onReload(@Context CommandSender player) {
         config.reloadConfig();
         guiConfig.reloadConfig();

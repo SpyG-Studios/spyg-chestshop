@@ -44,8 +44,6 @@ public class AmountHandler {
     public void create(int amount) {
         if (type.equals(GuiAction.SET_ITEM_PRICE)) {
             shop.setPrice(amount);
-        } else if (type.equals(GuiAction.SET_ITEM_AMOUNT)) {
-            shop.setAmount(amount);
         }
         Message.ENTER_AMOUNT_SUCCESS.send(player);
         this.amount = amount;

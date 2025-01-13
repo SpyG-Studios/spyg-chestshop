@@ -13,11 +13,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
-import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
-import org.bukkit.block.data.type.WallSign;
-import org.bukkit.block.sign.Side;
-import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
@@ -27,6 +23,8 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.components.ComponentUtils;
+import com.spygstudios.spyglib.hologram.Hologram;
+import com.spygstudios.spyglib.hologram.HologramItemRow;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
 import com.spygstudios.spyglib.location.LocationUtils;
 
@@ -35,39 +33,27 @@ import lombok.Setter;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class Shop {
-
     @Getter
     private UUID ownerId;
-
     @Getter
     private int price;
-
-    @Getter
-    private int amount;
-
     @Getter
     private Material material;
-
     @Getter
     private Location chestLocation;
-
-    @Getter
-    private Location signLocation;
-
     @Getter
     private String createdAt;
-
     @Getter
     @Setter
     private String name;
-
     @Getter
     private boolean isNotify;
-
-    private ShopFile shopFile;
-
     @Getter
     private List<UUID> addedPlayers;
+    @Getter
+    private Hologram hologram;
+
+    private ShopFile shopFile;
 
     private static final List<Shop> SHOPS = new ArrayList<>();
     private static ChestShop plugin = ChestShop.getInstance();
@@ -81,19 +67,23 @@ public class Shop {
         this.name = name;
         this.shopFile = shopFile;
         price = shopFile.getInt("shops." + name + ".price");
-        amount = shopFile.getInt("shops." + name + ".amount");
         material = Material.getMaterial(shopFile.getString("shops." + name + ".material"));
         chestLocation = LocationUtils.toLocation(shopFile.getString("shops." + name + ".location"));
         createdAt = shopFile.getString("shops." + name + ".created");
         isNotify = shopFile.getBoolean("shops." + name + ".do-notify");
         addedPlayers = shopFile.getAddedUuids(name);
-
+        hologram = plugin.getHologramManager().createHologram(chestLocation.clone().add(0.5, 0.7, 0.5));
+        updateHologramRows();
         SHOPS.add(this);
-        setShopSign();
     }
 
-    public int getPriceForEach() {
-        return (int) Math.round(((double) price / amount));
+    private void updateHologramRows() {
+        while (!hologram.getRows().isEmpty()) {
+            hologram.removeRow(0);
+        }
+        plugin.getConf().getStringList("shop.lines").forEach(line -> hologram.addRow(TranslateColor.translate(line.replace("%owner%", Bukkit.getOfflinePlayer(ownerId).getName())
+                .replace("%shop-name%", name).replace("%price%", String.valueOf(price)).replace("%material%", getMaterialString()))));
+        hologram.addRow(new ItemStack(material == null ? Material.BARRIER : material));
     }
 
     public String getMaterialString() {
@@ -119,19 +109,15 @@ public class Shop {
     public void setMaterial(Material material) {
         this.material = material;
         ShopFile.getShopFile(ownerId).setMaterial(name, material);
-        setShopSign();
-    }
-
-    public void setAmount(int amount) {
-        this.amount = amount;
-        ShopFile.getShopFile(ownerId).setAmount(name, amount);
-        setShopSign();
+        if (getHologram().getRows().get(plugin.getConf().getStringList("shop.lines").size()) instanceof HologramItemRow row) {
+            row.setItem(new ItemStack(material));
+        }
     }
 
     public void setPrice(int price) {
         this.price = price;
         ShopFile.getShopFile(ownerId).setPrice(name, price);
-        setShopSign();
+        updateHologramRows();
     }
 
     public void setNotify(boolean notify) {
@@ -168,29 +154,6 @@ public class Shop {
         Bukkit.getPlayer(ownerId).sendMessage(ComponentUtils.replaceComponent(Message.PLAYER_REMOVED.get(), "%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
     }
 
-    public void setShopSign() throws IllegalArgumentException {
-        if (chestLocation.getBlock().getType() != Material.CHEST) {
-            removeShop(this);
-            throw new IllegalArgumentException("Block is not a chest, Shop removed! Location: " + chestLocation);
-        }
-        BlockFace chestFacing = getChestFace(chestLocation.getBlock());
-        signLocation = chestLocation.clone().add(chestFacing.getModX(), chestFacing.getModY(), chestFacing.getModZ());
-        Block signBlock = signLocation.getBlock();
-        if (!(signBlock.getBlockData() instanceof WallSign) || signBlock.getType() == Material.AIR) {
-            Bukkit.getLogger().warning("Shop sign is not a sign or air, removing shop! " + getName() + " at " + getChestLocationString());
-            remove();
-            return;
-        }
-
-        Sign sign = (Sign) signLocation.getBlock().getState();
-        SignSide side = sign.getSide(Side.FRONT);
-        for (int i = 0; i < 4; i++) {
-            side.line(i, TranslateColor.translate(plugin.getConf().getString("shop.sign.line." + (i + 1)).replace("%owner%", Bukkit.getOfflinePlayer(ownerId).getName())
-                    .replace("%amount%", String.valueOf(amount)).replace("%price%", String.valueOf(price)).replace("%material%", getMaterialString())));
-        }
-        sign.update();
-    }
-
     public void remove() {
         Shop.removeShop(this);
     }
@@ -215,7 +178,7 @@ public class Shop {
     }
 
     public void sell(Player buyer) {
-        if (getMaterial() == null || getAmount() == 0) {
+        if (getMaterial() == null) {
             Message.SHOP_SETUP_NEEDED.send(buyer);
             return;
         }
@@ -228,13 +191,13 @@ public class Shop {
             Message.SHOP_EMPTY.send(buyer);
             return;
         }
-        itemCount = getAmount() > itemCount ? itemCount : getAmount();
+        itemCount = 1 > itemCount ? itemCount : 1;
         itemsLeft -= itemCount;
         if (!InventoryUtils.hasFreeSlot(buyer)) {
             Message.SHOP_INVENTORY_FULL.send(buyer);
             return;
         }
-        int itemPrice = getPriceForEach() * itemCount;
+        int itemPrice = 1 * itemCount;
         EconomyResponse response = plugin.getEconomy().withdrawPlayer(buyer, (double) getPrice());
         if (response.transactionSuccess()) {
             ChestShop.getInstance().getEconomy().depositPlayer(Bukkit.getOfflinePlayer(getOwnerId()), (double) itemPrice);
@@ -276,6 +239,12 @@ public class Shop {
         return itemCount;
     }
 
+    public void removeHologram() {
+        if (hologram != null) {
+            hologram.remove();
+        }
+    }
+
     public static boolean isDisabledWorld(String worldName) {
         return Bukkit.getWorld(worldName) != null && isDisabledWorld(Bukkit.getWorld(worldName));
     }
@@ -314,7 +283,7 @@ public class Shop {
 
     public static Shop getShop(Location location) {
         for (Shop shop : SHOPS) {
-            if (shop.getChestLocation().equals(location) || shop.getSignLocation().equals(location)) {
+            if (shop.getChestLocation().equals(location)) {
                 return shop;
             }
         }

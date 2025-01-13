@@ -26,11 +26,9 @@ public class Config extends YamlManager {
         set("shops.save-interval", 60, Arrays.asList("The interval in seconds to save the shops data."));
 
         set("shop.anti-explosion", true, Arrays.asList("Prevent shops from being destroyed by explosions."));
-        set("shop.triggers", Arrays.asList("[chestshop]", "[cs]", "[shop]"), Arrays.asList("The sign text that triggers a shop."));
-        set("shop.sign.line.1", "&0[&b%material%&0]", Arrays.asList("You can customize the sign lines here."));
-        set("shop.sign.line.2", "%owner%");
-        set("shop.sign.line.3", "x&c%amount%");
-        set("shop.sign.line.4", "&a$&f%price%");
+        set("shop.hopper-protection", true,
+                Arrays.asList("Prevent hoppers from taking items from shops. !!!YOU MUST TURN OFF \"hopper.disable-move-event\" IN PAPER CONFIG IN ORDER TO PROTECT THE HOPPERS!!!"));
+        set("shop.lines", Arrays.asList("%shop-name%", "%owner%", "&a$&f%price%"), Arrays.asList("The lines of the shop."));
         saveConfig();
     }
 

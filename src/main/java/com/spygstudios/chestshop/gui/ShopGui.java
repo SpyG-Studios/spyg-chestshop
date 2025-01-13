@@ -53,8 +53,8 @@ public class ShopGui {
         ItemStack infoItem = ItemUtils.create(Material.WRITABLE_BOOK, config.getString("shop.info.title"),
                 ParseListPlaceholder.parse(config.getStringList("shop.info.lore"),
                         Map.of("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName(), "%material%", shop.getMaterial() == null ? "AIR" : shop.getMaterial().name(), "%price%",
-                                String.valueOf(shop.getPrice()), "%created%", shop.getCreatedAt(), "%location%", shop.getChestLocationString(), "%amount%", String.valueOf(shop.getAmount()),
-                                "%sold-items%", String.valueOf(shop.getSoldItems()), "%money-earnd%", String.valueOf(shop.getMoneyEarned()))));
+                                String.valueOf(shop.getPrice()), "%created%", shop.getCreatedAt(), "%location%", shop.getChestLocationString(), "%sold-items%", String.valueOf(shop.getSoldItems()),
+                                "%money-earnd%", String.valueOf(shop.getMoneyEarned()))));
         inventory.setItem(8, infoItem);
 
         // notify item
