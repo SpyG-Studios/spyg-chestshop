@@ -14,8 +14,8 @@ import net.kyori.adventure.text.event.ClickEvent.Action;
 @UtilityClass
 public class PageUtil {
 
-    public static Component getPages(int page, int maxPage, String command) {
-        int pages = (int) Math.ceil((double) maxPage / 10);
+    public static Component getPages(int page, int allPages, int elementPerPage, String command) {
+        int pages = (int) Math.ceil((double) allPages / elementPerPage);
         if (pages < page || page < 1) {
             return ComponentUtils.replaceComponent(Message.SHOP_INVALID_PAGE.get(), Map.of("%page%", page + ""));
         }

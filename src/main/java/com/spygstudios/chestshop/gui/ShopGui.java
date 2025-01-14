@@ -73,14 +73,14 @@ public class ShopGui {
         moneyData.set("shop", shop.getName());
         moneyData.save();
         inventory.setItem(11, moneyItem);
-
-        // amount item
-        ItemStack amountItem = ItemUtils.create(Material.CHEST, config.getString("shop.amount.title"), config.getStringList("shop.amount.lore"));
-        PersistentData amountData = new PersistentData(plugin, amountItem);
-        amountData.set("action", GuiAction.SET_ITEM_AMOUNT.name());
-        amountData.set("shop", shop.getName());
-        amountData.save();
-        inventory.setItem(15, amountItem);
+      
+        // inventory item
+        ItemStack inventoryItem = ItemUtils.create(Material.CHEST, config.getString("shop.inventory.title"), config.getStringList("shop.inventory.lore"));
+        PersistentData inventoryData = new PersistentData(plugin, inventoryItem);
+        inventoryData.set("action", GuiAction.OPEN_SHOP_INVENTORY.name());
+        inventoryData.set("shop", shop.getName());
+        inventoryData.save();
+        inventory.setItem(18, inventoryItem);
 
         // player item
         OfflinePlayer owner = Bukkit.getOfflinePlayer(shop.getOwnerId());
@@ -92,7 +92,7 @@ public class ShopGui {
         playerData.set("action", GuiAction.OPEN_PLAYERS.name());
         playerData.set("shop", shop.getName());
         playerData.save();
-        inventory.setItem(18, playrItem);
+        inventory.setItem(26, playrItem);
     }
 
     public static class ShopHolder implements InventoryHolder {

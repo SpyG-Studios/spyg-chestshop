@@ -18,8 +18,8 @@ public class GuiConfig extends YamlManager {
         set("shop.money.title", "&6Price");
         set("shop.money.lore", Arrays.asList("&7Edit the price you want to sell the material for"));
 
-        set("shop.amount.title", "&cAmount");
-        set("shop.amount.lore", Arrays.asList("&7Edit the amount of items you want to sell"));
+        set("shop.inventory.title", "&cShopInventory");
+        set("shop.inventory.lore", Arrays.asList("&7Click to open the shop inventory"));
 
         set("players.title", "&8[&6%shop-name%&8] &9Added players");
         set("players.player.title", "&6&l%player-name%");

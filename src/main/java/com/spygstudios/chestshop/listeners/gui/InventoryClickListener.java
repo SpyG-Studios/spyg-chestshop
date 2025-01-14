@@ -120,6 +120,9 @@ public class InventoryClickListener implements Listener {
         case OPEN_PLAYERS:
             PlayersGui.open(plugin, player, shop);
             break;
+        case OPEN_SHOP_INVENTORY:
+            shop.openShopInventory(player);
+            break;
         case CLOSE:
             player.closeInventory();
             break;

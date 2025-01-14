@@ -3,9 +3,11 @@ package com.spygstudios.chestshop.commands;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
@@ -36,6 +38,13 @@ public class Create {
 
         if (Shop.isDisabledWorld(player.getWorld())) {
             Message.SHOP_DISABLED_WORLD.send(player);
+            return;
+        }
+
+        BlockBreakEvent event = new BlockBreakEvent(targetBlock, player);
+        Bukkit.getServer().getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            Message.CANT_CREATE_SHOP_HERE.send(player);
             return;
         }
 

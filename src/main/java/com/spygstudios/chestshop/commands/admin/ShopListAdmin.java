@@ -50,6 +50,6 @@ public class ShopListAdmin {
             player.sendMessage(ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS.get(), "%shop-name%", shop.getName()).hoverEvent(HoverEvent.showText(hoverMessage)));
         }
 
-        player.sendMessage(PageUtil.getPages(page, file.getPlayerShops().size(), "/spygchestshop list"));
+        player.sendMessage(PageUtil.getPages(page, file.getPlayerShops().size(), 10, "/spygchestshop list"));
     }
 }

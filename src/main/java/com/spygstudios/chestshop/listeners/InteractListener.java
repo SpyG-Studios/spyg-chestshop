@@ -1,6 +1,7 @@
 package com.spygstudios.chestshop.listeners;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -10,6 +11,7 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.gui.ShopGui;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.spyglib.item.ItemUtils;
 
 public class InteractListener implements Listener {
 
@@ -37,13 +39,13 @@ public class InteractListener implements Listener {
         if (shop == null) {
             return;
         }
+        if (player.isSneaking() && ItemUtils.hasItemInHand(player, Material.HOPPER)) {
+            return;
+        }
 
         // Owner
         boolean isAdmin = (player.hasPermission("spygchestshop.admin") || player.hasPermission("spygchestshop.admin.edit")) && player.isSneaking();
         if (shop.getOwnerId().equals(player.getUniqueId()) || isAdmin) {
-            if (shop.getChestLocation().equals(location)) {
-                return;
-            }
             ShopGui.open(plugin, player, shop);
             event.setCancelled(true);
             return;

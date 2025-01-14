@@ -13,7 +13,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
-import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
@@ -159,8 +158,7 @@ public class Shop {
     }
 
     public boolean isDoubleChest() {
-
-        if (!(chestLocation.getBlock() instanceof Chest chest)) {
+        if (!(chestLocation.getBlock().getState() instanceof Chest chest)) {
             return false;
         }
         Inventory inv = chest.getInventory();
@@ -245,6 +243,13 @@ public class Shop {
         }
     }
 
+    public void openShopInventory(Player player) {
+        if (!(chestLocation.getBlock().getState() instanceof Chest chest)) {
+            return;
+        }
+        player.openInventory(chest.getInventory());
+    }
+
     public static boolean isDisabledWorld(String worldName) {
         return Bukkit.getWorld(worldName) != null && isDisabledWorld(Bukkit.getWorld(worldName));
     }
@@ -282,8 +287,9 @@ public class Shop {
     }
 
     public static Shop getShop(Location location) {
+        location = location.getBlock().getLocation();
         for (Shop shop : SHOPS) {
-            if (shop.getChestLocation().equals(location)) {
+            if (shop.getChestLocation().equals(location) || (shop.isDoubleChest() && shop.getAdjacentChest().getLocation().equals(location))) {
                 return shop;
             }
         }
@@ -296,14 +302,8 @@ public class Shop {
 
     public static void removeShop(Shop shop) {
         ShopFile.getShopFile(shop.getOwnerId()).removeShop(shop.getName());
+        shop.removeHologram();
         SHOPS.remove(shop);
-    }
-
-    public static BlockFace getChestFace(Block chestBlock) throws IllegalArgumentException {
-        if (!(chestBlock.getBlockData() instanceof Directional directional)) {
-            throw new IllegalArgumentException("Block is not a chest!");
-        }
-        return directional.getFacing();
     }
 
     public static boolean isDoubleChest(Block block) {
@@ -322,12 +322,6 @@ public class Shop {
             }
         }
         return null;
-    }
-
-    public static boolean isChestFaceFree(Block chestBlock) {
-        BlockFace facing = getChestFace(chestBlock);
-        Location signLocation = chestBlock.getLocation().clone().add(facing.getModX(), facing.getModY(), facing.getModZ());
-        return signLocation.getBlock().getType() == Material.AIR;
     }
 
 }

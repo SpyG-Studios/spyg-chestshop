@@ -63,6 +63,8 @@ public class ChestShop extends JavaPlugin {
         new ChatListener(instance);
         new HopperListener(instance);
 
+        // getServer().spigot().getPaperConfig().
+
         getLogger().info("Loading economy plugin...");
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
