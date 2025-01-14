@@ -29,10 +29,6 @@ public class AmountHandler {
     private Shop shop;
 
     public AmountHandler(Player player, Shop shop, GuiAction type) {
-        if (pendingAmount.contains(this)) {
-            return;
-        }
-
         this.player = player;
         this.type = type;
         this.shop = shop;

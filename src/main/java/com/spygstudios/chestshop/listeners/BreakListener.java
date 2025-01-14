@@ -2,8 +2,6 @@ package com.spygstudios.chestshop.listeners;
 
 import java.util.Map;
 
-import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,22 +19,23 @@ public class BreakListener implements Listener {
     }
 
     @EventHandler
-    public void onInteractWithShop(BlockBreakEvent event) {
-        Player player = event.getPlayer();
-        if (Shop.isDisabledWorld(player.getWorld())) {
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (Shop.isDisabledWorld(event.getBlock().getWorld())) {
             return;
         }
-        Block block = event.getBlock();
-        Location location = block.getLocation();
-        Shop shop = Shop.getShop(location);
-        if (shop == null || (shop.isDoubleChest() && !shop.getAdjacentChest().equals(event.getBlock()))) {
+        Shop shop = Shop.getShop(event.getBlock().getLocation());
+        if (shop == null) {
             return;
         }
 
+        Player player = event.getPlayer();
         boolean isAdmin = (player.hasPermission("spygchestshop.admin") || player.hasPermission("spygchestshop.admin.break")) && player.isSneaking();
         if (!shop.getOwnerId().equals(player.getUniqueId()) && !isAdmin) {
             Message.SHOP_NOT_OWNER.send(player);
             event.setCancelled(true);
+            return;
+        }
+        if (!shop.getChestLocation().equals(event.getBlock().getLocation())) {
             return;
         }
         shop.remove();

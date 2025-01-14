@@ -9,9 +9,9 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.gui.ShopGui;
+import com.spygstudios.chestshop.gui.ChestShopGui;
+import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
-import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.shop.Shop;
 
 public class InventoryCloseListener implements Listener {
@@ -28,17 +28,17 @@ public class InventoryCloseListener implements Listener {
         InventoryHolder invHolder = event.getInventory().getHolder();
 
         if (invHolder instanceof PlayersHolder holder && (event.getPlayer().getOpenInventory() == null || !(event.getPlayer().getOpenInventory().getTopInventory() instanceof PlayersHolder))) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> ShopGui.open(plugin, (Player) event.getPlayer(), holder.getShop()), 1);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> ChestShopGui.open(plugin, (Player) event.getPlayer(), holder.getShop()), 1);
             return;
         }
 
-        if (invHolder instanceof ShopHolder holder) {
+        if (invHolder instanceof ChestShopHolder holder) {
             itemAdding(event, holder);
         }
 
     }
 
-    private void itemAdding(InventoryCloseEvent event, ShopHolder holdder) {
+    private void itemAdding(InventoryCloseEvent event, ChestShopHolder holdder) {
         ItemStack item = event.getInventory().getItem(13);
         Shop shop = holdder.getShop();
         if (item == null || item.getType().equals(shop.getMaterial())) {

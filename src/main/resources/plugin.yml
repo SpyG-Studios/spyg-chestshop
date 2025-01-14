@@ -6,4 +6,4 @@ authors: [ikoli, Ris]
 depend: [Vault]
 
 libraries:
-  - com.spygstudios:spyglib:1.1.0
+  - com.spygstudios:spyglib:${spyglib.version}

@@ -15,10 +15,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.enums.GuiAction;
-import com.spygstudios.chestshop.gui.PlayersGui;
-import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui;
-import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
+import com.spygstudios.chestshop.gui.ChestShopGui;
+import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
+import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.shop.AmountHandler;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.color.TranslateColor;
@@ -35,7 +35,7 @@ public class InventoryClickListener implements Listener {
 
     @EventHandler
     public void onShopGuiClick(InventoryClickEvent event) {
-        if (!(event.getInventory().getHolder() instanceof ShopHolder)) {
+        if (!(event.getInventory().getHolder() instanceof ChestShopHolder)) {
             return;
         }
         if (event.getClickedInventory() == null || event.getClickedInventory().getType().equals(InventoryType.PLAYER)) {
@@ -80,10 +80,10 @@ public class InventoryClickListener implements Listener {
         case REMOVE_PLAYER:
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(data.getString("uuid")));
             shop.removePlayer(offlinePlayer.getUniqueId());
-            PlayersGui.open(plugin, player, shop);
+            ShopGui.open(plugin, player, shop);
             break;
         case BACK:
-            ShopGui.open(plugin, player, shop);
+            ChestShopGui.open(plugin, player, shop);
             break;
         default:
             break;
@@ -98,7 +98,7 @@ public class InventoryClickListener implements Listener {
             return;
         }
 
-        Player player = ((ShopHolder) event.getInventory().getHolder()).getPlayer();
+        Player player = ((ChestShopHolder) event.getInventory().getHolder()).getPlayer();
         Shop shop = Shop.getShop(data.getString("shop"));
         GuiAction guiAction = GuiAction.valueOf(action);
         switch (guiAction) {
@@ -114,11 +114,14 @@ public class InventoryClickListener implements Listener {
             player.updateInventory();
             break;
         case SET_ITEM_AMOUNT, SET_ITEM_PRICE:
+            if (AmountHandler.getPendingAmount(player) != null) {
+                AmountHandler.getPendingAmount(player).cancel();
+            }
             new AmountHandler(player, shop, guiAction);
             event.getInventory().close();
             break;
         case OPEN_PLAYERS:
-            PlayersGui.open(plugin, player, shop);
+            ShopGui.open(plugin, player, shop);
             break;
         case OPEN_SHOP_INVENTORY:
             shop.openShopInventory(player);
