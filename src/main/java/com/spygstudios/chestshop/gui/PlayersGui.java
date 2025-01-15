@@ -1,5 +1,6 @@
 package com.spygstudios.chestshop.gui;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -21,6 +22,7 @@ import com.spygstudios.spyglib.item.PlayerHeads;
 import com.spygstudios.spyglib.persistentdata.PersistentData;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -29,10 +31,10 @@ public class PlayersGui {
 
     public static void open(ChestShop plugin, Player player, Shop shop) {
         config = plugin.getGuiConfig();
-        Inventory inventory = player.getServer().createInventory(new PlayersHolder(player, shop), 27,
-                TranslateColor.translate(config.getString("players.title").replace("%shop-name%", shop.getName())));
+        PlayersHolder holder = new PlayersHolder(player, shop);
+        Inventory inventory = player.getServer().createInventory(holder, 27, TranslateColor.translate(config.getString("players.title").replace("%shop-name%", shop.getName())));
         setGlassBackground(inventory);
-        loadPlayerHeads(plugin, shop, inventory);
+        loadPlayerHeads(plugin, shop, inventory, holder.getPage());
         player.openInventory(inventory);
     }
 
@@ -41,7 +43,7 @@ public class PlayersGui {
             return;
         }
         setGlassBackground(inventory);
-        loadPlayerHeads(plugin, holder.getShop(), inventory);
+        loadPlayerHeads(plugin, holder.getShop(), inventory, holder.getPage());
     }
 
     private static void setGlassBackground(Inventory inventory) {
@@ -54,9 +56,13 @@ public class PlayersGui {
         }
     }
 
-    private static void loadPlayerHeads(ChestShop plugin, Shop shop, Inventory inventory) {
-        for (int i = 0; i < shop.getAddedPlayers().size(); i++) {
-            UUID uuid = shop.getAddedPlayers().get(i);
+    private static void loadPlayerHeads(ChestShop plugin, Shop shop, Inventory inventory, int page) {
+        int headPerPage = 18;
+        int maxPage = (int) Math.ceil((double) shop.getAddedPlayers().size() / headPerPage);
+        List<UUID> addedPlayers = shop.getAddedPlayers().stream().skip((long) (page - 1) * headPerPage).limit(headPerPage).toList();
+
+        for (int i = 0; i < addedPlayers.size(); i++) {
+            UUID uuid = addedPlayers.get(i);
             if (Bukkit.getOfflinePlayer(uuid).getName() == null) {
                 continue;
             }
@@ -87,9 +93,23 @@ public class PlayersGui {
                 });
             });
         }
-        if (shop.getAddedPlayers().size() > 18) {
-            inventory.setItem(26, new ItemStack(Material.ARROW));
+        if (page > 1) {
+            inventory.setItem(18, getArrowItem(plugin, config.getString("players.back.title"), GuiAction.BACK));
         }
+        if (shop.getAddedPlayers().size() > 18 && page < maxPage) {
+            inventory.setItem(26, getArrowItem(plugin, config.getString("players.next.title"), GuiAction.NEXT));
+        }
+    }
+
+    private static ItemStack getArrowItem(ChestShop plugin, String displayName, GuiAction action) {
+        ItemStack arrow = new ItemStack(Material.ARROW);
+        ItemMeta arrowMeta = arrow.getItemMeta();
+        arrowMeta.displayName(TranslateColor.translate(displayName));
+        arrow.setItemMeta(arrowMeta);
+        PersistentData nextData = new PersistentData(plugin, arrow);
+        nextData.set("action", action.name());
+        nextData.save();
+        return arrow;
     }
 
     private static SkullMeta getPlayerHeadMeta(ItemStack skull, OfflinePlayer offlinePlayer) {
@@ -107,9 +127,14 @@ public class PlayersGui {
         @Getter
         private final Shop shop;
 
+        @Getter
+        @Setter
+        private int page;
+
         public PlayersHolder(Player player, Shop shop) {
             this.player = player;
             this.shop = shop;
+            this.page = 1;
         }
 
         @Override

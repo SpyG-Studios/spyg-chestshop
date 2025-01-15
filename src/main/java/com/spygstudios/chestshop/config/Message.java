@@ -64,7 +64,7 @@ public enum Message {
     SHOP_SETUP_NEEDED("shop.setup-needed", "%prefix% &cThis shop is not set up properly!"),
     SHOP_NAME_TOO_SHORT("shop.name-too-short", "%prefix% &cShop name is too short!"),
     SHOP_SOLD("shop.sold", "%prefix% &aYou sold &7x%items-bought% &f%material% &afor &f$%price%&a, to %player-name%! &7(&8%items-left%&7)"),
-    
+
     ADMIN_SHOP_LIST_HEAD("admin.shop.list.header", "%prefix% &e%player-name%&a's shops:"), 
     ADMIN_SHOP_LIST_SHOPS("admin.shop.list.shops", "&7- &f%shop-name%"),
     ADMIN_SHOP_LIST_SHOPS_HOVER("admin.shop.list.shops-hover", "&6&l%material%&r\n &8- &7price: &6$&e%price%\n &8- &7items left: &e%items-left%\n &8- &7location: &e%location%\n &8- &7created at: &e%created%"),

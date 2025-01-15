@@ -112,11 +112,25 @@ public class InventoryClickListener implements Listener {
             return;
         }
         PlayersHolder holder = (PlayersHolder) event.getInventory().getHolder();
-        if (GuiAction.valueOf(action).equals(GuiAction.REMOVE_PLAYER)) {
+        GuiAction guiAction = GuiAction.valueOf(action);
+        switch (guiAction) {
+        case REMOVE_PLAYER:
             Shop shop = holder.getShop();
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(data.getString("uuid")));
             shop.removePlayer(offlinePlayer.getUniqueId());
             PlayersGui.reloadGui(plugin, event.getInventory());
+            break;
+
+        case NEXT:
+            holder.setPage(holder.getPage() + 1);
+            PlayersGui.reloadGui(plugin, event.getInventory());
+            break;
+        case BACK:
+            holder.setPage(holder.getPage() - 1);
+            PlayersGui.reloadGui(plugin, event.getInventory());
+            break;
+        default:
+            break;
         }
     }
 

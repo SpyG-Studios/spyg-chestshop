@@ -35,6 +35,8 @@ public class GuiConfig extends YamlManager {
         set("players.title", "&8[&6%shop-name%&8] &9Added players");
         set("players.player.title", "&6&l%player-name%");
         set("players.player.lore", Arrays.asList("&7Click to remove this player"));
+        set("players.next.title", "&6Next page");
+        set("players.back.title", "&6Previous page");
 
         set("shop.title", "&8[&6%shop-name%&8] &7Shop Menu");
         set("shop.item-to-buy.title", "&6&lBuy &7%material%");
