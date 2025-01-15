@@ -40,6 +40,7 @@ public class BreakListener implements Listener {
         }
         shop.remove();
         player.sendMessage(ComponentUtils.replaceComponent(Message.SHOP_REMOVED.get(), Map.of("%shop-name%", shop.getName())));
+        event.setCancelled(true);
     }
 
 }

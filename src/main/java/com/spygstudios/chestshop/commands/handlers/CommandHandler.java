@@ -5,9 +5,9 @@ import org.bukkit.command.CommandSender;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.commands.AddPlayer;
 import com.spygstudios.chestshop.commands.Create;
-import com.spygstudios.chestshop.commands.Reload;
 import com.spygstudios.chestshop.commands.RemovePlayer;
 import com.spygstudios.chestshop.commands.ShopList;
+import com.spygstudios.chestshop.commands.admin.Reload;
 import com.spygstudios.chestshop.commands.admin.ShopListAdmin;
 import com.spygstudios.chestshop.commands.arguments.IntegerArgument;
 import com.spygstudios.chestshop.commands.arguments.ShopArgument;
@@ -39,7 +39,9 @@ public class CommandHandler {
 
                 .argument(Shop.class, new ShopArgument())
 
-                .argument(Integer.class, new IntegerArgument()).build();
+                .argument(Integer.class, new IntegerArgument())
+
+                .build();
     }
 
     public void unregister() {

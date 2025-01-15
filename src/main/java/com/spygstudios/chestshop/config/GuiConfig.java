@@ -13,10 +13,10 @@ public class GuiConfig extends YamlManager {
         set("chestshop.title", "&8[&6%shop-name%&8] &7 &8%player-name%");
 
         set("chestshop.material.title", "&cMaterial");
-        set("chestshop.material.lore", Arrays.asList("&7Put here the material you want to sell in the chest"));
+        set("chestshop.material.lore", Arrays.asList("&7Put here the material you", "&7want to sell"));
 
         set("chestshop.money.title", "&6Price");
-        set("chestshop.money.lore", Arrays.asList("&7Edit the price you want to sell the material for"));
+        set("chestshop.money.lore", Arrays.asList("&7Edit the price you want to", "&7sell the material for"));
 
         set("chestshop.inventory.title", "&cShopInventory");
         set("chestshop.inventory.lore", Arrays.asList("&7Click to open the shop inventory"));

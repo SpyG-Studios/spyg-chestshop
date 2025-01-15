@@ -77,7 +77,7 @@ public class Shop {
         SHOPS.add(this);
     }
 
-    private void updateHologramRows() {
+    public void updateHologramRows() {
         while (!hologram.getRows().isEmpty()) {
             hologram.removeRow(0);
         }

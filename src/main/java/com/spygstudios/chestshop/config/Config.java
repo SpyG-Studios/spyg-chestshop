@@ -28,7 +28,7 @@ public class Config extends YamlManager {
         set("shop.anti-explosion", true, Arrays.asList("Prevent shops from being destroyed by explosions."));
         set("shop.hopper-protection", true,
                 Arrays.asList("Prevent hoppers from taking items from shops. !!!YOU MUST TURN OFF \"hopper.disable-move-event\" IN PAPER CONFIG IN ORDER TO PROTECT THE HOPPERS!!!"));
-        set("shop.lines", Arrays.asList("%shop-name%", "%owner%", "&a$&f%price%"), Arrays.asList("The lines of the shop."));
+        set("shop.lines", Arrays.asList("%shop-name%", "&#dddddd%owner%", "&2$&a%price%"), Arrays.asList("The lines of the shop."));
         saveConfig();
     }
 
