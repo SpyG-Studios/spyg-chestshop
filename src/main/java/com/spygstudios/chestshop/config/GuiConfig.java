@@ -36,18 +36,29 @@ public class GuiConfig extends YamlManager {
         set("players.player.title", "&6&l%player-name%");
         set("players.player.lore", Arrays.asList("&7Click to remove this player"));
 
-        set("shop.title", "&8[&6%shop-name%&8] &7Shop");
-        set("shop.minus.title", "&c%amount%");
-        set("shop.minus.lore", Arrays.asList("&7Click to decrease the amount"));
-        set("shop.plus.title", "&a+%amount%");
-        set("shop.plus.lore", Arrays.asList("&7Click to increase the amount"));
+        set("shop.title", "&8[&6%shop-name%&8] &7Shop Menu");
         set("shop.item-to-buy.title", "&6&lBuy &7%material%");
         set("shop.item-to-buy.lore", Arrays.asList("&7Buy item for &6$&e%price%"));
 
-        set("shop.amount.items.1", -32);
-        set("shop.amount.items.2", -1);
-        set("shop.amount.items.3", 1);
-        set("shop.amount.items.4", 32);
+        set("shop.amount.items.minus1.slot", 9);
+        set("shop.amount.items.minus1.title", "-&c%amount%");
+        set("shop.amount.items.minus1.lore", Arrays.asList("&7Click to decrease the amount"));
+        set("shop.amount.items.minus1.amount", -16);
+
+        set("shop.amount.items.minus2.slot", 11);
+        set("shop.amount.items.minus2.title", "-&c%amount%");
+        set("shop.amount.items.minus2.lore", Arrays.asList("&7Click to decrease the amount"));
+        set("shop.amount.items.minus2.amount", -1);
+
+        set("shop.amount.items.plus1.slot", 15);
+        set("shop.amount.items.plus1.title", "+&a%amount%");
+        set("shop.amount.items.plus1.lore", Arrays.asList("&7Click to increase the amount"));
+        set("shop.amount.items.plus1.amount", 1);
+
+        set("shop.amount.items.plus2.slot", 17);
+        set("shop.amount.items.plus2.title", "+&a%amount%");
+        set("shop.amount.items.plus2.lore", Arrays.asList("&7Click to increase the amount"));
+        set("shop.amount.items.plus2.amount", 16);
 
         saveConfig();
     }

@@ -40,7 +40,7 @@ public enum Message {
     SHOP_INVALID_PRICE("shop.invalid-price", "%prefix% &cInvalid price!"),
     SHOP_INVALID_PAGE("shop.invalid-page", "%prefix% &cInvalid page! &7(&8%page%&7)"),
     SHOP_LIMIT_REACHED("shop.limit-reached", "%prefix% &cYou have reached the shop limit! (&e%shop-limit%&c)"), 
-    SHOP_PLAYER_LIMIT_REACHED("shop.player-limit-reached", "%prefix% &cYou have reached the player limit! (&e%player-limit%&c)"),
+    SHOP_PLAYER_LIMIT_REACHED("shop.player-limit-reached", "%prefix% &cYou have reached the player limit! (&e%max-players%&c)"),
     
     SHOP_LIST_HEAD("shop.list.header", "%prefix% &aYour shops:"), 
     SHOP_LIST_SHOPS("shop.list.shops", "&7- &f%shop-name%"),

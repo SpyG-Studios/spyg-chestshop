@@ -41,20 +41,20 @@ public class ShopGui {
         data.save();
         inventory.setItem(13, shopItem);
 
-        addItemToInventory(plugin, inventory, 9, Material.RED_STAINED_GLASS_PANE, config.getString("shop.minus.title").replace("%amount%", config.getString("shop.amount.items.1")),
-                config.getStringList("shop.minus.lore"), config.getInt("shop.amount.items.1"));
-        addItemToInventory(plugin, inventory, 11, Material.RED_STAINED_GLASS_PANE, config.getString("shop.minus.title").replace("%amount%", config.getString("shop.amount.items.2")),
-                config.getStringList("shop.minus.lore"), config.getInt("shop.amount.items.2"));
-        addItemToInventory(plugin, inventory, 15, Material.GREEN_STAINED_GLASS_PANE, config.getString("shop.plus.title").replace("%amount%", config.getString("shop.amount.items.3")),
-                config.getStringList("shop.plus.lore"), config.getInt("shop.amount.items.3"));
-        addItemToInventory(plugin, inventory, 17, Material.GREEN_STAINED_GLASS_PANE, config.getString("shop.plus.title").replace("%amount%", config.getString("shop.amount.items.4")),
-                config.getStringList("shop.plus.lore"), config.getInt("shop.amount.items.4"));
+        config.getConfigurationSection("shop.amount.items").getKeys(false).forEach(key -> {
+            int slot = config.getInt("shop.amount.items." + key + ".slot");
+            int amount = config.getInt("shop.amount.items." + key + ".amount");
+            String title = config.getString("shop.amount.items." + key + ".title").replace("%amount%", String.valueOf(amount).replace("-", ""));
+            List<String> lore = config.getStringList("shop.amount.items." + key + ".lore");
+            Material material = amount > 0 ? Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
+            addItemToInventory(plugin, inventory, slot, material, title, lore, amount);
+        });
 
         player.openInventory(inventory);
     }
 
     private void addItemToInventory(ChestShop plugin, Inventory inventory, int slot, Material material, String title, List<String> lore, int amount) {
-        ItemStack item = ItemUtils.create(material, title, lore);
+        ItemStack item = ItemUtils.create(material, title, lore, Math.abs(amount));
         PersistentData data = new PersistentData(plugin, item);
         data.set("action", GuiAction.SET_ITEM_AMOUNT.name());
         data.set("amount", amount);

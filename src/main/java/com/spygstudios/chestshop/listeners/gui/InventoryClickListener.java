@@ -1,11 +1,14 @@
 package com.spygstudios.chestshop.listeners.gui;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,9 +21,8 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
-import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.PlayersGui;
-import com.spygstudios.chestshop.gui.ShopGui;
+import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
 import com.spygstudios.chestshop.shop.AmountHandler;
 import com.spygstudios.chestshop.shop.Shop;
@@ -31,10 +33,12 @@ import net.kyori.adventure.text.Component;
 
 public class InventoryClickListener implements Listener {
 
-    private ChestShop plugin;
+    private final ChestShop plugin;
+    private final Map<UUID, Long> lastAmountClick;
 
     public InventoryClickListener(ChestShop plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        this.lastAmountClick = new HashMap<>();
         this.plugin = plugin;
     }
 
@@ -55,6 +59,10 @@ public class InventoryClickListener implements Listener {
         }
         GuiAction guiAction = GuiAction.valueOf(action);
         if (guiAction.equals(GuiAction.SET_ITEM_AMOUNT)) {
+            if (System.currentTimeMillis() - getLastAmountClick(event.getWhoClicked()) < 100) {
+                return;
+            }
+            lastAmountClick.put(event.getWhoClicked().getUniqueId(), System.currentTimeMillis());
             ShopGuiHolder holder = (ShopGuiHolder) event.getInventory().getHolder();
             int itemsLeft = holder.getShop().getItemsLeft();
             int max = 64 > itemsLeft ? itemsLeft : 64;
@@ -81,7 +89,7 @@ public class InventoryClickListener implements Listener {
             ItemStack shopItem = event.getInventory().getItem(13);
             int amount = shopItem.getAmount();
             holder.getShop().sell(holder.getPlayer(), amount);
-            if (holder.getShop().getItemsLeft() < shopItem.getAmount()) {
+            if (holder.getShop().getItemsLeft() == 0) {
                 holder.getPlayer().closeInventory();
                 Message.SHOP_EMPTY.send(holder.getPlayer());
             }
@@ -104,12 +112,11 @@ public class InventoryClickListener implements Listener {
             return;
         }
         PlayersHolder holder = (PlayersHolder) event.getInventory().getHolder();
-        Player player = holder.getPlayer();
         if (GuiAction.valueOf(action).equals(GuiAction.REMOVE_PLAYER)) {
             Shop shop = holder.getShop();
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(data.getString("uuid")));
             shop.removePlayer(offlinePlayer.getUniqueId());
-            ShopGui.open(plugin, player, shop);
+            PlayersGui.reloadGui(plugin, event.getInventory());
         }
     }
 
@@ -190,6 +197,13 @@ public class InventoryClickListener implements Listener {
         PersistentData newData = new PersistentData(plugin, event.getInventory().getItem(13));
         newData.set("action", GuiAction.SET_MATERIAL.name());
         newData.save();
+    }
+
+    private Long getLastAmountClick(HumanEntity player) {
+        if (lastAmountClick.containsKey(player.getUniqueId())) {
+            return lastAmountClick.get(player.getUniqueId());
+        }
+        return 0L;
     }
 
 }

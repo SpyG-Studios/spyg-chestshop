@@ -79,7 +79,7 @@ public class ChestShop extends JavaPlugin {
         ShopFile.loadShopFiles(instance);
 
         ShopFile.startSaveScheduler(instance);
-        String info = String.format("%s v. %s plugin has been enabled!", getName(), getPluginMeta().getVersion());
+        String info = String.format("%s v. %s plugin has been enabled!", getName(), getDescription().getVersion());
         getLogger().info(info);
     }
 
@@ -98,7 +98,7 @@ public class ChestShop extends JavaPlugin {
             }
         }
 
-        String info = String.format("%s v. %s plugin has been disabled!", getName(), getPluginMeta().getVersion());
+        String info = String.format("%s v. %s plugin has been disabled!", getName(), getDescription().getVersion());
         getLogger().info(info);
     }
 
