@@ -136,39 +136,47 @@ public class ShopFile extends YamlManager {
             return;
         }
         for (File file : shopsFolder.listFiles()) {
-            if (!file.isFile() || !file.getName().endsWith(".yml")) {
-                continue;
-            }
-            UUID ownerId;
-            try {
-                ownerId = UUID.fromString(file.getName().replace(".yml", ""));
-            } catch (IllegalArgumentException e) {
-                plugin.getLogger().warning("Invalid shop file: " + file.getName() + " (invalid UUID)");
-                continue;
-            }
-            ShopFile shopFile = new ShopFile(plugin, ownerId);
-            setDefaultValues(shopFile);
-            for (String shopName : shopFile.getPlayerShops()) {
-                String shopPath = "shops." + shopName;
-                String locationString = shopFile.getString(shopPath + ".location");
-                if (locationString == null) {
-                    plugin.getLogger().warning("Invalid shop file: " + file.getName() + " (location is null) removing shop...");
-                    shopFile.removeShop(shopName);
-                    continue;
-                }
-                Location location = LocationUtils.toLocation(locationString);
-                if (Shop.isDisabledWorld(location.getWorld())) {
-                    continue;
-                }
-                if (!location.getBlock().getType().equals(Material.CHEST)) {
-                    plugin.getLogger().warning("Invalid shop in: " + file.getName() + " (chest is not a chest) removing shop...");
-                    shopFile.removeShop(shopName);
-                    continue;
-                }
-                new Shop(ownerId, shopName, shopFile);
-            }
+            processShopFile(plugin, file);
         }
         plugin.getLogger().info("Shops loaded!");
+    }
+
+    private static void processShopFile(ChestShop plugin, File file) {
+        if (!file.isFile() || !file.getName().endsWith(".yml")) {
+            return;
+        }
+        UUID ownerId;
+        try {
+            ownerId = UUID.fromString(file.getName().replace(".yml", ""));
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().warning("Invalid shop file: " + file.getName() + " (invalid UUID)");
+            return;
+        }
+        ShopFile shopFile = new ShopFile(plugin, ownerId);
+        setDefaultValues(shopFile);
+        for (String shopName : shopFile.getPlayerShops()) {
+            processShop(plugin, file, shopFile, shopName);
+        }
+    }
+
+    private static void processShop(ChestShop plugin, File file, ShopFile shopFile, String shopName) {
+        String shopPath = "shops." + shopName;
+        String locationString = shopFile.getString(shopPath + ".location");
+        if (locationString == null) {
+            plugin.getLogger().warning("Invalid shop file: " + file.getName() + " (location is null) removing shop...");
+            shopFile.removeShop(shopName);
+            return;
+        }
+        Location location = LocationUtils.toLocation(locationString);
+        if (Shop.isDisabledWorld(location.getWorld())) {
+            return;
+        }
+        if (!location.getBlock().getType().equals(Material.CHEST)) {
+            plugin.getLogger().warning("Invalid shop in: " + file.getName() + " (chest is not a chest) removing shop...");
+            shopFile.removeShop(shopName);
+            return;
+        }
+        new Shop(shopFile.getOwnerId(), shopName, shopFile);
     }
 
     public static ShopFile getShopFile(UUID ownerId) {
