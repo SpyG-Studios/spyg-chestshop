@@ -64,6 +64,11 @@ public class InteractListener implements Listener {
             event.setCancelled(true);
             return;
         }
+        if (shop.getItemsLeft() == 0) {
+            Message.SHOP_EMPTY.send(player);
+            event.setCancelled(true);
+            return;
+        }
         ShopGui.open(plugin, player, shop);
         event.setCancelled(true);
     }

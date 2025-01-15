@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
@@ -77,8 +78,13 @@ public class InventoryClickListener implements Listener {
             shopMaterial.setItemMeta(shopMeta);
         } else if (guiAction.equals(GuiAction.BUY)) {
             ShopGuiHolder holder = (ShopGuiHolder) event.getInventory().getHolder();
-            int amount = event.getInventory().getItem(13).getAmount();
+            ItemStack shopItem = event.getInventory().getItem(13);
+            int amount = shopItem.getAmount();
             holder.getShop().sell(holder.getPlayer(), amount);
+            if (holder.getShop().getItemsLeft() < shopItem.getAmount()) {
+                holder.getPlayer().closeInventory();
+                Message.SHOP_EMPTY.send(holder.getPlayer());
+            }
         }
     }
 

@@ -160,6 +160,11 @@ public class ShopFile extends YamlManager {
                 if (Shop.isDisabledWorld(location.getWorld())) {
                     continue;
                 }
+                if (!location.getBlock().getType().equals(Material.CHEST)) {
+                    plugin.getLogger().warning("Invalid shop in: " + file.getName() + " (chest is not a chest) removing shop...");
+                    shopFile.removeShop(shopName);
+                    continue;
+                }
                 new Shop(ownerId, shopName, shopFile);
             }
         }
