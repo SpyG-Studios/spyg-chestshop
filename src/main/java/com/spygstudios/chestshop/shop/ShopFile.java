@@ -36,8 +36,9 @@ public class ShopFile extends YamlManager {
             return;
         }
         set("shops", null);
+        this.isSaved = true;
+        this.ownerId = ownerId;
         SHOPS_FILES.put(ownerId, this);
-        isSaved = true;
     }
 
     public void setPlayers(List<UUID> players, String shopName) {
