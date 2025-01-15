@@ -3,6 +3,7 @@ package com.spygstudios.chestshop;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
@@ -63,6 +64,9 @@ public class ChestShop extends JavaPlugin {
         new ExplosionListener(instance);
         new ChatListener(instance);
         new HopperListener(instance);
+
+        // bStats
+        new Metrics(this, 24462);
 
         getLogger().info("Loading economy plugin...");
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
