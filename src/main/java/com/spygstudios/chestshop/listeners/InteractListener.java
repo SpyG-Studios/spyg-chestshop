@@ -8,7 +8,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.gui.ChestShopGui;
+import com.spygstudios.chestshop.gui.ShopGui;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.item.ItemUtils;
 
@@ -57,7 +59,12 @@ public class InteractListener implements Listener {
         }
 
         // Buyer
-        shop.sell(player);
+        if (shop.getMaterial() == null) {
+            Message.SHOP_SETUP_NEEDED.send(player);
+            event.setCancelled(true);
+            return;
+        }
+        ShopGui.open(plugin, player, shop);
         event.setCancelled(true);
     }
 

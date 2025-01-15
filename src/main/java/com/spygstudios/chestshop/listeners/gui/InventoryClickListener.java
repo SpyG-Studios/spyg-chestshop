@@ -1,6 +1,7 @@
 package com.spygstudios.chestshop.listeners.gui;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -15,14 +16,17 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.enums.GuiAction;
-import com.spygstudios.chestshop.gui.ShopGui;
-import com.spygstudios.chestshop.gui.ChestShopGui;
 import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
+import com.spygstudios.chestshop.gui.PlayersGui;
+import com.spygstudios.chestshop.gui.ShopGui;
+import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
 import com.spygstudios.chestshop.shop.AmountHandler;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.persistentdata.PersistentData;
+
+import net.kyori.adventure.text.Component;
 
 public class InventoryClickListener implements Listener {
 
@@ -31,6 +35,76 @@ public class InventoryClickListener implements Listener {
     public InventoryClickListener(ChestShop plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onShopClick(InventoryClickEvent event) {
+        if (!(event.getInventory().getHolder() instanceof ShopGuiHolder)) {
+            return;
+        }
+        ItemStack clickedItem = event.getCurrentItem();
+        if (clickedItem == null) {
+            return;
+        }
+        event.setCancelled(true);
+        PersistentData data = new PersistentData(plugin, clickedItem);
+        String action = data.getString("action");
+        if (action == null) {
+            return;
+        }
+        GuiAction guiAction = GuiAction.valueOf(action);
+        if (guiAction.equals(GuiAction.SET_ITEM_AMOUNT)) {
+            ShopGuiHolder holder = (ShopGuiHolder) event.getInventory().getHolder();
+            int itemsLeft = holder.getShop().getItemsLeft();
+            int max = 64 > itemsLeft ? itemsLeft : 64;
+            int min = 1;
+            int modifier = data.getInt("amount");
+            int currentAmount = event.getInventory().getItem(13).getAmount();
+            if (currentAmount + modifier >= max) {
+                currentAmount = max;
+            } else if (currentAmount + modifier <= min) {
+                currentAmount = min;
+            } else {
+                currentAmount = currentAmount + modifier;
+            }
+            ItemStack shopMaterial = event.getInventory().getItem(13);
+            shopMaterial.setAmount(currentAmount);
+            ItemMeta shopMeta = shopMaterial.getItemMeta();
+            final int finalCurrentAmount = currentAmount;
+            List<Component> translatedLore = plugin.getGuiConfig().getStringList("shop.item-to-buy.lore").stream()
+                    .map(line -> TranslateColor.translate(line.replace("%price%", String.valueOf(holder.getShop().getPrice() * finalCurrentAmount)))).toList();
+            shopMeta.lore(translatedLore);
+            shopMaterial.setItemMeta(shopMeta);
+        } else if (guiAction.equals(GuiAction.BUY)) {
+            ShopGuiHolder holder = (ShopGuiHolder) event.getInventory().getHolder();
+            int amount = event.getInventory().getItem(13).getAmount();
+            holder.getShop().sell(holder.getPlayer(), amount);
+        }
+    }
+
+    @EventHandler
+    public void onPlayersGuiClick(InventoryClickEvent event) {
+        if (!(event.getInventory().getHolder() instanceof PlayersHolder)) {
+            return;
+        }
+        ItemStack clickedItem = event.getCurrentItem();
+        if (clickedItem == null) {
+            return;
+        }
+        event.setCancelled(true);
+        PersistentData data = new PersistentData(plugin, clickedItem);
+        String action = data.getString("action");
+        if (action == null) {
+            return;
+        }
+        PlayersHolder holder = (PlayersHolder) event.getInventory().getHolder();
+        Player player = holder.getPlayer();
+        if (GuiAction.valueOf(action).equals(GuiAction.REMOVE_PLAYER)) {
+            Shop shop = holder.getShop();
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(data.getString("uuid")));
+            shop.removePlayer(offlinePlayer.getUniqueId());
+            ShopGui.open(plugin, player, shop);
+        }
     }
 
     @EventHandler
@@ -54,52 +128,19 @@ public class InventoryClickListener implements Listener {
         if (clickedItem == null) {
             return;
         }
-        shopGui(event);
+        chestShopGui(event);
     }
 
-    @EventHandler
-    public void onPlayersGuiClick(InventoryClickEvent event) {
-        if (!(event.getInventory().getHolder() instanceof PlayersHolder)) {
-            return;
-        }
+    private void chestShopGui(InventoryClickEvent event) {
         ItemStack clickedItem = event.getCurrentItem();
-        if (clickedItem == null) {
-            return;
-        }
-        event.setCancelled(true);
         PersistentData data = new PersistentData(plugin, clickedItem);
         String action = data.getString("action");
         if (action == null) {
             return;
         }
-        PlayersHolder holder = (PlayersHolder) event.getInventory().getHolder();
+        ChestShopHolder holder = (ChestShopHolder) event.getInventory().getHolder();
         Player player = holder.getPlayer();
         Shop shop = holder.getShop();
-        GuiAction guiAction = GuiAction.valueOf(action);
-        switch (guiAction) {
-        case REMOVE_PLAYER:
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(data.getString("uuid")));
-            shop.removePlayer(offlinePlayer.getUniqueId());
-            ShopGui.open(plugin, player, shop);
-            break;
-        case BACK:
-            ChestShopGui.open(plugin, player, shop);
-            break;
-        default:
-            break;
-        }
-    }
-
-    private void shopGui(InventoryClickEvent event) {
-        ItemStack clickedItem = event.getCurrentItem();
-        PersistentData data = new PersistentData(plugin, clickedItem);
-        String action = data.getString("action");
-        if (action == null) {
-            return;
-        }
-
-        Player player = ((ChestShopHolder) event.getInventory().getHolder()).getPlayer();
-        Shop shop = Shop.getShop(data.getString("shop"));
         GuiAction guiAction = GuiAction.valueOf(action);
         switch (guiAction) {
         case SET_MATERIAL:
@@ -109,11 +150,12 @@ public class InventoryClickListener implements Listener {
             shop.setNotify(!shop.isNotify());
             ItemStack notifyItem = clickedItem;
             ItemMeta notifyMeta = notifyItem.getItemMeta();
-            notifyMeta.lore(Arrays.asList(TranslateColor.translate(shop.isNotify() ? plugin.getGuiConfig().getString("shop.notify.on") : plugin.getGuiConfig().getString("shop.notify.off"))));
+            notifyMeta
+                    .lore(Arrays.asList(TranslateColor.translate(shop.isNotify() ? plugin.getGuiConfig().getString("chestshop.notify.on") : plugin.getGuiConfig().getString("chestshop.notify.off"))));
             notifyItem.setItemMeta(notifyMeta);
             player.updateInventory();
             break;
-        case SET_ITEM_AMOUNT, SET_ITEM_PRICE:
+        case SET_ITEM_PRICE:
             if (AmountHandler.getPendingAmount(player) != null) {
                 AmountHandler.getPendingAmount(player).cancel();
             }
@@ -121,7 +163,7 @@ public class InventoryClickListener implements Listener {
             event.getInventory().close();
             break;
         case OPEN_PLAYERS:
-            ShopGui.open(plugin, player, shop);
+            PlayersGui.open(plugin, player, shop);
             break;
         case OPEN_SHOP_INVENTORY:
             shop.openShopInventory(player);

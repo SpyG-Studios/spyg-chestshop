@@ -29,6 +29,7 @@ import com.spygstudios.spyglib.location.LocationUtils;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class Shop {
@@ -175,45 +176,44 @@ public class Shop {
         return null;
     }
 
-    public void sell(Player buyer) {
+    public void sell(Player buyer, int amount) {
         if (getMaterial() == null) {
             Message.SHOP_SETUP_NEEDED.send(buyer);
             return;
         }
-        Chest chest = (Chest) getChestLocation().getBlock().getState();
 
-        int itemCount;
-        int itemsLeft;
-        itemCount = itemsLeft = InventoryUtils.countItems(chest.getInventory(), getMaterial());
-        if (itemCount == 0) {
+        int itemsLeft = getItemsLeft();
+        if (itemsLeft == 0) {
             Message.SHOP_EMPTY.send(buyer);
             return;
         }
-        itemCount = 1 > itemCount ? itemCount : 1;
-        itemsLeft -= itemCount;
+        int itemCount = itemsLeft < amount ? itemsLeft : amount;
         if (!InventoryUtils.hasFreeSlot(buyer)) {
             Message.SHOP_INVENTORY_FULL.send(buyer);
             return;
         }
-        int itemPrice = 1 * itemCount;
-        EconomyResponse response = plugin.getEconomy().withdrawPlayer(buyer, (double) getPrice());
+        int itemsPrice = itemCount * price;
+        Economy economy = plugin.getEconomy();
+        EconomyResponse response = economy.withdrawPlayer(buyer, itemsPrice);
         if (response.transactionSuccess()) {
-            ChestShop.getInstance().getEconomy().depositPlayer(Bukkit.getOfflinePlayer(getOwnerId()), (double) itemPrice);
+            economy.depositPlayer(Bukkit.getOfflinePlayer(getOwnerId()), itemsPrice);
 
-            itemCount = extractItems(buyer, chest, itemCount);
+            extractItems(buyer, (Chest) getChestLocation().getBlock().getState(), itemCount);
+            itemsLeft = itemsLeft - itemCount;
 
-            Message.SHOP_BOUGHT.send(buyer, Map.of("%price%", String.valueOf(itemPrice), "%material%", getMaterial().name(), "%items-left%", String.valueOf(itemsLeft)));
+            Message.SHOP_BOUGHT.send(buyer,
+                    Map.of("%price%", String.valueOf(itemsPrice), "%material%", getMaterial().name(), "%items-left%", String.valueOf(itemsLeft), "%items-bought%", String.valueOf(itemCount)));
             shopFile.overwriteSet("shops." + getName() + ".sold-items", shopFile.getInt("shops." + getName() + ".sold-items") + itemCount);
-            shopFile.overwriteSet("shops." + getName() + ".money-earned", shopFile.getDouble("shops." + getName() + ".money-earned") + itemPrice);
+            shopFile.overwriteSet("shops." + getName() + ".money-earned", shopFile.getDouble("shops." + getName() + ".money-earned") + itemsPrice);
             shopFile.save();
             Player owner = Bukkit.getPlayer(getOwnerId());
             if (isNotify() && owner != null) {
-                Message.SHOP_SOLD.send(owner,
-                        Map.of("%price%", String.valueOf(itemPrice), "%material%", getMaterial().name(), "%player-name%", buyer.getName(), "%items-left%", String.valueOf(itemsLeft)));
+                Message.SHOP_SOLD.send(owner, Map.of("%price%", String.valueOf(itemsPrice), "%material%", getMaterial().name(), "%player-name%", buyer.getName(), "%items-left%",
+                        String.valueOf(itemsLeft), "%items-bought%", String.valueOf(itemCount)));
             }
             return;
         }
-        Message.NOT_ENOUGH_MONEY.send(buyer, Map.of("%price%", String.valueOf(itemPrice)));
+        Message.NOT_ENOUGH_MONEY.send(buyer, Map.of("%price%", String.valueOf(itemsPrice)));
     }
 
     private int extractItems(Player buyer, Chest chest, int itemCount) {
@@ -241,6 +241,11 @@ public class Shop {
         if (hologram != null) {
             hologram.remove();
         }
+    }
+
+    public int getItemsLeft() {
+        Chest chest = (Chest) chestLocation.getBlock().getState();
+        return InventoryUtils.countItems(chest.getInventory(), material);
     }
 
     public void openShopInventory(Player player) {
