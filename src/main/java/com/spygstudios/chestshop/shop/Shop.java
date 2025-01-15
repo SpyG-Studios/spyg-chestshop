@@ -195,25 +195,25 @@ public class Shop {
         int itemsPrice = itemCount * price;
         Economy economy = plugin.getEconomy();
         EconomyResponse response = economy.withdrawPlayer(buyer, itemsPrice);
-        if (response.transactionSuccess()) {
-            economy.depositPlayer(Bukkit.getOfflinePlayer(getOwnerId()), itemsPrice);
 
-            extractItems(buyer, (Chest) getChestLocation().getBlock().getState(), itemCount);
-            itemsLeft = itemsLeft - itemCount;
-
-            Message.SHOP_BOUGHT.send(buyer,
-                    Map.of("%price%", String.valueOf(itemsPrice), "%material%", getMaterial().name(), "%items-left%", String.valueOf(itemsLeft), "%items-bought%", String.valueOf(itemCount)));
-            shopFile.overwriteSet("shops." + getName() + ".sold-items", shopFile.getInt("shops." + getName() + ".sold-items") + itemCount);
-            shopFile.overwriteSet("shops." + getName() + ".money-earned", shopFile.getDouble("shops." + getName() + ".money-earned") + itemsPrice);
-            shopFile.save();
-            Player owner = Bukkit.getPlayer(getOwnerId());
-            if (isNotify() && owner != null) {
-                Message.SHOP_SOLD.send(owner, Map.of("%price%", String.valueOf(itemsPrice), "%material%", getMaterial().name(), "%player-name%", buyer.getName(), "%items-left%",
-                        String.valueOf(itemsLeft), "%items-bought%", String.valueOf(itemCount)));
-            }
-            return;
+        if (!response.transactionSuccess()) {
+            Message.NOT_ENOUGH_MONEY.send(buyer, Map.of("%price%", String.valueOf(itemsPrice)));
         }
-        Message.NOT_ENOUGH_MONEY.send(buyer, Map.of("%price%", String.valueOf(itemsPrice)));
+
+        economy.depositPlayer(Bukkit.getOfflinePlayer(getOwnerId()), itemsPrice);
+        extractItems(buyer, (Chest) getChestLocation().getBlock().getState(), itemCount);
+        itemsLeft = itemsLeft - itemCount;
+
+        Message.SHOP_BOUGHT.send(buyer,
+                Map.of("%price%", String.valueOf(itemsPrice), "%material%", getMaterial().name(), "%items-left%", String.valueOf(itemsLeft), "%items-bought%", String.valueOf(itemCount)));
+        shopFile.overwriteSet("shops." + getName() + ".sold-items", shopFile.getInt("shops." + getName() + ".sold-items") + itemCount);
+        shopFile.overwriteSet("shops." + getName() + ".money-earned", shopFile.getDouble("shops." + getName() + ".money-earned") + itemsPrice);
+        shopFile.save();
+        Player owner = Bukkit.getPlayer(getOwnerId());
+        if (isNotify() && owner != null) {
+            Message.SHOP_SOLD.send(owner, Map.of("%price%", String.valueOf(itemsPrice), "%material%", getMaterial().name(), "%player-name%", buyer.getName(), "%items-left%", String.valueOf(itemsLeft),
+                    "%items-bought%", String.valueOf(itemCount)));
+        }
     }
 
     private int extractItems(Player buyer, Chest chest, int itemCount) {
