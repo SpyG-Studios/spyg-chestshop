@@ -13,9 +13,9 @@ import com.spygstudios.chestshop.commands.handlers.CommandHandler;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
-import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
 import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
+import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
 import com.spygstudios.chestshop.listeners.BreakListener;
 import com.spygstudios.chestshop.listeners.BuildListener;
 import com.spygstudios.chestshop.listeners.ChatListener;
@@ -79,7 +79,7 @@ public class ChestShop extends JavaPlugin {
         ShopFile.loadShopFiles(instance);
 
         ShopFile.startSaveScheduler(instance);
-        String info = String.format("%s v. %s plugin has been enabled!", getName(), getDescription().getVersion());
+        String info = String.format("%s v. %s plugin has been enabled!", getName(), getPluginMeta().getVersion());
         getLogger().info(info);
     }
 
@@ -98,7 +98,7 @@ public class ChestShop extends JavaPlugin {
             }
         }
 
-        String info = String.format("%s v. %s plugin has been disabled!", getName(), getDescription().getVersion());
+        String info = String.format("%s v. %s plugin has been disabled!", getName(), getPluginMeta().getVersion());
         getLogger().info(info);
     }
 
