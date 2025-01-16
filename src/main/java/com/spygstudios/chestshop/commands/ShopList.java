@@ -15,6 +15,7 @@ import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.execute.Execute;
 import dev.rollczi.litecommands.annotations.optional.OptionalArg;
+import dev.rollczi.litecommands.annotations.permission.Permission;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 
@@ -22,6 +23,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 public class ShopList {
 
     @Execute
+    @Permission("spygchestshop.use")
     public void onList(@Context Player player, @OptionalArg Integer page) {
         if (page == null) {
             page = 1;

@@ -24,13 +24,9 @@ import dev.rollczi.litecommands.annotations.execute.Execute;
 public class Create {
 
     @Execute
+    @Permission("spygchestshop.use")
     public void onCreate(@Context Player player, @Arg String name) {
         Block targetBlock = player.getTargetBlock((Set<Material>) null, 4);
-        if (targetBlock == null || targetBlock.getType() != Material.CHEST) {
-            player.sendMessage("You must be looking at a chest to create a shop.");
-            return;
-        }
-
         if (targetBlock == null || targetBlock.getType() != Material.CHEST) {
             Message.SHOP_NO_CHEST.send(player);
             return;
@@ -69,6 +65,17 @@ public class Create {
 
         if (config.getInt("shops.max-shops") != 0 && file.getPlayerShops().size() >= config.getInt("shops.max-shops")) {
             Message.SHOP_LIMIT_REACHED.send(player, Map.of("%shop-limit%", String.valueOf(config.getInt("shops.max-shops"))));
+            return;
+        }
+
+        if (Shop.isBlacklistedName(name)) {
+            player.sendMessage(Message.SHOP_BLACKLISTED_NAME.get());
+            return;
+        }
+        int minLength = config.getInt("shops.name.min-length");
+        int maxLength = config.getInt("shops.name.max-length");
+        if (name.length() < minLength || name.length() > maxLength) {
+            Message.SHOP_NAME_LENGTH.send(player,Map.of("%min-length%", minLength + "", "%max-length%", maxLength + ""));
             return;
         }
 

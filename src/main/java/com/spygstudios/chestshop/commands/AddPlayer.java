@@ -14,6 +14,7 @@ import dev.rollczi.litecommands.annotations.async.Async;
 import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.execute.Execute;
+import dev.rollczi.litecommands.annotations.permission.Permission;
 
 @Command(name = "spygchestshop add", aliases = { "spcs add", "chestshop add", "scs add" })
 public class AddPlayer {
@@ -24,6 +25,7 @@ public class AddPlayer {
     }
 
     @Execute
+    @Permission("spygchestshop.use")
     public void onAdd(@Context Player sender, @Arg Shop shop, @Async @Arg OfflinePlayer player) {
         if (sender.getUniqueId().equals(player.getUniqueId())) {
             Message.CANNOT_ADD_YOURSELF.send(sender);
