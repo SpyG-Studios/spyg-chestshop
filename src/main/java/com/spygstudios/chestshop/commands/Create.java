@@ -47,10 +47,6 @@ public class Create {
             return;
         }
 
-        if (name.length() < 3) {
-            Message.SHOP_NAME_TOO_SHORT.send(player);
-            return;
-        }
         ShopFile file = ShopFile.getShopFile(player);
         if (file == null) {
             file = new ShopFile(ChestShop.getInstance(), player);
