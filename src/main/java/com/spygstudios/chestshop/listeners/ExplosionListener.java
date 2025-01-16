@@ -12,7 +12,6 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
-import com.spygstudios.spyglib.components.ComponentUtils;
 
 public class ExplosionListener implements Listener {
     Config config;
@@ -31,8 +30,7 @@ public class ExplosionListener implements Listener {
         event.blockList().stream().filter(block -> Shop.getShop(block.getLocation()) != null).forEach(block -> {
             Shop shop = Shop.getShop(block.getLocation());
             if (Bukkit.getPlayer(shop.getOwnerId()) != null) {
-                Bukkit.getPlayer(shop.getOwnerId())
-                        .sendMessage(ComponentUtils.replaceComponent(Message.SHOP_EXPLODED.get(), Map.of("%shop-name%", shop.getName(), "%shop-location%", shop.getChestLocationString())));
+                Message.SHOP_EXPLODED.send(Bukkit.getPlayer(shop.getOwnerId()), Map.of("%shop-name%", shop.getName(), "%shop-location%", shop.getChestLocationString()));
             }
             shop.remove();
         });
@@ -47,8 +45,7 @@ public class ExplosionListener implements Listener {
         event.blockList().stream().filter(block -> Shop.getShop(block.getLocation()) != null).forEach(block -> {
             Shop shop = Shop.getShop(block.getLocation());
             if (Bukkit.getPlayer(shop.getOwnerId()) != null) {
-                Bukkit.getPlayer(shop.getOwnerId())
-                        .sendMessage(ComponentUtils.replaceComponent(Message.SHOP_EXPLODED.get(), Map.of("%shop-name%", shop.getName(), "%shop-location%", shop.getChestLocationString())));
+                Message.SHOP_EXPLODED.send(Bukkit.getPlayer(shop.getOwnerId()), Map.of("%shop-name%", shop.getName(), "%shop-location%", shop.getChestLocationString()));
             }
             shop.remove();
         });

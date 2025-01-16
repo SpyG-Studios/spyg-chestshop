@@ -1,5 +1,7 @@
 package com.spygstudios.chestshop.listeners;
 
+import java.util.Map;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,13 +41,12 @@ public class ChatListener implements Listener {
         try {
             int amount = Integer.parseInt(message);
             if (amount < 0 || amount > 10000000000000L) {
-                player.sendMessage(ComponentUtils.replaceComponent(Message.INVALID_NUMBER.get(), "%entered%", message));
+                Message.INVALID_NUMBER.send(player, Map.of("%entered%", message));
                 return;
             }
             Bukkit.getScheduler().runTask(ChestShop.getInstance(), () -> pendingAmount.create(amount));
         } catch (NumberFormatException e) {
-            player.sendMessage(ComponentUtils.replaceComponent(Message.INVALID_NUMBER.get(), "%entered%", message));
-
+            Message.INVALID_NUMBER.send(player, Map.of("%entered%", message));
         }
 
     }

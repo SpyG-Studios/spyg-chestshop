@@ -10,7 +10,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
-import com.spygstudios.spyglib.components.ComponentUtils;
 
 public class BlockPlaceListener implements Listener {
 
@@ -39,7 +38,7 @@ public class BlockPlaceListener implements Listener {
             return;
         }
         shop.remove();
-        player.sendMessage(ComponentUtils.replaceComponent(Message.SHOP_REMOVED.get(), Map.of("%shop-name%", shop.getName())));
+        Message.SHOP_REMOVED.send(player, Map.of("%shop-name%", shop.getName()));
         event.setCancelled(true);
     }
 }

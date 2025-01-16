@@ -2,13 +2,13 @@ package com.spygstudios.chestshop.shop;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.entity.Player;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.enums.GuiAction;
-import com.spygstudios.spyglib.components.ComponentUtils;
 
 import lombok.Getter;
 
@@ -32,8 +32,7 @@ public class AmountHandler {
         this.player = player;
         this.type = type;
         this.shop = shop;
-
-        player.sendMessage(ComponentUtils.replaceComponent(Message.ENTER_AMOUNT.get(), "%cancel%", ChestShop.getInstance().getConf().getString("cancel")));
+        Message.ENTER_AMOUNT.send(player, Map.of("%cancel%", ChestShop.getInstance().getConf().getString("cancel")));
         pendingAmount.add(this);
     }
 

@@ -31,13 +31,13 @@ public class Rename {
             return;
         }
         if (Shop.isBlacklistedName(name)) {
-            player.sendMessage(Message.SHOP_BLACKLISTED_NAME.get());
+            Message.SHOP_BLACKLISTED_NAME.send(player);
             return;
         }
         int minLength = config.getInt("shops.name.min-length");
         int maxLength = config.getInt("shops.name.max-length");
         if (name.length() < minLength || name.length() > maxLength) {
-            Message.SHOP_NAME_LENGTH.send(player,Map.of("%min-length%", minLength + "", "%max-length%", maxLength + ""));
+            Message.SHOP_NAME_LENGTH.send(player, Map.of("%min-length%", minLength + "", "%max-length%", maxLength + ""));
             return;
         }
         Message.SHOP_RENAMED.send(player, Map.of("%old-name%", shop.getName(), "%new-name%", name));

@@ -21,7 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.spyglib.color.TranslateColor;
-import com.spygstudios.spyglib.components.ComponentUtils;
 import com.spygstudios.spyglib.hologram.Hologram;
 import com.spygstudios.spyglib.hologram.HologramItemRow;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
@@ -136,12 +135,12 @@ public class Shop {
 
     public void addPlayer(UUID uuid) {
         if (addedPlayers.contains(uuid)) {
-            Bukkit.getPlayer(ownerId).sendMessage(ComponentUtils.replaceComponent(Message.PLAYER_ALREADY_ADDED.get(), "%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
+            Message.PLAYER_ALREADY_ADDED.send(Bukkit.getPlayer(ownerId), Map.of("%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
             return;
         }
         addedPlayers.add(uuid);
         shopFile.addPlayer(uuid, name);
-        Bukkit.getPlayer(ownerId).sendMessage(ComponentUtils.replaceComponent(Message.PLAYER_ADDED.get(), "%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
+        Message.PLAYER_ADDED.send(Bukkit.getPlayer(ownerId), Map.of("%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
     }
 
     public void removePlayer(OfflinePlayer player) {
@@ -150,12 +149,12 @@ public class Shop {
 
     public void removePlayer(UUID uuid) {
         if (!addedPlayers.contains(uuid)) {
-            Bukkit.getPlayer(ownerId).sendMessage(ComponentUtils.replaceComponent(Message.PLAYER_NOT_ADDED.get(), "%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
+            Message.PLAYER_NOT_ADDED.send(Bukkit.getPlayer(ownerId), Map.of("%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
             return;
         }
         addedPlayers.remove(uuid);
         shopFile.removePlayer(uuid, name);
-        Bukkit.getPlayer(ownerId).sendMessage(ComponentUtils.replaceComponent(Message.PLAYER_REMOVED.get(), "%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
+        Message.PLAYER_REMOVED.send(Bukkit.getPlayer(ownerId), Map.of("%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
     }
 
     public void remove() {

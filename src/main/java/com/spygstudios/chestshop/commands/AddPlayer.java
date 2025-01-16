@@ -1,5 +1,7 @@
 package com.spygstudios.chestshop.commands;
 
+import java.util.Map;
+
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -7,7 +9,6 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
-import com.spygstudios.spyglib.components.ComponentUtils;
 
 import dev.rollczi.litecommands.annotations.argument.Arg;
 import dev.rollczi.litecommands.annotations.async.Async;
@@ -32,13 +33,13 @@ public class AddPlayer {
             return;
         }
         if (!player.isOnline() && !player.hasPlayedBefore()) {
-            sender.sendMessage(ComponentUtils.replaceComponent(Message.PLAYER_NOT_PLAYED_BEFORE.get(), "%player-name%", player.getName()));
+            Message.PLAYER_NOT_PLAYED_BEFORE.send(sender, Map.of("%player-name%", player.getName()));
             return;
         }
 
         int maxPlayers = config.getInt("shops.max-players");
         if (maxPlayers != 0 && shop.getAddedPlayers().size() >= maxPlayers) {
-            sender.sendMessage(ComponentUtils.replaceComponent(Message.SHOP_PLAYER_LIMIT_REACHED.get(), "%max-players%", String.valueOf(maxPlayers)));
+            Message.SHOP_PLAYER_LIMIT_REACHED.send(sender, Map.of("%max-players%", String.valueOf(maxPlayers)));
             return;
         }
 

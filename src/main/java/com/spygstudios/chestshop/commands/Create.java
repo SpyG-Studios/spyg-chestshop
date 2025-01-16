@@ -39,7 +39,7 @@ public class Create {
             Message.SHOP_DISABLED_WORLD.send(player);
             return;
         }
-        
+
         BlockPlaceEvent event = new BlockPlaceEvent(targetBlock, targetBlock.getState(), null, new ItemStack(Material.AIR), player, true, EquipmentSlot.HAND);
         Bukkit.getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) {
@@ -71,13 +71,13 @@ public class Create {
         }
 
         if (Shop.isBlacklistedName(name)) {
-            player.sendMessage(Message.SHOP_BLACKLISTED_NAME.get());
+            Message.SHOP_BLACKLISTED_NAME.send(player);
             return;
         }
         int minLength = config.getInt("shops.name.min-length");
         int maxLength = config.getInt("shops.name.max-length");
         if (name.length() < minLength || name.length() > maxLength) {
-            Message.SHOP_NAME_LENGTH.send(player,Map.of("%min-length%", minLength + "", "%max-length%", maxLength + ""));
+            Message.SHOP_NAME_LENGTH.send(player, Map.of("%min-length%", minLength + "", "%max-length%", maxLength + ""));
             return;
         }
 
