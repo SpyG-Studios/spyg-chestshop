@@ -28,7 +28,6 @@ import com.spygstudios.spyglib.inventory.InventoryUtils;
 import com.spygstudios.spyglib.location.LocationUtils;
 
 import lombok.Getter;
-import lombok.Setter;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 
@@ -44,7 +43,6 @@ public class Shop {
     @Getter
     private String createdAt;
     @Getter
-    @Setter
     private String name;
     @Getter
     private boolean isNotify;
@@ -112,6 +110,12 @@ public class Shop {
         if (getHologram().getRows().get(plugin.getConf().getStringList("shop.lines").size()) instanceof HologramItemRow row) {
             row.setItem(new ItemStack(material));
         }
+    }
+
+    public void setName(String newName) {
+        ShopFile.getShopFile(ownerId).setName(name, newName);
+        this.name = newName;
+        updateHologramRows();
     }
 
     public void setPrice(int price) {
@@ -309,6 +313,16 @@ public class Shop {
         ShopFile.getShopFile(shop.getOwnerId()).removeShop(shop.getName());
         shop.removeHologram();
         SHOPS.remove(shop);
+    }
+
+    public static boolean isBlacklistedName(String name) {
+        String nameLowerCase = name.toLowerCase();
+        for (String invalidName : plugin.getConf().getStringList("shops.blacklisted-names")) {
+            if (nameLowerCase.contains(invalidName.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isDoubleChest(Block block) {

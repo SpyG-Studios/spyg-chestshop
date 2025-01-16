@@ -51,6 +51,8 @@ public enum Message {
     SHOP_LIST_BACK("shop.list.back", "&7[&cBack&7]"),
     SHOP_LIST_PAGE("shop.list.page", "&7[&e%page%&7]"),
 
+    SHOP_BLACKLISTED_NAME("shop.blacklisted-name", "%prefix% &cThis name is blacklisted!"),
+    SHOP_NAME_LENGTH("shop.name-length", "%prefix% &cShop name must be between &f%min-length% &cand &f%max-length% &ccharacters long!"),
     SHOP_NO_CHEST("shop.no-chest", "%prefix% &cYou need to look at a chest to create a shop!"), 
     SHOP_EMPTY("shop.empty", "%prefix% &cThe shop is empty!"),
     SHOP_INVENTORY_FULL("shop.inventory-full", "%prefix% &cYour inventory is full!"),
@@ -64,6 +66,7 @@ public enum Message {
     SHOP_SETUP_NEEDED("shop.setup-needed", "%prefix% &cThis shop is not set up properly!"),
     SHOP_NAME_TOO_SHORT("shop.name-too-short", "%prefix% &cShop name is too short!"),
     SHOP_SOLD("shop.sold", "%prefix% &aYou sold &7x%items-bought% &f%material% &afor &f$%price%&a, to %player-name%! &7(&8%items-left%&7)"),
+    SHOP_RENAMED("shop.renamed", "%prefix% &aShop &f%old-name% &arenamed to &f%new-name%!"),
 
     ADMIN_SHOP_LIST_HEAD("admin.shop.list.header", "%prefix% &e%player-name%&a's shops:"), 
     ADMIN_SHOP_LIST_SHOPS("admin.shop.list.shops", "&7- &f%shop-name%"),

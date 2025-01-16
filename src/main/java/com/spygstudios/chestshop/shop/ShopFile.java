@@ -81,13 +81,23 @@ public class ShopFile extends YamlManager {
 
     public void addShop(Player owner, String name, Location chestLocation) {
         set("shops." + name + ".price", 0);
-        set("shops." + name + ".amount", 0);
         set("shops." + name + ".material", null);
         set("shops." + name + ".location", LocationUtils.fromLocation(chestLocation, true));
         set("shops." + name + ".do-notify", false);
         set("shops." + name + ".created", getDateString());
         set("shops." + name + ".added-players", new ArrayList<String>());
         new Shop(owner.getUniqueId(), name, this);
+        isSaved = false;
+    }
+
+    public void setName(String shopName, String name) {
+        set("shops." + name + ".price", getInt("shops." + shopName + ".price", 0));
+        set("shops." + name + ".material", getString("shops." + shopName + ".material", null));
+        set("shops." + name + ".location", getString("shops." + shopName + ".location"));
+        set("shops." + name + ".do-notify", getBoolean("shops." + shopName + ".do-notify", false));
+        set("shops." + name + ".created", getString("shops." + shopName + ".created", getDateString()));
+        set("shops." + name + ".added-players", getStringList("shops." + shopName + ".added-players", new ArrayList<>()));
+        overwriteSet("shops." + shopName, null);
         isSaved = false;
     }
 
@@ -101,11 +111,6 @@ public class ShopFile extends YamlManager {
         isSaved = false;
     }
 
-    public void setAmount(String shopName, int amount) {
-        overwriteSet("shops." + shopName + ".amount", amount);
-        isSaved = false;
-    }
-
     public void save() {
         isSaved = false;
     }
@@ -114,7 +119,6 @@ public class ShopFile extends YamlManager {
         for (String shopName : shopFile.getPlayerShops()) {
             String shopPath = "shops." + shopName;
             shopFile.set(shopPath + ".price", 0);
-            shopFile.set(shopPath + ".amount", 0);
             shopFile.set(shopPath + ".do-notify", false);
             shopFile.set(shopPath + ".sold-items", 0);
             shopFile.set(shopPath + ".money-earned", 0);
