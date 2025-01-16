@@ -41,6 +41,14 @@ public class ShopGui {
         data.save();
         inventory.setItem(13, shopItem);
 
+        if (shop.getAddedPlayers().contains(player.getUniqueId())) {
+            ItemStack inventoryItem = ItemUtils.create(Material.CHEST, config.getString("chestshop.inventory.title"), config.getStringList("chestshop.inventory.lore"));
+            PersistentData inventoryData = new PersistentData(plugin, inventoryItem);
+            inventoryData.set("action", GuiAction.OPEN_SHOP_INVENTORY.name());
+            inventoryData.save();
+            inventory.setItem(18, inventoryItem);
+        }
+
         config.getConfigurationSection("shop.amount.items").getKeys(false).forEach(key -> {
             int slot = config.getInt("shop.amount.items." + key + ".slot");
             int amount = config.getInt("shop.amount.items." + key + ".amount");

@@ -53,19 +53,14 @@ public class InteractListener implements Listener {
             return;
         }
 
-        // Added player
-        if (shop.getChestLocation().equals(location) && shop.getAddedPlayers().contains(player.getUniqueId())) {
-            shop.openShopInventory(player);
-            return;
-        }
-
         // Buyer
         if (shop.getMaterial() == null) {
             Message.SHOP_SETUP_NEEDED.send(player);
             event.setCancelled(true);
             return;
         }
-        if (shop.getItemsLeft() == 0) {
+
+        if (shop.getItemsLeft() == 0 && !shop.getAddedPlayers().contains(player.getUniqueId())) {
             Message.SHOP_EMPTY.send(player);
             event.setCancelled(true);
             return;

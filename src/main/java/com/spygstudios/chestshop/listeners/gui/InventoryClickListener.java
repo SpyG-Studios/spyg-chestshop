@@ -58,12 +58,13 @@ public class InventoryClickListener implements Listener {
             return;
         }
         GuiAction guiAction = GuiAction.valueOf(action);
-        if (guiAction.equals(GuiAction.SET_ITEM_AMOUNT)) {
+        ShopGuiHolder holder = (ShopGuiHolder) event.getInventory().getHolder();
+        switch (guiAction) {
+        case SET_ITEM_AMOUNT:
             if (System.currentTimeMillis() - getLastAmountClick(event.getWhoClicked()) < 100) {
                 return;
             }
             lastAmountClick.put(event.getWhoClicked().getUniqueId(), System.currentTimeMillis());
-            ShopGuiHolder holder = (ShopGuiHolder) event.getInventory().getHolder();
             int itemsLeft = holder.getShop().getItemsLeft();
             int max = 64 > itemsLeft ? itemsLeft : 64;
             int min = 1;
@@ -84,8 +85,9 @@ public class InventoryClickListener implements Listener {
                     .map(line -> TranslateColor.translate(line.replace("%price%", String.valueOf(holder.getShop().getPrice() * finalCurrentAmount)))).toList();
             shopMeta.lore(translatedLore);
             shopMaterial.setItemMeta(shopMeta);
-        } else if (guiAction.equals(GuiAction.BUY)) {
-            ShopGuiHolder holder = (ShopGuiHolder) event.getInventory().getHolder();
+            break;
+
+        case BUY:
             ItemStack shopItem = event.getInventory().getItem(13);
             int amount = shopItem.getAmount();
             holder.getShop().sell(holder.getPlayer(), amount);
@@ -93,6 +95,12 @@ public class InventoryClickListener implements Listener {
                 holder.getPlayer().closeInventory();
                 Message.SHOP_EMPTY.send(holder.getPlayer());
             }
+            break;
+        case OPEN_SHOP_INVENTORY:
+            holder.getShop().openShopInventory(holder.getPlayer());
+            break;
+        default:
+            break;
         }
     }
 

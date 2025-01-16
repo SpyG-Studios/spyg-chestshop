@@ -180,16 +180,7 @@ public class Shop {
     }
 
     public void sell(Player buyer, int amount) {
-        if (getMaterial() == null) {
-            Message.SHOP_SETUP_NEEDED.send(buyer);
-            return;
-        }
-
         int itemsLeft = getItemsLeft();
-        if (itemsLeft == 0) {
-            Message.SHOP_EMPTY.send(buyer);
-            return;
-        }
         int itemCount = itemsLeft < amount ? itemsLeft : amount;
         if (!InventoryUtils.hasFreeSlot(buyer)) {
             Message.SHOP_INVENTORY_FULL.send(buyer);
