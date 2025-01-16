@@ -7,7 +7,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
@@ -19,6 +21,7 @@ import dev.rollczi.litecommands.annotations.argument.Arg;
 import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.execute.Execute;
+import dev.rollczi.litecommands.annotations.permission.Permission;
 
 @Command(name = "spygchestshop create", aliases = { "spcs create", "chestshop create", "scs create" })
 public class Create {
@@ -36,8 +39,8 @@ public class Create {
             Message.SHOP_DISABLED_WORLD.send(player);
             return;
         }
-
-        BlockBreakEvent event = new BlockBreakEvent(targetBlock, player);
+        
+        BlockPlaceEvent event = new BlockPlaceEvent(targetBlock, targetBlock.getState(), null, new ItemStack(Material.AIR), player, true, EquipmentSlot.HAND);
         Bukkit.getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             Message.CANT_CREATE_SHOP_HERE.send(player);
@@ -62,7 +65,6 @@ public class Create {
         }
 
         Config config = ChestShop.getInstance().getConf();
-
         if (config.getInt("shops.max-shops") != 0 && file.getPlayerShops().size() >= config.getInt("shops.max-shops")) {
             Message.SHOP_LIMIT_REACHED.send(player, Map.of("%shop-limit%", String.valueOf(config.getInt("shops.max-shops"))));
             return;
