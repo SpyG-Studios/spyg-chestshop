@@ -10,7 +10,7 @@ public class GuiConfig extends YamlManager {
     public GuiConfig(ChestShop plugin) {
         super("guis.yml", plugin);
 
-        set("chestshop.title", "&8[&6%shop-name%&8] &7 &8%player-name%");
+        set("chestshop.title", "&c%shop-name% &8(%player-name%)");
 
         set("chestshop.material.title", "&cMaterial");
         set("chestshop.material.lore", Arrays.asList("&7Put here the material you", "&7want to sell"));
@@ -32,13 +32,13 @@ public class GuiConfig extends YamlManager {
         set("chestshop.notify.on", "&2ON");
         set("chestshop.notify.off", "&4OFF");
 
-        set("players.title", "&8[&6%shop-name%&8] &9Added players");
+        set("players.title", "&9Added players");
         set("players.player.title", "&6&l%player-name%");
         set("players.player.lore", Arrays.asList("&7Click to remove this player"));
         set("players.next.title", "&6Next page");
         set("players.back.title", "&6Previous page");
 
-        set("shop.title", "&8[&6%shop-name%&8] &7Shop Menu");
+        set("shop.title", "&c%shop-name%");
         set("shop.item-to-buy.title", "&6&lBuy &7%material%");
         set("shop.item-to-buy.lore", Arrays.asList("&7Buy item for &6$&e%price%"));
 
