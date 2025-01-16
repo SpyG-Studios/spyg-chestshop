@@ -1,0 +1,77 @@
+prefix: '&8[&#ffbc1fChest&#ff711fShop&8] &7»&f'
+commands: '%prefix% &7Parancsok:'
+enter-amount-cancelled: '%prefix% &cÖsszeg beírása megszakítva!'
+enter-amount-prompt: '%prefix% &aÍrd be az értéket &7&o(A megszakításhoz írdbe: &f%cancel%&7&o)'
+enter-amount-success: '%prefix% &aÖsszeg sikeresen beállítva!'
+invalid-number: '%prefix% &cÉrvénytelen szám! (&e%entered%&c)'
+cannot-add-yourself: '%prefix% &cNem adhatod hozzá saját magad a bolthoz!'
+cant-create-shop-here: '%prefix% &cItt nem hozhatsz létre boltot!'
+usage: '%prefix% &7%usage%'
+config-reloaded: '%prefix% &aKonfiguráció sikeresen újratöltve!'
+no-permission: '%prefix% &cEhhez nincs jogod!'
+not-enough-money: '%prefix% &cNincs elég pénzed! ($%price%)'
+player:
+  only: '&cCsak játékosok használhatják ezt a parancsot!'
+  already-added: '%prefix% &f%player-name% &cmár hozzá lett adva a boltodhoz!'
+  not-added: '%prefix% &f%player-name% &cnincs hozzáadva a boltodhoz!'
+  added: '%prefix% &aSikeresen hozzáadtad &f%player-name% &aa boltodhoz!'
+  removed: '%prefix% &aSikeresen eltávolítottad &f%player-name% &aa boltodból!'
+  not-played-before: '%prefix% &f%player-name% &cMég sohasem játszott a szerveren!'
+  only-players: '&cOnly players can use this command!'
+shop:
+  already-exists: '%prefix% &f%shop-name% &cnévvle már van boltod!'
+  bought: '%prefix% &aSikeresen vásároltál &7x%items-bought% &f%material% &f$%price%
+    &aért! &7(&8%items-left%&7)'
+  chest-already-shop: '%prefix% &cEz a láda már jelenleg is bolt!'
+  created: '%prefix% &aSikeresen létrehoztad a(z) &f%shop-name% &aboltot!'
+  disabled-world: '%prefix% &cEbben a világban nem hozhatsz létre boltot!'
+  invalid-price: '%prefix% &cÉrvénytelen ár!'
+  invalid-page: '%prefix% &cÉrvénytelen oldal! &7(&8%page%&7)'
+  limit-reached: '%prefix% &cElérted a maximum boltok számát! (&e%shop-limit%&c)'
+  player-limit-reached: '%prefix% &cElérted a maximum hozzáadható játékosok számát!
+    (&e%max-players%&c)'
+  list:
+    header: '%prefix% &aBoltjaid:'
+    shops: '&7- &f%shop-name%'
+    shops-hover: |-
+      &6&l%material%&r
+       &8- &7ár: &6$&e%price%
+       &8- &7hátralévő tárgyak: &e%items-left%
+       &8- &7hely: &e%location%
+       &8- &7létrehozva: &e%created%
+    current-page: '&7[&e&l%page%&r&7]'
+    next: ' &7[&eKövetkező&7]'
+    back: '&7[&cVissza&7]'
+    page: '&7[&e%page%&7]'
+  blacklisted-name: '%prefix% &cEzt a nevet nem állíthatod be!'
+  name-length: '%prefix% &cA bolt neve nem lehet rövidebb mint &f%min-length% &ckarakter
+    és hosszabb mint &f%max-length% &ckarakter!'
+  no-chest: '%prefix% &cEgy ládára kell nézned, a bolt létrehozásához!'
+  empty: '%prefix% &cEz a bolt üres!'
+  inventory-full: '%prefix% &cAz eszköztárad tele van!'
+  exploded: '%prefix% %shop-name% boltod felrobbant! &7&o(&f%shop-location%&7)'
+  no-shops: '%prefix% &cNincsenek boltjaid!'
+  not-found: '%prefix% &cA megadott bolt nem található!'
+  not-owner: '%prefix% &cNem te vagy ennek a boltnak a tulajdonosa!'
+  removed: '%prefix% &cSikeresen törölted a(z) &f%shop-name% &cboltot!'
+  setup-needed: '%prefix% &cEz a bolt nincs megfelelően beállítva!'
+  sold: '%prefix% &aSikeresen eladtál &7x%items-bought% &f%material% &f$%price% &f%player-name%
+    &ajátékosnak! &7(&8%items-left%&7)'
+  renamed: '%prefix% &f%old-name% &aúj neve: &f%new-name%!'
+  chest-face-not-free: '%prefix% &cThe face of the chest is not free!'
+  no-permission: '%prefix% &cYou don''t have permission to use this shop!'
+  no-double-chest: '%prefix% &cYou can''t place a chest next to a chest shop!'
+  name-too-short: '%prefix% &cShop name is too short!'
+admin:
+  shop:
+    list:
+      header: '%prefix% &e%player-name% &aboltja:'
+      shops: '&7- &f%shop-name%'
+      shops-hover: |-
+        &6&l%material%&r
+          &8- &7ár: &6$&e%price%
+          &8- &7hátralévő tárgyak: &e%items-left%
+          &8- &7hely: &e%location%
+          &8- &7létrehozva: &e%created%
+  no-shops: '%prefix% &f%player-name% &cjátékosnak nincsenek boltjai!'
+player-not-added: '%prefix% &cPlayer &f%player-name% &cis not added to the shop!'

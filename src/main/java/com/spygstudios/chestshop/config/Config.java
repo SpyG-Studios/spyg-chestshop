@@ -9,10 +9,8 @@ public class Config extends YamlManager {
 
     public Config(ChestShop plugin) {
         super("config.yml", plugin);
-
-        set("prefix", "&8[&#ffbc1fChest&#ff711fShop&8] &7»&f");
-        set("cancel", "cancel");
-
+        set("locale", "en_US", Arrays.asList("The locale of the plugin. (file name)"));
+        set("cancel", "cancel", Arrays.asList("The text to cancel the amount action."));
         set("colors.command.required-arg", " &c");
         set("colors.command.optional-arg", " &7");
         set("colors.command.list", "&8- ");

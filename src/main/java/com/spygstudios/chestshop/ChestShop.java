@@ -1,5 +1,9 @@
 package com.spygstudios.chestshop;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,6 +18,7 @@ import com.spygstudios.chestshop.commands.handlers.CommandHandler;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.chestshop.config.MessageConfig;
 import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
@@ -29,6 +34,7 @@ import com.spygstudios.chestshop.shop.ShopFile;
 import com.spygstudios.spyglib.hologram.HologramManager;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.milkbowl.vault.economy.Economy;
 
 public class ChestShop extends JavaPlugin {
@@ -44,6 +50,9 @@ public class ChestShop extends JavaPlugin {
     private HologramManager hologramManager;
     @Getter
     private CommandHandler commandHandler;
+    @Getter
+    @Setter
+    private MessageConfig messageConfig;
 
     public ChestShop() {
         instance = this;
@@ -53,7 +62,9 @@ public class ChestShop extends JavaPlugin {
     public void onEnable() {
         conf = new Config(this);
         guiConfig = new GuiConfig(this);
-        Message.init(conf);
+        messageConfig = new MessageConfig(this, conf.getString("locale"));
+        Message.init(messageConfig);
+
         hologramManager = HologramManager.getManager(instance);
         commandHandler = new CommandHandler(instance);
         new InteractListener(this);
@@ -64,6 +75,8 @@ public class ChestShop extends JavaPlugin {
         new ExplosionListener(instance);
         new ChatListener(instance);
         new HopperListener(instance);
+
+        loadLocalizations();
 
         // bStats
         new Metrics(this, 24462);
@@ -102,6 +115,29 @@ public class ChestShop extends JavaPlugin {
 
         String info = String.format("%s v. %s plugin has been disabled!", getName(), getPluginMeta().getVersion());
         getLogger().info(info);
+    }
+
+    private List<String> localizations = Arrays.asList("hu_HU");
+
+    private void loadLocalizations() {
+        File targetDirectory = new File(getDataFolder(), "locale");
+        if (!targetDirectory.exists()) {
+            targetDirectory.mkdirs();
+        }
+
+        for (String locale : localizations) {
+            File targetFile = new File(targetDirectory, locale);
+            if (!targetFile.exists()) {
+                try (InputStream inputStream = getResource(locale)) {
+                    if (inputStream == null) {
+                        return;
+                    }
+                    Files.copy(inputStream, targetFile.toPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 }
