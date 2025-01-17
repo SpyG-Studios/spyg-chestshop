@@ -11,6 +11,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.chestshop.enums.ShopRemoveCause;
 import com.spygstudios.chestshop.shop.Shop;
 
 public class ExplosionListener implements Listener {
@@ -32,7 +33,7 @@ public class ExplosionListener implements Listener {
             if (Bukkit.getPlayer(shop.getOwnerId()) != null) {
                 Message.SHOP_EXPLODED.send(Bukkit.getPlayer(shop.getOwnerId()), Map.of("%shop-name%", shop.getName(), "%shop-location%", shop.getChestLocationString()));
             }
-            shop.remove();
+            shop.remove(null, ShopRemoveCause.EXPLOSION);
         });
     }
 
@@ -47,7 +48,7 @@ public class ExplosionListener implements Listener {
             if (Bukkit.getPlayer(shop.getOwnerId()) != null) {
                 Message.SHOP_EXPLODED.send(Bukkit.getPlayer(shop.getOwnerId()), Map.of("%shop-name%", shop.getName(), "%shop-location%", shop.getChestLocationString()));
             }
-            shop.remove();
+            shop.remove(null, ShopRemoveCause.EXPLOSION);
         });
     }
 }

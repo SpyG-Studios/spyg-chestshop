@@ -20,6 +20,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.chestshop.enums.ShopRemoveCause;
+import com.spygstudios.chestshop.events.ShopRemoveEvent;
 import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.hologram.Hologram;
 import com.spygstudios.spyglib.hologram.HologramItemRow;
@@ -157,7 +159,9 @@ public class Shop {
         Message.PLAYER_REMOVED.send(Bukkit.getPlayer(ownerId), Map.of("%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
     }
 
-    public void remove() {
+    public void remove(Player remover, ShopRemoveCause cause) {
+        ShopRemoveEvent shopRemoveEvent = new ShopRemoveEvent(this, cause, remover);
+        Bukkit.getPluginManager().callEvent(shopRemoveEvent);
         Shop.removeShop(this);
     }
 

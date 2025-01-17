@@ -9,6 +9,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.chestshop.enums.ShopRemoveCause;
 import com.spygstudios.chestshop.shop.Shop;
 
 public class BreakListener implements Listener {
@@ -37,7 +38,7 @@ public class BreakListener implements Listener {
         if (!shop.getChestLocation().equals(event.getBlock().getLocation())) {
             return;
         }
-        shop.remove();
+        shop.remove(event.getPlayer(), ShopRemoveCause.PLAYER);
         Message.SHOP_REMOVED.send(player, Map.of("%shop-name%", shop.getName()));
         event.setCancelled(true);
     }

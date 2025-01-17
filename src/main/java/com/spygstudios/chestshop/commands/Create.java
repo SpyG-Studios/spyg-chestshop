@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.chestshop.events.ShopCreateEvent;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.shop.ShopFile;
 
@@ -77,6 +78,8 @@ public class Create {
             return;
         }
         Shop shop = new Shop(player, name, targetBlock.getLocation(), file);
+        ShopCreateEvent shopCreateEvent = new ShopCreateEvent(shop);
+        Bukkit.getPluginManager().callEvent(shopCreateEvent);
         Message.SHOP_CREATED.send(player, Map.of("%shop-name%", name));
     }
 }
