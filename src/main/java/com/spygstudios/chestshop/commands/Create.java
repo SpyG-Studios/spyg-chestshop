@@ -76,8 +76,7 @@ public class Create {
             Message.SHOP_NAME_LENGTH.send(player, Map.of("%min-length%", minLength + "", "%max-length%", maxLength + ""));
             return;
         }
-
-        file.addShop(player, name, targetBlock.getLocation());
+        Shop shop = new Shop(player, name, targetBlock.getLocation(), file);
         Message.SHOP_CREATED.send(player, Map.of("%shop-name%", name));
     }
 }

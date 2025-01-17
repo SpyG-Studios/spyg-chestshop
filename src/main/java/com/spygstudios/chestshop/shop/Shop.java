@@ -24,7 +24,6 @@ import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.hologram.Hologram;
 import com.spygstudios.spyglib.hologram.HologramItemRow;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
-import com.spygstudios.spyglib.location.LocationUtils;
 
 import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
@@ -55,21 +54,22 @@ public class Shop {
     private static final List<Shop> SHOPS = new ArrayList<>();
     private static ChestShop plugin = ChestShop.getInstance();
 
-    public Shop(Player owner, String name, ShopFile shopFile) {
-        this(owner.getUniqueId(), name, shopFile);
+    public Shop(Player owner, String shopName, Location chestLocation, ShopFile shopFile) {
+        this(owner.getUniqueId(), shopName, 0, null, chestLocation, ShopFile.getDateString(), false, new ArrayList<>(), shopFile);
+        shopFile.addShop(this);
     }
 
-    public Shop(UUID ownerId, String name, ShopFile shopFile) {
+    public Shop(UUID ownerId, String shopName, int price, Material material, Location chestLocation, String createdAt, boolean isNotify, List<UUID> addedPlayers, ShopFile shopFile) {
         this.ownerId = ownerId;
-        this.name = name;
+        this.name = shopName;
+        this.price = price;
+        this.material = material;
+        this.chestLocation = chestLocation;
+        this.createdAt = createdAt;
+        this.isNotify = isNotify;
+        this.addedPlayers = addedPlayers;
         this.shopFile = shopFile;
-        price = shopFile.getInt("shops." + name + ".price");
-        material = Material.getMaterial(shopFile.getString("shops." + name + ".material"));
-        chestLocation = LocationUtils.toLocation(shopFile.getString("shops." + name + ".location"));
-        createdAt = shopFile.getString("shops." + name + ".created");
-        isNotify = shopFile.getBoolean("shops." + name + ".do-notify");
-        addedPlayers = shopFile.getAddedUuids(name);
-        hologram = plugin.getHologramManager().createHologram(chestLocation.clone().add(0.5, 0.7, 0.5));
+        this.hologram = plugin.getHologramManager().createHologram(chestLocation.clone().add(0.5, 0.7, 0.5));
         updateHologramRows();
         SHOPS.add(this);
     }

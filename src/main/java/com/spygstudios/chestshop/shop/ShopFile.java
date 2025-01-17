@@ -36,6 +36,7 @@ public class ShopFile extends YamlManager {
             return;
         }
         set("shops", null);
+        setDefaultValues(this);
         this.isSaved = true;
         this.ownerId = ownerId;
         SHOPS_FILES.put(ownerId, this);
@@ -79,14 +80,26 @@ public class ShopFile extends YamlManager {
         }
     }
 
-    public void addShop(Player owner, String name, Location chestLocation) {
+    private static void setDefaultValues(ShopFile shopFile) {
+        for (String shopName : shopFile.getPlayerShops()) {
+            String shopPath = "shops." + shopName;
+            shopFile.set(shopPath + ".price", 0);
+            shopFile.set(shopPath + ".do-notify", false);
+            shopFile.set(shopPath + ".sold-items", 0);
+            shopFile.set(shopPath + ".money-earned", 0);
+            shopFile.set(shopPath + ".created", getDateString());
+            shopFile.isSaved = false;
+        }
+    }
+
+    public void addShop(Shop shop) {
+        String name = shop.getName();
         set("shops." + name + ".price", 0);
         set("shops." + name + ".material", null);
-        set("shops." + name + ".location", LocationUtils.fromLocation(chestLocation, true));
+        set("shops." + name + ".location", LocationUtils.fromLocation(shop.getChestLocation(), true));
         set("shops." + name + ".do-notify", false);
         set("shops." + name + ".created", getDateString());
         set("shops." + name + ".added-players", new ArrayList<String>());
-        new Shop(owner.getUniqueId(), name, this);
         isSaved = false;
     }
 
@@ -115,19 +128,7 @@ public class ShopFile extends YamlManager {
         isSaved = false;
     }
 
-    private static void setDefaultValues(ShopFile shopFile) {
-        for (String shopName : shopFile.getPlayerShops()) {
-            String shopPath = "shops." + shopName;
-            shopFile.set(shopPath + ".price", 0);
-            shopFile.set(shopPath + ".do-notify", false);
-            shopFile.set(shopPath + ".sold-items", 0);
-            shopFile.set(shopPath + ".money-earned", 0);
-            shopFile.set(shopPath + ".created", getDateString());
-            shopFile.isSaved = false;
-        }
-    }
-
-    private static String getDateString() {
+    public static String getDateString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return LocalDateTime.now().format(formatter);
     }
@@ -140,6 +141,7 @@ public class ShopFile extends YamlManager {
             plugin.getLogger().info("Shops loaded!");
             return;
         }
+
         for (File file : shopsFolder.listFiles()) {
             processShopFile(plugin, file);
         }
@@ -158,7 +160,6 @@ public class ShopFile extends YamlManager {
             return;
         }
         ShopFile shopFile = new ShopFile(plugin, ownerId);
-        setDefaultValues(shopFile);
         for (String shopName : shopFile.getPlayerShops()) {
             processShop(plugin, file, shopFile, shopName);
         }
@@ -181,7 +182,11 @@ public class ShopFile extends YamlManager {
             shopFile.removeShop(shopName);
             return;
         }
-        new Shop(shopFile.getOwnerId(), shopName, shopFile);
+        int price = shopFile.getInt("shops." + shopName + ".price");
+        Material material = Material.getMaterial(shopFile.getString("shops." + shopName + ".material"));
+        String createdAt = shopFile.getString("shops." + shopName + ".created");
+        boolean isNotify = shopFile.getBoolean("shops." + shopName + ".do-notify");
+        new Shop(shopFile.getOwnerId(), shopName, price, material, location, createdAt, isNotify, shopFile.getAddedUuids(shopName), shopFile);
     }
 
     public static ShopFile getShopFile(UUID ownerId) {
