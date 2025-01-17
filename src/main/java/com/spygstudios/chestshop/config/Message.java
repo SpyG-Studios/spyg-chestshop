@@ -14,6 +14,7 @@ public enum Message {
 
     PREFIX("prefix", "&8[&#ffbc1fChest&#ff711fShop&8] &7»&f"), 
     COMMANDS("commands", "%prefix% &7Commands:"),
+    NEW_VERSION("new-version", "%prefix% &aA new version of SpygChestShop is available! Current version: &#e80000%old-version% &aNew version: &#00bf0d%new-version% &7&o(Click to download)"),
 
     ENTER_AMOUNT_CANCELLED("enter-amount-cancelled", "%prefix% &cAmount entering cancelled!"),
     ENTER_AMOUNT("enter-amount-prompt", "%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel)"), 

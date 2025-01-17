@@ -1,5 +1,7 @@
 prefix: '&8[&#ffbc1fChest&#ff711fShop&8] &7»&f'
 commands: '%prefix% &7Parancsok:'
+new-version: '%prefix% &aElérhető a SpygChestShop egy új verziója! Jelenlegi verzió:  
+  &#e80000%old-version% &aÚj verzió: &#00bf0d%new-version% &7&o(Kattints a letöltéshez)'
 enter-amount-cancelled: '%prefix% &cÖsszeg beírása megszakítva!'
 enter-amount-prompt: '%prefix% &aÍrd be az értéket &7&o(A megszakításhoz írdbe: &f%cancel%&7&o)'
 enter-amount-success: '%prefix% &aÖsszeg sikeresen beállítva!'

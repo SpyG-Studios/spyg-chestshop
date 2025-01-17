@@ -9,6 +9,7 @@ public class Config extends YamlManager {
 
     public Config(ChestShop plugin) {
         super("config.yml", plugin);
+        set("check-for-updates", true, Arrays.asList("Check for updates on join (spygchestshop.admin.updates)."));
         set("locale", "en_US", Arrays.asList("The locale of the plugin. (file name)"));
         set("cancel", "cancel", Arrays.asList("The text to cancel the amount action."));
         set("colors.command.required-arg", " &c");
