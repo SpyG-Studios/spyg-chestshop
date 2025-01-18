@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -33,6 +34,7 @@ import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
 import com.spygstudios.chestshop.shop.ShopFile;
 import com.spygstudios.spyglib.hologram.HologramManager;
+import com.spygstudios.spyglib.version.VersionChecker;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -54,6 +56,7 @@ public class ChestShop extends JavaPlugin {
     @Getter
     @Setter
     private MessageConfig messageConfig;
+    private static final String API_URL = "https://hangar.papermc.io/api/v1/projects/Spyg-ChestShop/latestrelease";
 
     public ChestShop() {
         instance = this;
@@ -76,7 +79,10 @@ public class ChestShop extends JavaPlugin {
         new ExplosionListener(instance);
         new ChatListener(instance);
         new HopperListener(instance);
-        new PlayerJoinListener(instance);
+        Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+            Entry<String, Boolean> versionInfo = VersionChecker.isLatestVersion(API_URL, getPluginMeta().getVersion());
+            new PlayerJoinListener(instance, versionInfo.getKey(), versionInfo.getValue());
+        });
 
         loadLocalizations();
 
