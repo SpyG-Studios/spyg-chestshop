@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.commands.admin.CustomerMode;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.gui.ChestShopGui;
 import com.spygstudios.chestshop.gui.ShopGui;
@@ -47,7 +48,7 @@ public class InteractListener implements Listener {
 
         // Owner
         boolean isAdmin = (player.hasPermission("spygchestshop.admin") || player.hasPermission("spygchestshop.admin.edit")) && player.isSneaking();
-        if (shop.getOwnerId().equals(player.getUniqueId()) || isAdmin) {
+        if ((shop.getOwnerId().equals(player.getUniqueId()) || isAdmin) && !CustomerMode.getCustomerMode().contains(player.getUniqueId())) {
             ChestShopGui.open(plugin, player, shop);
             event.setCancelled(true);
             return;

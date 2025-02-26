@@ -71,7 +71,11 @@ public enum Message {
     ADMIN_SHOP_LIST_SHOPS("admin.shop.list.shops", "&7- &f%shop-name%"),
     ADMIN_SHOP_LIST_SHOPS_HOVER("admin.shop.list.shops-hover",
             "&6&l%material%&r\n &8- &7price: &6$&e%price%\n &8- &7items left: &e%items-left%\n &8- &7location: &e%location%\n &8- &7created at: &e%created%"),
-    ADMIN_NO_SHOPS("admin.no-shops", "%prefix% &cPlayer &f%player-name% &chas no shops!"),;
+    ADMIN_NO_SHOPS("admin.no-shops", "%prefix% &cPlayer &f%player-name% &chas no shops!"),
+    ADMIN_CUSTOMER_MODE("admin.customer-mode.message", "%prefix% &aCustomer mode %state%!"),
+    ADMIN_CUSTOMER_MODE_OTHER("admin.customer-mode.message-other", "%prefix% &aCustomer mode %state% for &f%player-name%&a!"),
+    ADMIN_CUSTOMER_MODE_STATE_DISABLED("admin.customer-mode.disabled", "&cdisabled"),
+    ADMIN_CUSTOMER_MODE_STATE_ENABLED("admin.customer-mode.enabled", "&2enabled");
 
     private String node;
     private String defaultMessage;

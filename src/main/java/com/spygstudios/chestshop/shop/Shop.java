@@ -188,9 +188,9 @@ public class Shop {
         int itemCount = itemsLeft < amount ? itemsLeft : amount;
         if (!InventoryUtils.hasFreeSlot(buyer)) {
             Message.SHOP_INVENTORY_FULL.send(buyer);
-
             return;
         }
+
         int itemsPrice = itemCount * price;
         Economy economy = plugin.getEconomy();
         EconomyResponse response = economy.withdrawPlayer(buyer, itemsPrice);

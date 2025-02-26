@@ -13,13 +13,12 @@ config-reloaded: '%prefix% &aKonfiguráció sikeresen újratöltve!'
 no-permission: '%prefix% &cEhhez nincs jogod!'
 not-enough-money: '%prefix% &cNincs elég pénzed! ($%price%)'
 player:
-  only: '&cCsak játékosok használhatják ezt a parancsot!'
+  only-players: '%prefix% &cCsak játékosok használhatják ezt a parancsot!'
   already-added: '%prefix% &f%player-name% &cmár hozzá lett adva a boltodhoz!'
-  not-added: '%prefix% &f%player-name% &cnincs hozzáadva a boltodhoz!'
   added: '%prefix% &aSikeresen hozzáadtad &f%player-name% &aa boltodhoz!'
   removed: '%prefix% &aSikeresen eltávolítottad &f%player-name% &aa boltodból!'
   not-played-before: '%prefix% &f%player-name% &cMég sohasem játszott a szerveren!'
-  only-players: '&cOnly players can use this command!'
+player-not-added: '%prefix% &f%player-name% &cjátékos nincs hozzáadva ehhez a bolthoz!'
 shop:
   already-exists: '%prefix% &f%shop-name% &cnévvle már van boltod!'
   bought: '%prefix% &aSikeresen vásároltál &7x%items-bought% &f%material% &f$%price%
@@ -27,7 +26,6 @@ shop:
   chest-already-shop: '%prefix% &cEz a láda már jelenleg is bolt!'
   created: '%prefix% &aSikeresen létrehoztad a(z) &f%shop-name% &aboltot!'
   disabled-world: '%prefix% &cEbben a világban nem hozhatsz létre boltot!'
-  invalid-price: '%prefix% &cÉrvénytelen ár!'
   invalid-page: '%prefix% &cÉrvénytelen oldal! &7(&8%page%&7)'
   limit-reached: '%prefix% &cElérted a maximum boltok számát! (&e%shop-limit%&c)'
   player-limit-reached: '%prefix% &cElérted a maximum hozzáadható játékosok számát!
@@ -60,20 +58,20 @@ shop:
   sold: '%prefix% &aSikeresen eladtál &7x%items-bought% &f%material% &f$%price% &f%player-name%
     &ajátékosnak! &7(&8%items-left%&7)'
   renamed: '%prefix% &f%old-name% &aúj neve: &f%new-name%!'
-  chest-face-not-free: '%prefix% &cThe face of the chest is not free!'
-  no-permission: '%prefix% &cYou don''t have permission to use this shop!'
-  no-double-chest: '%prefix% &cYou can''t place a chest next to a chest shop!'
-  name-too-short: '%prefix% &cShop name is too short!'
 admin:
   shop:
     list:
-      header: '%prefix% &e%player-name% &aboltja:'
+      header: '%prefix% &e%player-name%&a''s shops:'
       shops: '&7- &f%shop-name%'
       shops-hover: |-
         &6&l%material%&r
-          &8- &7ár: &6$&e%price%
-          &8- &7hátralévő tárgyak: &e%items-left%
-          &8- &7hely: &e%location%
-          &8- &7létrehozva: &e%created%
+         &8- &7ár: &6$&e%price%
+         &8- &7hátralévő tárgyak: &e%items-left%
+         &8- &7hely: &e%location%
+         &8- &7létrehozva: &e%created%
   no-shops: '%prefix% &f%player-name% &cjátékosnak nincsenek boltjai!'
-player-not-added: '%prefix% &cPlayer &f%player-name% &cis not added to the shop!'
+  customer-mode:
+    message: '%prefix% &aVásárlói mód %state%!'
+    message-other: '%prefix% &aVásárlói mód %state% &f%player-name% &aszámára!'
+    disabled: '&ckikapcsolva'
+    enabled: '&2bekaolcsolva'
