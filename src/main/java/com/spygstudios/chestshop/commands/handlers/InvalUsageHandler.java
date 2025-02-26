@@ -39,7 +39,7 @@ public class InvalUsageHandler implements InvalidUsageHandler<CommandSender> {
 
     private String getCommand(String scheme, String label) {
         String[] args = scheme.split(" ");
-        args[0] = config.getString("colors.command.label") + "/" + label + " "; // Az első argumentum kicserélése
+        args[0] = config.getString("colors.command.label") + "/" + label + ""; // Az első argumentum kicserélése
 
         StringBuilder result = new StringBuilder(args[0]);
 
@@ -50,7 +50,7 @@ public class InvalUsageHandler implements InvalidUsageHandler<CommandSender> {
             } else if (arg.startsWith("[") && arg.endsWith("]")) {
                 result.append(config.getString("colors.command.optional-arg")).append(arg);
             } else {
-                result.append(config.getString("colors.command.args")).append(arg);
+                result.append(config.getString("colors.command.args")).append(" "+arg);
             }
         }
 
