@@ -26,7 +26,6 @@ public class Reload {
         this.guiConfig = plugin.getGuiConfig();
         this.messageConfig = plugin.getMessageConfig();
         this.plugin = plugin;
-
     }
 
     @Execute
@@ -34,6 +33,7 @@ public class Reload {
     public void onReload(@Context CommandSender player) {
         config.reloadConfig();
         guiConfig.reloadConfig();
+        plugin.getMessageConfig().reloadConfig();
         for (Shop shop : Shop.getShops()) {
             shop.updateHologramRows();
         }
