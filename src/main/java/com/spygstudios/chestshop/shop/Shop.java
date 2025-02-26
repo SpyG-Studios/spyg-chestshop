@@ -196,6 +196,7 @@ public class Shop {
 
         if (!response.transactionSuccess()) {
             Message.NOT_ENOUGH_MONEY.send(buyer, Map.of("%price%", String.valueOf(itemsPrice)));
+            return;
         }
 
         economy.depositPlayer(Bukkit.getOfflinePlayer(getOwnerId()), itemsPrice);
