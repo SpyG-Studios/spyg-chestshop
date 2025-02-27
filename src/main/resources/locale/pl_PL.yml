@@ -1,0 +1,77 @@
+prefix: '&8[&#ffbc1fChest&#ff711fShop&8] &7»&f'  # Prefiks używany przed każdą wiadomością z pluginu, np. dla kolorów i wyglądu.
+commands: '%prefix% &7Komendy:'  # Komenda wyświetlająca listę dostępnych komend z pluginu.
+new-version: '%prefix% &aDostępna jest nowa wersja SpygChestShop! Aktualna wersja: &#e80000%old-version% &aNowa wersja: &#00bf0d%new-version% &7&o(Kliknij by zainstalować!)' # Powiadomienie o dostępnej nowej wersji pluginu, zawiera link do instalacji.
+enter-amount-cancelled: '%prefix% &cWprowadzanie kwoty anulowane!'  # Wiadomość, gdy proces wprowadzania kwoty zostanie anulowany.
+enter-amount-prompt: '%prefix% &aWprowadź kwotę &7&o(Wprowadź&f%cancel%&7&o aby anulować)'  # Komunikat wyświetlający prośbę o wpisanie kwoty, z możliwością anulowania.
+enter-amount-success: '%prefix% &aKwota ustawiona pomyślnie!'  # Wiadomość, gdy kwota została ustawiona pomyślnie.
+invalid-number: '%prefix% &cNieprawidłowy numer!(&e%entered%&c)'  # Wiadomość, gdy wpisany numer jest nieprawidłowy.
+cannot-add-yourself: '%prefix% &cNie możesz dodać siebie do sklepu!'  # Wiadomość, gdy gracz próbuje dodać siebie do swojego sklepu.
+cant-create-shop-here: '%prefix% &cNie możesz utworzyć sklepu tutaj!'  # Wiadomość, gdy sklep nie może zostać stworzony w danym miejscu.
+usage: '%prefix% &7%usage%'  # Komunikat pokazujący poprawne użycie komendy, np. jak używać pluginu.
+config-reloaded: '%prefix% &aKonfiguracja została pomyślnie załadowana!'  # Wiadomość, gdy konfiguracja pluginu została pomyślnie załadowana.
+no-permission: '%prefix% &cNie masz do tego uprawnień!'  # Komunikat, gdy gracz nie ma uprawnień do wykonania danej akcji.
+not-enough-money: '%prefix% &cNie masz wystarczającej ilości pieniędzy! ($%price%)'  # Wiadomość, gdy gracz próbuje wykonać akcję bez wystarczających pieniędzy.
+player:
+  only-players: '&cTylko gracze mogą używać tego polecenia!'  # Sprawdzanie, czy komenda jest używana przez gracza.
+  already-added: '%prefix% &cGracz &f%player-name% &cjest już dodany do sklepu!'  # Wiadomość, gdy gracz już jest dodany do sklepu.
+  added: '%prefix% &aGracz &f%player-name% &adodany do sklepu!'  # Wiadomość, gdy gracz został pomyślnie dodany do sklepu.
+  removed: '%prefix% &aGracz &f%player-name% &ausunięty ze sklepu!'  # Wiadomość, gdy gracz został usunięty ze sklepu.
+  not-played-before: '%prefix% &cGracz &f%player-name% &cnigdy wcześniej nie grał na tym serwerze!'  # Wiadomość, gdy gracz nie był wcześniej na serwerze.
+  player-not-added: '%prefix% &cGracz &f%player-name% &cnie został dodany do sklepu!'  # Wiadomość, gdy gracz nie został dodany do sklepu.
+shop:
+  already-exists: '%prefix% &cSklep o nazwie &f%shop-name% &cjuż istnieje!'  # Wiadomość, gdy sklep o podanej nazwie już istnieje.
+  bought: '%prefix% &aKupiłeś &7x%items-bought% &f%material% &a za &f$%price%&a! &7(&8%items-left%&7)'  # Wiadomość po zakupie przedmiotu w sklepie, z ilością zakupionych i pozostałych przedmiotów.
+  chest-already-shop: '%prefix% &cTa skrzynia jest już sklepem!'  # Wiadomość, gdy skrzynia, którą gracz chce użyć, jest już sklepem.
+  created: '%prefix% &aSklep &f%shop-name% &autworzony!'  # Wiadomość, gdy sklep został pomyślnie utworzony.
+  disabled-world: '%prefix% &cSklepy są wyłączone na tym świecie!'  # Wiadomość, gdy sklepy są wyłączone na aktualnym świecie.
+  invalid-page: '%prefix% &cNieprawidłowa strona! &7(&8%page%&7)'  # Wiadomość, gdy numer strony jest niepoprawny.
+  limit-reached: '%prefix% &cOsiągnięto limit sklepów! (&e%shop-limit%&c)'  # Wiadomość, gdy gracz osiągnął limit sklepów.
+  player-limit-reached: '%prefix% &cOsiągnąłeś limit graczy! (&e%max-players%&c)'  # Wiadomość, gdy gracz osiągnął limit sklepów dla graczy.
+  list:
+    header: '%prefix% &aTwoje sklepy:'  # Nagłówek listy sklepów gracza.
+    shops: '&7- &f%shop-name%'  # Wyświetlanie sklepów na liście.
+    shops-hover: |-
+      &6&l%material%&r  # Materiał przedmiotu w sklepie.
+       &8- &7Cena: &6$&e%price%  # Cena przedmiotu w sklepie.
+       &8- &7Pozostałe przedmioty: &e%items-left%  # Pozostała ilość przedmiotów.
+       &8- &7Lokalizacja: &e%location%  # Lokalizacja sklepu.
+       &8- &7Utworzono w: &e%created%  # Data utworzenia sklepu.
+    current-page: '&7[&e&l%page%&r&7]'  # Numer aktualnej strony.
+    next: ' &7[&eNastępna&7]'  # Przycisk przejścia do następnej strony.
+    back: '&7[&cWstecz&7]'  # Przycisk przejścia do poprzedniej strony.
+    page: '&7[&e%page%&7]'  # Numer strony.
+  blacklisted-name: '%prefix% &cTa nazwa jest na czarnej liście!'  # Wiadomość, gdy nazwa sklepu jest na czarnej liście.
+  name-length: '%prefix% &cNazwa sklepu musi mieć długość od &f%min-length% &cdo &f%max-length% &cznaków!'  # Sprawdzenie, czy nazwa sklepu mieści się w wymaganym zakresie długości.
+  no-chest: '%prefix% &cMusisz spojrzeć na skrzynię, aby stworzyć sklep!'  # Wiadomość, gdy gracz nie patrzy na skrzynię, by utworzyć sklep.
+  empty: '%prefix% &cSklep jest pusty!'  # Wiadomość, gdy sklep nie ma przedmiotów do sprzedaży.
+  inventory-full: '%prefix% &cTwój ekwipunek jest pełny!'  # Wiadomość, gdy ekwipunek gracza jest pełny.
+  exploded: '%prefix% &cTwój sklep %shop-name% eksplodował! &7&o(&f%shop-location%&7)'  # Wiadomość, gdy sklep eksplodował w danej lokalizacji.
+  no-shops: '%prefix% &cNie masz żadnych sklepów!'  # Wiadomość, gdy gracz nie ma żadnych sklepów.
+  not-found: '%prefix% &cNie znaleziono sklepu!'  # Wiadomość, gdy sklep o podanej nazwie nie został znaleziony.
+  not-owner: '%prefix% &cNie jesteś właścicielem tego sklepu!'  # Wiadomość, gdy gracz nie jest właścicielem sklepu.
+  removed: '%prefix% &cSklep &f%shop-name% &cusunięty!'  # Wiadomość, gdy sklep został usunięty.
+  setup-needed: '%prefix% &cTen sklep nie jest poprawnie skonfigurowany!'  # Wiadomość, gdy sklep nie jest poprawnie skonfigurowany.
+  sold: '%prefix% &aSprzedałeś &7x%items-bought% &f%material% &a za &f$%price%&a, do &f%player-name%&a! &7(&8%items-left%&7)'  # Wiadomość po sprzedaży przedmiotu z jednego sklepu do drugiego gracza.
+  renamed: '%prefix% &aSklep &f%old-name% &azmieniony na &f%new-name%'  # Wiadomość po zmianie nazwy sklepu.
+admin:
+  shop:
+    list:
+      header: '%prefix% &eSklepy gracza &f%player-name%&a:'  # Nagłówek listy sklepów dla administracji.
+      shops: '&7- &f%shop-name%'  # Lista sklepów gracza w widoku administracyjnym.
+      shops-hover: |-
+        &6&l%material%&r  # Materiał przedmiotu w sklepie.
+         &8- &7Cena: &6$&e%price%  # Cena przedmiotu w sklepie.
+         &8- &7Pozostałe przedmioty: &e%items-left%  # Pozostała ilość przedmiotów.
+         &8- &7Lokalizacja: &e%location%  # Lokalizacja sklepu.
+         &8- &7Utworzono w: &e%created%  # Data utworzenia sklepu.
+  no-shops: '%prefix% &cGracz &f%player-name% &cnie ma sklepów!'  # Wiadomość, gdy administracja sprawdza gracza, który nie ma sklepów.
+  customer-mode:
+    message: '%prefix% &aTryb klienta %state%!'  # Wiadomość pokazująca, czy tryb klienta jest włączony, czy wyłączony.
+    message-other: '%prefix% &aTryb klienta %state% dla &f%player-name%&a!'  # Wiadomość pokazująca, czy tryb klienta jest włączony, czy wyłączony dla innego gracza.
+    disabled: '&cWyłączony'  # Stan trybu klienta, wyłączony.
+    enabled: '&2Włączony'  # Stan trybu klienta, włączony.
+
+# Tłumaczenie autorstwa vexu(1337vexu)/vexu1337 [Version 1.1 of the translation]
+# Translation by vexu(1337vexu)/vexu1337   
+# Tłumaczenie zostało przesłane dzięki zaszczytowi team SpygChestShop (ikoli & Ris)
+# The translation was uploaded thanks to the honor of team SpygChestShop (ikoli & Ris)
