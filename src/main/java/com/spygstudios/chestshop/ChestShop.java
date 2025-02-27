@@ -140,7 +140,6 @@ public class ChestShop extends JavaPlugin {
         while (entries.hasMoreElements()) {
             JarEntry entry = entries.nextElement();
             String name = entry.getName();
-            System.out.println(entry);
             if (name.startsWith("locale/") && !entry.isDirectory()) {
                 String fileName = name.substring("locale/".length());
                 File targetFile = new File(localeDirectory, fileName);
