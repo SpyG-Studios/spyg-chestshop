@@ -13,6 +13,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.chestshop.shop.ShopUtils;
 
 public class BuildListener implements Listener {
 
@@ -27,7 +28,7 @@ public class BuildListener implements Listener {
         }
 
         Player player = event.getPlayer();
-        if (Shop.isDisabledWorld(player.getWorld())) {
+        if (ShopUtils.isDisabledWorld(event.getBlock().getWorld().getName())) {
             return;
         }
         Chest chest = (Chest) event.getBlock().getState().getBlockData();

@@ -8,6 +8,7 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.chestshop.shop.ShopUtils;
 
 import dev.rollczi.litecommands.annotations.argument.Arg;
 import dev.rollczi.litecommands.annotations.command.Command;
@@ -30,7 +31,7 @@ public class Rename {
             Message.SHOP_ALREADY_EXISTS.send(player, Map.of("%shop-name%", name));
             return;
         }
-        if (Shop.isBlacklistedName(name)) {
+        if (ShopUtils.isBlacklistedName(name)) {
             Message.SHOP_BLACKLISTED_NAME.send(player);
             return;
         }

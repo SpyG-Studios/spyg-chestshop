@@ -14,6 +14,7 @@ import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.gui.ChestShopGui;
 import com.spygstudios.chestshop.gui.ShopGui;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.chestshop.shop.ShopUtils;
 import com.spygstudios.spyglib.item.ItemUtils;
 
 public class InteractListener implements Listener {
@@ -34,7 +35,7 @@ public class InteractListener implements Listener {
             return;
         }
         Player player = event.getPlayer();
-        if (Shop.isDisabledWorld(player.getWorld())) {
+        if (ShopUtils.isDisabledWorld(player.getWorld().getName())) {
             return;
         }
         Location location = event.getClickedBlock().getLocation();

@@ -17,6 +17,7 @@ import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.events.ShopCreateEvent;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.shop.ShopFile;
+import com.spygstudios.chestshop.shop.ShopUtils;
 
 import dev.rollczi.litecommands.annotations.argument.Arg;
 import dev.rollczi.litecommands.annotations.command.Command;
@@ -36,7 +37,7 @@ public class Create {
             return;
         }
 
-        if (Shop.isDisabledWorld(player.getWorld())) {
+        if (ShopUtils.isDisabledWorld(player.getWorld().getName())) {
             Message.SHOP_DISABLED_WORLD.send(player);
             return;
         }
@@ -56,21 +57,23 @@ public class Create {
             return;
         }
 
-        if (Shop.getShop(targetBlock.getLocation()) != null || (Shop.isDoubleChest(targetBlock) && Shop.getShop(Shop.getAdjacentChest(targetBlock).getLocation()) != null)) {
+        if (Shop.getShop(targetBlock.getLocation()) != null || (ShopUtils.isDoubleChest(targetBlock) && Shop.getShop(ShopUtils.getAdjacentChest(targetBlock).getLocation()) != null)) {
             Message.SHOP_CHEST_ALREADY_SHOP.send(player);
             return;
         }
 
-        Config config = ChestShop.getInstance().getConf();
-        if (config.getInt("shops.max-shops") != 0 && file.getPlayerShops().size() >= config.getInt("shops.max-shops")) {
-            Message.SHOP_LIMIT_REACHED.send(player, Map.of("%shop-limit%", String.valueOf(config.getInt("shops.max-shops"))));
+        int maxShops = ShopUtils.getMaxShops(player);
+        if (maxShops != 0 && file.getPlayerShops().size() >= maxShops) {
+            Message.SHOP_LIMIT_REACHED.send(player, Map.of("%shop-limit%", String.valueOf(maxShops)));
             return;
         }
 
-        if (Shop.isBlacklistedName(name)) {
+        if (ShopUtils.isBlacklistedName(name)) {
             Message.SHOP_BLACKLISTED_NAME.send(player);
             return;
         }
+        Config config = ChestShop.getInstance().getConf();
+
         int minLength = config.getInt("shops.name.min-length");
         int maxLength = config.getInt("shops.name.max-length");
         if (name.length() < minLength || name.length() > maxLength) {

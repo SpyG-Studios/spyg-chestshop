@@ -174,7 +174,7 @@ public class ShopFile extends YamlManager {
             return;
         }
         Location location = LocationUtils.toLocation(locationString);
-        if (Shop.isDisabledWorld(location.getWorld())) {
+        if (location.getWorld() == null || ShopUtils.isDisabledWorld(location.getWorld().getName())) {
             return;
         }
         if (!location.getBlock().getType().equals(Material.CHEST)) {
