@@ -35,7 +35,7 @@ public class Reload {
         guiConfig.reloadConfig();
         plugin.getMessageConfig().reloadConfig();
         for (Shop shop : Shop.getShops()) {
-            shop.updateHologramRows();
+            shop.getHologram().updateHologramRows();
         }
         if (!config.getString("locale").equals(plugin.getMessageConfig().getLocale())) {
             plugin.setMessageConfig(new MessageConfig(plugin, config.getString("locale")));
