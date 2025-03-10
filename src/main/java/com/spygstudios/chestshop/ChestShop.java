@@ -129,33 +129,30 @@ public class ChestShop extends JavaPlugin {
     }
 
     private void loadLocalizations() {
-    File localeDirectory = new File(getDataFolder(), "locale");
-    if (!localeDirectory.exists()) {
-        localeDirectory.mkdirs();
-    }
+        File localeDirectory = new File(getDataFolder(), "locale");
+        if (!localeDirectory.exists()) {
+            localeDirectory.mkdirs();
+        }
 
-    try (JarFile jarFile = new JarFile(getFile())) {
-        Enumeration<JarEntry> entries = jarFile.entries();
-
-        while (entries.hasMoreElements()) {
-            JarEntry entry = entries.nextElement();
-            String name = entry.getName();
-            if (name.startsWith("locale/") && !entry.isDirectory()) {
-                String fileName = name.substring("locale/".length());
-                File targetFile = new File(localeDirectory, fileName);
-                if (!targetFile.exists()) {
-                    try (InputStream inputStream = getResource(name)) {
-                        if (inputStream != null) {
-                            Files.copy(inputStream, targetFile.toPath());
+        try (JarFile jarFile = new JarFile(getFile())) {
+            Enumeration<JarEntry> entries = jarFile.entries();
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+                String name = entry.getName();
+                if (name.startsWith("locale/") && !entry.isDirectory()) {
+                    String fileName = name.substring("locale/".length());
+                    File targetFile = new File(localeDirectory, fileName);
+                    if (!targetFile.exists()) {
+                        try (InputStream inputStream = getResource(name)) {
+                            if (inputStream != null) {
+                                Files.copy(inputStream, targetFile.toPath());
+                            }
                         }
                     }
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    } catch (IOException e) {
-        e.printStackTrace();
     }
-}
-
-
 }

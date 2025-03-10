@@ -90,7 +90,7 @@ public class InventoryClickListener implements Listener {
         case BUY:
             ItemStack shopItem = event.getInventory().getItem(13);
             int amount = shopItem.getAmount();
-            holder.getShop().sell(holder.getPlayer(), amount);
+            holder.getShop().getShopTransactions().sell(holder.getPlayer(), amount);
             if (holder.getShop().getItemsLeft() == 0) {
                 holder.getPlayer().closeInventory();
                 Message.SHOP_EMPTY.send(holder.getPlayer());

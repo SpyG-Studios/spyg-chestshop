@@ -9,27 +9,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.DoubleChestInventory;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.enums.ShopRemoveCause;
 import com.spygstudios.chestshop.events.ShopRemoveEvent;
-import com.spygstudios.spyglib.color.TranslateColor;
-import com.spygstudios.spyglib.hologram.Hologram;
 import com.spygstudios.spyglib.hologram.HologramItemRow;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
 
 import lombok.Getter;
-import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.economy.EconomyResponse;
 
 public class Shop {
     @Getter
@@ -49,7 +41,9 @@ public class Shop {
     @Getter
     private List<UUID> addedPlayers;
     @Getter
-    private Hologram hologram;
+    private ShopTransactions shopTransactions;
+    @Getter
+    private ShopHologram hologram;
 
     private ShopFile shopFile;
 
@@ -71,18 +65,10 @@ public class Shop {
         this.isNotify = isNotify;
         this.addedPlayers = addedPlayers;
         this.shopFile = shopFile;
-        this.hologram = plugin.getHologramManager().createHologram(chestLocation.clone().add(0.5, 0.7, 0.5));
-        updateHologramRows();
-        SHOPS.add(this);
-    }
+        this.shopTransactions = new ShopTransactions(this, shopFile);
+        this.hologram = new ShopHologram(this, plugin);
 
-    public void updateHologramRows() {
-        while (!hologram.getRows().isEmpty()) {
-            hologram.removeRow(0);
-        }
-        plugin.getConf().getStringList("shop.lines").forEach(line -> hologram.addRow(TranslateColor.translate(line.replace("%owner%", Bukkit.getOfflinePlayer(ownerId).getName())
-                .replace("%shop-name%", name).replace("%price%", String.valueOf(price)).replace("%material%", getMaterialString()))));
-        hologram.addRow(new ItemStack(material == null ? Material.BARRIER : material));
+        SHOPS.add(this);
     }
 
     public String getMaterialString() {
@@ -108,7 +94,7 @@ public class Shop {
     public void setMaterial(Material material) {
         this.material = material;
         ShopFile.getShopFile(ownerId).setMaterial(name, material);
-        if (getHologram().getRows().get(plugin.getConf().getStringList("shop.lines").size()) instanceof HologramItemRow row) {
+        if (hologram.getHologram().getRows().get(plugin.getConf().getStringList("shop.lines").size()) instanceof HologramItemRow row) {
             row.setItem(new ItemStack(material));
         }
     }
@@ -116,13 +102,13 @@ public class Shop {
     public void setName(String newName) {
         ShopFile.getShopFile(ownerId).setName(name, newName);
         this.name = newName;
-        updateHologramRows();
+        hologram.updateHologramRows();
     }
 
     public void setPrice(int price) {
         this.price = price;
         ShopFile.getShopFile(ownerId).setPrice(name, price);
-        updateHologramRows();
+        hologram.updateHologramRows();
     }
 
     public void setNotify(boolean notify) {
@@ -166,81 +152,11 @@ public class Shop {
     }
 
     public boolean isDoubleChest() {
-        if (!(chestLocation.getBlock().getState() instanceof Chest chest)) {
-            return false;
-        }
-        Inventory inv = chest.getInventory();
-        return inv instanceof DoubleChestInventory;
+        return ShopUtils.isDoubleChest(getAdjacentChest());
     }
 
     public Block getAdjacentChest() {
-        for (BlockFace face : new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST }) {
-            Block relativeBlock = chestLocation.getBlock().getRelative(face);
-            if (relativeBlock.getState() instanceof Chest) {
-                return relativeBlock;
-            }
-        }
-        return null;
-    }
-
-    public void sell(Player buyer, int amount) {
-        int itemsLeft = getItemsLeft();
-        int itemCount = itemsLeft < amount ? itemsLeft : amount;
-        if (!InventoryUtils.hasFreeSlot(buyer)) {
-            Message.SHOP_INVENTORY_FULL.send(buyer);
-            return;
-        }
-
-        int itemsPrice = itemCount * price;
-        Economy economy = plugin.getEconomy();
-        EconomyResponse response = economy.withdrawPlayer(buyer, itemsPrice);
-
-        if (!response.transactionSuccess()) {
-            Message.NOT_ENOUGH_MONEY.send(buyer, Map.of("%price%", String.valueOf(itemsPrice)));
-            return;
-        }
-
-        economy.depositPlayer(Bukkit.getOfflinePlayer(getOwnerId()), itemsPrice);
-        extractItems(buyer, (Chest) getChestLocation().getBlock().getState(), itemCount);
-        itemsLeft = itemsLeft - itemCount;
-
-        Message.SHOP_BOUGHT.send(buyer,
-                Map.of("%price%", String.valueOf(itemsPrice), "%material%", getMaterial().name(), "%items-left%", String.valueOf(itemsLeft), "%items-bought%", String.valueOf(itemCount)));
-        shopFile.overwriteSet("shops." + getName() + ".sold-items", shopFile.getInt("shops." + getName() + ".sold-items") + itemCount);
-        shopFile.overwriteSet("shops." + getName() + ".money-earned", shopFile.getDouble("shops." + getName() + ".money-earned") + itemsPrice);
-        shopFile.save();
-        Player owner = Bukkit.getPlayer(getOwnerId());
-        if (isNotify() && owner != null) {
-            Message.SHOP_SOLD.send(owner, Map.of("%price%", String.valueOf(itemsPrice), "%material%", getMaterial().name(), "%player-name%", buyer.getName(), "%items-left%", String.valueOf(itemsLeft),
-                    "%items-bought%", String.valueOf(itemCount)));
-        }
-    }
-
-    private int extractItems(Player buyer, Chest chest, int itemCount) {
-        while (itemCount > 0) {
-            int amountToTransfer = Math.min(itemCount, getMaterial().getMaxStackSize());
-            ItemStack stackToAdd = new ItemStack(getMaterial(), amountToTransfer);
-            buyer.getInventory().addItem(stackToAdd);
-            for (ItemStack chestItem : chest.getInventory().getContents()) {
-                if (chestItem != null && chestItem.getType() == getMaterial()) {
-                    int chestItemAmount = chestItem.getAmount();
-                    int removeAmount = Math.min(amountToTransfer, chestItemAmount);
-                    chestItem.setAmount(chestItemAmount - removeAmount); // Csökkentjük a ládában lévő mennyiséget
-                    amountToTransfer -= removeAmount; // Csökkentjük az áthelyezendő mennyiséget
-                    if (amountToTransfer <= 0) {
-                        break;
-                    }
-                }
-            }
-            itemCount -= Math.min(itemCount, getMaterial().getMaxStackSize());
-        }
-        return itemCount;
-    }
-
-    public void removeHologram() {
-        if (hologram != null) {
-            hologram.remove();
-        }
+        return ShopUtils.getAdjacentChest(chestLocation.getBlock());
     }
 
     public int getItemsLeft() {
@@ -268,15 +184,6 @@ public class Shop {
         return false;
     }
 
-    public static Shop getShop(String name) {
-        for (Shop shop : SHOPS) {
-            if (shop.getName().equalsIgnoreCase(name)) {
-                return shop;
-            }
-        }
-        return null;
-    }
-
     public static List<Shop> getShops(Player owner) {
         return getShops(owner.getUniqueId());
     }
@@ -291,6 +198,19 @@ public class Shop {
         return shops;
     }
 
+    public static List<Shop> getShops() {
+        return new ArrayList<>(SHOPS);
+    }
+
+    public static Shop getShop(UUID ownerId, String name) {
+        for (Shop shop : SHOPS) {
+            if (shop.getOwnerId().equals(ownerId) && shop.getName().equalsIgnoreCase(name)) {
+                return shop;
+            }
+        }
+        return null;
+    }
+
     public static Shop getShop(Location location) {
         location = location.getBlock().getLocation();
         for (Shop shop : SHOPS) {
@@ -301,42 +221,10 @@ public class Shop {
         return null;
     }
 
-    public static List<Shop> getShops() {
-        return new ArrayList<>(SHOPS);
-    }
-
     public static void removeShop(Shop shop) {
         ShopFile.getShopFile(shop.getOwnerId()).removeShop(shop.getName());
-        shop.removeHologram();
+        shop.hologram.removeHologram();
         SHOPS.remove(shop);
-    }
-
-    public static boolean isBlacklistedName(String name) {
-        String nameLowerCase = name.toLowerCase();
-        for (String invalidName : plugin.getConf().getStringList("shops.blacklisted-names")) {
-            if (nameLowerCase.contains(invalidName.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isDoubleChest(Block block) {
-        if (!(block.getState() instanceof Chest chest)) {
-            return false;
-        }
-        Inventory inv = chest.getInventory();
-        return inv instanceof DoubleChestInventory;
-    }
-
-    public static Block getAdjacentChest(Block block) {
-        for (BlockFace face : new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST }) {
-            Block relativeBlock = block.getRelative(face);
-            if (relativeBlock.getState() instanceof Chest) {
-                return relativeBlock;
-            }
-        }
-        return null;
     }
 
 }

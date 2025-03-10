@@ -11,6 +11,7 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.enums.ShopRemoveCause;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.chestshop.shop.ShopUtils;
 
 public class BreakListener implements Listener {
 
@@ -20,7 +21,7 @@ public class BreakListener implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        if (Shop.isDisabledWorld(event.getBlock().getWorld())) {
+        if (ShopUtils.isDisabledWorld(event.getBlock().getWorld().getName())) {
             return;
         }
         Shop shop = Shop.getShop(event.getBlock().getLocation());

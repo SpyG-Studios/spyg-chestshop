@@ -19,7 +19,10 @@ import dev.rollczi.litecommands.suggestion.SuggestionResult;
 public class ShopArgument extends ArgumentResolver<CommandSender, Shop> {
     @Override
     protected ParseResult<Shop> parse(Invocation<CommandSender> invocation, Argument<Shop> argument, String param) {
-        Shop shop = Shop.getShop(param);
+        if (!(invocation.sender() instanceof Player player)) {
+            return ParseResult.failure(Message.PLAYER_ONLY.get());
+        }
+        Shop shop = Shop.getShop(player.getUniqueId(), param);
         if (shop == null) {
             return ParseResult.failure(ComponentUtils.replaceComponent(Message.SHOP_NOT_FOUND.get(), "%shop%", param));
         } else {
