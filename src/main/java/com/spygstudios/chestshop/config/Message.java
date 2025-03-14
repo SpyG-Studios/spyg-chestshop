@@ -30,6 +30,7 @@ public enum Message {
     NO_PERMISSION("no-permission", "%prefix% &cYou don't have permission to do that!"),
     NOT_ENOUGH_MONEY("not-enough-money", "%prefix% &cYou don't have enough money! ($%price%)"), 
     PLAYER_ONLY("player.only-players", "&cOnly players can use this command!"),
+    PLAYER_NOT_FOUND("player.not-found", "%prefix% &cPlayer not found!"),
     PLAYER_ALREADY_ADDED("player.already-added", "%prefix% &cPlayer &f%player-name% &cis already added to the shop!"),
     PLAYER_NOT_ADDED("player-not-added", "%prefix% &cPlayer &f%player-name% &cis not added to the shop!"), 
     PLAYER_ADDED("player.added", "%prefix% &aPlayer &f%player-name% &aadded to the shop!"),

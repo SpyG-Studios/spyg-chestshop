@@ -36,6 +36,7 @@ public class CommandHandler {
                 .message(LiteBukkitMessages.PLAYER_ONLY, Message.PLAYER_ONLY.get())
 
                 .message(LiteMessages.MISSING_PERMISSIONS, Message.NO_PERMISSION.get())
+                .message(LiteBukkitMessages.PLAYER_NOT_FOUND, Message.PLAYER_NOT_FOUND.get())
 
                 .invalidUsage(new InvalUsageHandler(plugin)).extension(new LiteAdventureExtension<>())
 

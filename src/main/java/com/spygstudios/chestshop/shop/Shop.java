@@ -151,14 +151,6 @@ public class Shop {
         Shop.removeShop(this);
     }
 
-    public boolean isDoubleChest() {
-        return ShopUtils.isDoubleChest(getAdjacentChest());
-    }
-
-    public Block getAdjacentChest() {
-        return ShopUtils.getAdjacentChest(chestLocation.getBlock());
-    }
-
     public int getItemsLeft() {
         Chest chest = (Chest) chestLocation.getBlock().getState();
         return InventoryUtils.countItems(chest.getInventory(), material);
@@ -169,19 +161,6 @@ public class Shop {
             return;
         }
         player.openInventory(chest.getInventory());
-    }
-
-    public static boolean isDisabledWorld(String worldName) {
-        return Bukkit.getWorld(worldName) != null && isDisabledWorld(Bukkit.getWorld(worldName));
-    }
-
-    public static boolean isDisabledWorld(World world) {
-        for (String worldName : plugin.getConf().getStringList("shops.disabled-worlds")) {
-            if (world.getName().equalsIgnoreCase(worldName)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static List<Shop> getShops(Player owner) {
@@ -214,7 +193,8 @@ public class Shop {
     public static Shop getShop(Location location) {
         location = location.getBlock().getLocation();
         for (Shop shop : SHOPS) {
-            if (shop.getChestLocation().equals(location) || (shop.isDoubleChest() && shop.getAdjacentChest().getLocation().equals(location))) {
+            Block shopBlock = shop.getChestLocation().getBlock();
+            if (shop.getChestLocation().equals(location) || (ShopUtils.isDoubleChest(shopBlock) && ShopUtils.getAdjacentChest(shopBlock).getLocation().equals(location))) {
                 return shop;
             }
         }
