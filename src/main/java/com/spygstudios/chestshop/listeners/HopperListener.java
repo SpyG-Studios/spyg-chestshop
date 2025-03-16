@@ -7,6 +7,7 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.chestshop.shop.ShopUtils;
 
 public class HopperListener implements Listener {
 
@@ -22,7 +23,7 @@ public class HopperListener implements Listener {
         if (!config.getBoolean("shop.hopper-protection")) {
             return;
         }
-        if (Shop.isDisabledWorld(event.getSource().getLocation().getWorld())) {
+        if (ShopUtils.isDisabledWorld(event.getSource().getLocation().getWorld().getName())) {
             return;
         }
 

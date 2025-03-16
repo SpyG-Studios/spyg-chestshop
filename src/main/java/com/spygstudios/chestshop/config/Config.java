@@ -23,7 +23,8 @@ public class Config extends YamlManager {
         set("shops.blacklisted-names", Arrays.asList("stupid"));
         set("shops.disabled-worlds", Arrays.asList("disabled_world"));
         set("shops.unknown-material", "-", Arrays.asList("The material text to use when the material is unknown."));
-        set("shops.max-shops", 0, Arrays.asList("The maximum amount of shops a player can have. Set to 0 for unlimited."));
+        set("shops.max-shops.default", -1,
+                Arrays.asList("The maximum amount of shops a player can have (spygchestshop.max.<group>). Set to -1 for unlimited. If a player has more than one permission, the highest amount will be used."));
         set("shops.max-players", 18, Arrays.asList("The maximum amount of players that can be added to a shop. Set to 0 for unlimited."));
         set("shops.save-interval", 60, Arrays.asList("The interval in seconds to save the shops data."));
 

@@ -9,10 +9,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.commands.admin.CustomerMode;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.gui.ChestShopGui;
 import com.spygstudios.chestshop.gui.ShopGui;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.chestshop.shop.ShopUtils;
 import com.spygstudios.spyglib.item.ItemUtils;
 
 public class InteractListener implements Listener {
@@ -33,7 +35,7 @@ public class InteractListener implements Listener {
             return;
         }
         Player player = event.getPlayer();
-        if (Shop.isDisabledWorld(player.getWorld())) {
+        if (ShopUtils.isDisabledWorld(player.getWorld().getName())) {
             return;
         }
         Location location = event.getClickedBlock().getLocation();
@@ -47,7 +49,7 @@ public class InteractListener implements Listener {
 
         // Owner
         boolean isAdmin = (player.hasPermission("spygchestshop.admin") || player.hasPermission("spygchestshop.admin.edit")) && player.isSneaking();
-        if (shop.getOwnerId().equals(player.getUniqueId()) || isAdmin) {
+        if ((shop.getOwnerId().equals(player.getUniqueId()) || isAdmin) && !CustomerMode.getCustomerMode().contains(player.getUniqueId())) {
             ChestShopGui.open(plugin, player, shop);
             event.setCancelled(true);
             return;

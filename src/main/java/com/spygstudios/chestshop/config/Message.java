@@ -30,6 +30,7 @@ public enum Message {
     NO_PERMISSION("no-permission", "%prefix% &cYou don't have permission to do that!"),
     NOT_ENOUGH_MONEY("not-enough-money", "%prefix% &cYou don't have enough money! ($%price%)"), 
     PLAYER_ONLY("player.only-players", "&cOnly players can use this command!"),
+    PLAYER_NOT_FOUND("player.not-found", "%prefix% &cPlayer not found!"),
     PLAYER_ALREADY_ADDED("player.already-added", "%prefix% &cPlayer &f%player-name% &cis already added to the shop!"),
     PLAYER_NOT_ADDED("player-not-added", "%prefix% &cPlayer &f%player-name% &cis not added to the shop!"), 
     PLAYER_ADDED("player.added", "%prefix% &aPlayer &f%player-name% &aadded to the shop!"),
@@ -71,7 +72,11 @@ public enum Message {
     ADMIN_SHOP_LIST_SHOPS("admin.shop.list.shops", "&7- &f%shop-name%"),
     ADMIN_SHOP_LIST_SHOPS_HOVER("admin.shop.list.shops-hover",
             "&6&l%material%&r\n &8- &7price: &6$&e%price%\n &8- &7items left: &e%items-left%\n &8- &7location: &e%location%\n &8- &7created at: &e%created%"),
-    ADMIN_NO_SHOPS("admin.no-shops", "%prefix% &cPlayer &f%player-name% &chas no shops!"),;
+    ADMIN_NO_SHOPS("admin.no-shops", "%prefix% &cPlayer &f%player-name% &chas no shops!"),
+    ADMIN_CUSTOMER_MODE("admin.customer-mode.message", "%prefix% &aCustomer mode %state%!"),
+    ADMIN_CUSTOMER_MODE_OTHER("admin.customer-mode.message-other", "%prefix% &aCustomer mode %state% for &f%player-name%&a!"),
+    ADMIN_CUSTOMER_MODE_STATE_DISABLED("admin.customer-mode.disabled", "&cdisabled"),
+    ADMIN_CUSTOMER_MODE_STATE_ENABLED("admin.customer-mode.enabled", "&2enabled");
 
     private String node;
     private String defaultMessage;
