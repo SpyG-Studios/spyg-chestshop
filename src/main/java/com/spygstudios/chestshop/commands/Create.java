@@ -63,7 +63,7 @@ public class Create {
         }
 
         int maxShops = ShopUtils.getMaxShops(player);
-        if (maxShops != 0 && file.getPlayerShops().size() >= maxShops) {
+        if (maxShops != -1 && file.getPlayerShops().size() >= maxShops) {
             Message.SHOP_LIMIT_REACHED.send(player, Map.of("%shop-limit%", String.valueOf(maxShops)));
             return;
         }

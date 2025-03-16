@@ -51,15 +51,19 @@ public class ShopUtils {
     }
 
     public static int getMaxShops(Player player) {
-        int maxShops = 0;
+        int maxShops = plugin.getConf().getInt("shops.max-shops.default");
+        if (maxShops == -1) {
+            return -1;
+        }
         for (String permission : plugin.getConf().getConfigurationSection("shops.max-shops").getKeys(false)) {
-            int value = plugin.getConf().getInt("shops.max-shops." + permission);
-            if (player.hasPermission(permission)) {
-                if (value == 0) {
-                    return 0;
-                }
-                maxShops = Math.max(maxShops, value);
+            if (permission.equals("default") || !player.hasPermission("spygchestshop.max." + permission)) {
+                continue;
             }
+            int value = plugin.getConf().getInt("shops.max-shops." + permission);
+            if (value == -1) {
+                return -1;
+            }
+            maxShops = Math.max(maxShops, value);
         }
         return maxShops;
     }
