@@ -64,12 +64,13 @@ public class InventoryClickListener implements Listener {
             if (System.currentTimeMillis() - getLastAmountClick(event.getWhoClicked()) < 100) {
                 return;
             }
+            ItemStack item = event.getInventory().getItem(13);
             lastAmountClick.put(event.getWhoClicked().getUniqueId(), System.currentTimeMillis());
             int itemsLeft = holder.getShop().getItemsLeft();
-            int max = 64 > itemsLeft ? itemsLeft : 64;
+            int max = item.getMaxStackSize() > itemsLeft ? itemsLeft : item.getMaxStackSize();
             int min = 1;
             int modifier = data.getInt("amount");
-            int currentAmount = event.getInventory().getItem(13).getAmount();
+            int currentAmount = item.getAmount();
             if (currentAmount + modifier >= max) {
                 currentAmount = max;
             } else if (currentAmount + modifier <= min) {
@@ -77,14 +78,13 @@ public class InventoryClickListener implements Listener {
             } else {
                 currentAmount = currentAmount + modifier;
             }
-            ItemStack shopMaterial = event.getInventory().getItem(13);
-            shopMaterial.setAmount(currentAmount);
-            ItemMeta shopMeta = shopMaterial.getItemMeta();
+            item.setAmount(currentAmount);
+            ItemMeta shopMeta = item.getItemMeta();
             final int finalCurrentAmount = currentAmount;
             List<Component> translatedLore = plugin.getGuiConfig().getStringList("shop.item-to-buy.lore").stream()
                     .map(line -> TranslateColor.translate(line.replace("%price%", String.valueOf(holder.getShop().getPrice() * finalCurrentAmount)))).toList();
             shopMeta.lore(translatedLore);
-            shopMaterial.setItemMeta(shopMeta);
+            item.setItemMeta(shopMeta);
             break;
 
         case BUY:
@@ -92,6 +92,7 @@ public class InventoryClickListener implements Listener {
             int amount = shopItem.getAmount();
             holder.getShop().getShopTransactions().sell(holder.getPlayer(), amount);
             if (holder.getShop().getItemsLeft() == 0) {
+                holder.getShop().getHologram().updateHologramRows();
                 holder.getPlayer().closeInventory();
                 Message.SHOP_EMPTY.send(holder.getPlayer());
             }

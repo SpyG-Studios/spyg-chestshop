@@ -27,6 +27,14 @@ public class InventoryCloseListener implements Listener {
     public void onInventoryClose(InventoryCloseEvent event) {
         InventoryHolder invHolder = event.getInventory().getHolder();
 
+        if (plugin.getConf().getBoolean("shops.barrier-when-empty")) {
+            Shop shop = Shop.getShop(event.getInventory().getLocation());
+            if (shop != null) {
+                System.out.println(invHolder);
+                shop.getHologram().updateHologramRows();
+            }
+        }
+
         if (invHolder instanceof PlayersHolder holder && (event.getPlayer().getOpenInventory() == null || !(event.getPlayer().getOpenInventory().getTopInventory() instanceof PlayersHolder))) {
             Bukkit.getScheduler().runTaskLater(plugin, () -> ChestShopGui.open(plugin, (Player) event.getPlayer(), holder.getShop()), 1);
             return;
