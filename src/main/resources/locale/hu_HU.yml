@@ -55,7 +55,7 @@ shop:
   not-owner: '%prefix% &cNem te vagy ennek a boltnak a tulajdonosa!'
   removed: '%prefix% &cSikeresen törölted a(z) &f%shop-name% &cboltot!'
   setup-needed: '%prefix% &cEz a bolt nincs megfelelően beállítva!'
-  sold: '%prefix% &aSikeresen eladtál &7x%items-bought% &f%material% &f$%price% &f%player-name%
+  sold: '%prefix% &aSikeresen eladtál &7x%items-bought% &f%material% &2$&a%price% &aértékben &f%player-name%
     &ajátékosnak! &7(&8%items-left%&7)'
   renamed: '%prefix% &f%old-name% &aúj neve: &f%new-name%!'
 admin:
