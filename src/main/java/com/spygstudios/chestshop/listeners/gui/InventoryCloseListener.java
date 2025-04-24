@@ -27,10 +27,9 @@ public class InventoryCloseListener implements Listener {
     public void onInventoryClose(InventoryCloseEvent event) {
         InventoryHolder invHolder = event.getInventory().getHolder();
 
-        if (plugin.getConf().getBoolean("shops.barrier-when-empty")) {
+        if (plugin.getConf().getBoolean("shops.barrier-when-empty") && event.getInventory().getLocation() != null) {
             Shop shop = Shop.getShop(event.getInventory().getLocation());
             if (shop != null) {
-                System.out.println(invHolder);
                 shop.getHologram().updateHologramRows();
             }
         }
