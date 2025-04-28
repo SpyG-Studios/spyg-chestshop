@@ -7,6 +7,7 @@ enter-amount-prompt: '%prefix% &aÍrd be az értéket &7&o(A megszakításhoz í
 enter-amount-success: '%prefix% &aÖsszeg sikeresen beállítva!'
 invalid-number: '%prefix% &cÉrvénytelen szám! (&e%entered%&c)'
 cant-add-yourself: '%prefix% &cNem adhatod hozzá saját magad a bolthoz!'
+cant-remove-yourself: '%prefix% &cNem törölheted magad a boltból!'
 cant-create-shop-here: '%prefix% &cItt nem hozhatsz létre boltot!'
 usage: '%prefix% &7%usage%'
 config-reloaded: '%prefix% &aKonfiguráció sikeresen újratöltve!'
