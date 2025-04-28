@@ -22,7 +22,7 @@ public enum Message {
 
     INVALID_NUMBER("invalid-number", "%prefix% &cInvalid number! (&e%entered%&c)"),
 
-    CANNOT_ADD_YOURSELF("cannot-add-yourself", "%prefix% &cYou can't add yourself to the shop!"), 
+    CANT_ADD_YOURSELF("cant-add-yourself", "%prefix% &cYou can't add yourself to the shop!"), 
     CANT_CREATE_SHOP_HERE("cant-create-shop-here", "%prefix% &cYou can't create a shop here!"),
     USAGE("usage", "%prefix% &7%usage%"),
 
