@@ -1,5 +1,6 @@
 package com.spygstudios.chestshop.shop;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -62,23 +63,32 @@ public class ShopTransactions {
 
     private int extractItems(Player buyer, Chest chest, int itemCount) {
         Material material = shop.getMaterial();
-        while (itemCount > 0) {
-            int amountToTransfer = Math.min(itemCount, material.getMaxStackSize());
-            ItemStack stackToAdd = new ItemStack(material, amountToTransfer);
-            buyer.getInventory().addItem(stackToAdd);
-            for (ItemStack chestItem : chest.getInventory().getContents()) {
-                if (chestItem != null && chestItem.getType() == material) {
-                    int chestItemAmount = chestItem.getAmount();
-                    int removeAmount = Math.min(amountToTransfer, chestItemAmount);
-                    chestItem.setAmount(chestItemAmount - removeAmount); // Csökkentjük a ládában lévő mennyiséget
-                    amountToTransfer -= removeAmount; // Csökkentjük az áthelyezendő mennyiséget
-                    if (amountToTransfer <= 0) {
-                        break;
-                    }
+
+        for (ItemStack chestItem : chest.getInventory().getContents()) {
+            if (itemCount <= 0)
+                break;
+
+            if (chestItem != null && chestItem.getType() == material) {
+                int chestAmount = chestItem.getAmount();
+                int removeAmount = Math.min(itemCount, chestAmount);
+
+                ItemStack clone = chestItem.clone();
+                clone.setAmount(removeAmount);
+
+                HashMap<Integer, ItemStack> leftover = buyer.getInventory().addItem(clone);
+
+                if (leftover.isEmpty()) {
+                    chestItem.setAmount(chestAmount - removeAmount);
+                    itemCount -= removeAmount;
+                } else {
+                    int added = removeAmount - leftover.values().stream().mapToInt(ItemStack::getAmount).sum();
+                    chestItem.setAmount(chestAmount - added);
+                    itemCount -= added;
+                    break;
                 }
             }
-            itemCount -= Math.min(itemCount, material.getMaxStackSize());
         }
+
         return itemCount;
     }
 

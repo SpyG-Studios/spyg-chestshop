@@ -42,7 +42,7 @@ public class Create {
             return;
         }
 
-        BlockPlaceEvent event = new BlockPlaceEvent(targetBlock, targetBlock.getState(), null, new ItemStack(Material.AIR), player, true, EquipmentSlot.HAND);
+        BlockPlaceEvent event = new BlockPlaceEvent(targetBlock, targetBlock.getState(), targetBlock.getRelative(0, -1, 0), new ItemStack(Material.AIR), player, true, EquipmentSlot.HAND);
         Bukkit.getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             Message.CANT_CREATE_SHOP_HERE.send(player);

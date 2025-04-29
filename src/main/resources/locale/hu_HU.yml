@@ -6,7 +6,8 @@ enter-amount-cancelled: '%prefix% &cÖsszeg beírása megszakítva!'
 enter-amount-prompt: '%prefix% &aÍrd be az értéket &7&o(A megszakításhoz írdbe: &f%cancel%&7&o)'
 enter-amount-success: '%prefix% &aÖsszeg sikeresen beállítva!'
 invalid-number: '%prefix% &cÉrvénytelen szám! (&e%entered%&c)'
-cannot-add-yourself: '%prefix% &cNem adhatod hozzá saját magad a bolthoz!'
+cant-add-yourself: '%prefix% &cNem adhatod hozzá saját magad a bolthoz!'
+cant-remove-yourself: '%prefix% &cNem törölheted magad a boltból!'
 cant-create-shop-here: '%prefix% &cItt nem hozhatsz létre boltot!'
 usage: '%prefix% &7%usage%'
 config-reloaded: '%prefix% &aKonfiguráció sikeresen újratöltve!'
@@ -55,7 +56,7 @@ shop:
   not-owner: '%prefix% &cNem te vagy ennek a boltnak a tulajdonosa!'
   removed: '%prefix% &cSikeresen törölted a(z) &f%shop-name% &cboltot!'
   setup-needed: '%prefix% &cEz a bolt nincs megfelelően beállítva!'
-  sold: '%prefix% &aSikeresen eladtál &7x%items-bought% &f%material% &f$%price% &f%player-name%
+  sold: '%prefix% &aSikeresen eladtál &7x%items-bought% &f%material% &2$&a%price% &aértékben &f%player-name%
     &ajátékosnak! &7(&8%items-left%&7)'
   renamed: '%prefix% &f%old-name% &aúj neve: &f%new-name%!'
 admin:

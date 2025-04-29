@@ -29,7 +29,7 @@ public class AddPlayer {
     @Permission("spygchestshop.use")
     public void onAdd(@Context Player sender, @Arg Shop shop, @Async @Arg OfflinePlayer player) {
         if (sender.getUniqueId().equals(player.getUniqueId())) {
-            Message.CANNOT_ADD_YOURSELF.send(sender);
+            Message.CANT_ADD_YOURSELF.send(sender);
             return;
         }
         if (!player.isOnline() && !player.hasPlayedBefore()) {

@@ -5,7 +5,7 @@ enter-amount-cancelled: '%prefix% &cWprowadzanie kwoty anulowane!'  # Wiadomoś�
 enter-amount-prompt: '%prefix% &aWprowadź kwotę &7&o(Wprowadź&f%cancel%&7&o aby anulować)'  # Komunikat wyświetlający prośbę o wpisanie kwoty, z możliwością anulowania.
 enter-amount-success: '%prefix% &aKwota ustawiona pomyślnie!'  # Wiadomość, gdy kwota została ustawiona pomyślnie.
 invalid-number: '%prefix% &cNieprawidłowy numer!(&e%entered%&c)'  # Wiadomość, gdy wpisany numer jest nieprawidłowy.
-cannot-add-yourself: '%prefix% &cNie możesz dodać siebie do sklepu!'  # Wiadomość, gdy gracz próbuje dodać siebie do swojego sklepu.
+cant-add-yourself: '%prefix% &cNie możesz dodać siebie do sklepu!'  # Wiadomość, gdy gracz próbuje dodać siebie do swojego sklepu.
 cant-create-shop-here: '%prefix% &cNie możesz utworzyć sklepu tutaj!'  # Wiadomość, gdy sklep nie może zostać stworzony w danym miejscu.
 usage: '%prefix% &7%usage%'  # Komunikat pokazujący poprawne użycie komendy, np. jak używać pluginu.
 config-reloaded: '%prefix% &aKonfiguracja została pomyślnie załadowana!'  # Wiadomość, gdy konfiguracja pluginu została pomyślnie załadowana.

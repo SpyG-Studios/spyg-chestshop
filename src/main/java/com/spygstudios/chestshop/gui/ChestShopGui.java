@@ -80,6 +80,7 @@ public class ChestShopGui {
         ItemStack playrItem = owner.isOnline() ? PlayerHeads.getOnlinePlayerHead(owner.getUniqueId()) : PlayerHeads.getOfflinePlayerHead(owner.getUniqueId());
         ItemMeta playrMeta = playrItem.getItemMeta();
         playrMeta.displayName(TranslateColor.translate(config.getString("chestshop.player.title").replace("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName())));
+        playrMeta.lore(TranslateColor.translate(config.getStringList("chestshop.player.lore")));
         playrItem.setItemMeta(playrMeta);
         PersistentData playerData = new PersistentData(plugin, playrItem);
         playerData.set("action", GuiAction.OPEN_PLAYERS.name());

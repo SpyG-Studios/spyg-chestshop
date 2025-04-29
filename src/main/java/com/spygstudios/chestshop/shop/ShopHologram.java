@@ -30,7 +30,8 @@ public class ShopHologram {
         }
         plugin.getConf().getStringList("shop.lines").forEach(line -> hologram.addRow(TranslateColor.translate(line.replace("%owner%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName())
                 .replace("%shop-name%", shop.getName()).replace("%price%", String.valueOf(shop.getPrice())).replace("%material%", shop.getMaterialString()))));
-        hologram.addRow(new ItemStack(shop.getMaterial() == null ? Material.BARRIER : shop.getMaterial()));
+        hologram.addRow(new ItemStack(
+                shop.getMaterial() == null || (shop.getItemsLeft() == 0 && ChestShop.getInstance().getConf().getBoolean("shops.barrier-when-empty")) ? Material.BARRIER : shop.getMaterial()));
     }
 
     public void removeHologram() {

@@ -30,7 +30,7 @@ public class RemovePlayer {
     @Permission("spygchestshop.use")
     public void onRemove(@Context Player sender, @Arg Shop shop, @Async @Arg OfflinePlayer player) {
         if (sender.getUniqueId().equals(player.getUniqueId())) {
-            Message.CANNOT_ADD_YOURSELF.send(sender);
+            Message.CANT_REMOVE_YOURSELF.send(sender);
             return;
         }
 
