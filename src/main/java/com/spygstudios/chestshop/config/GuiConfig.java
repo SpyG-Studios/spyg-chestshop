@@ -25,7 +25,7 @@ public class GuiConfig extends YamlManager {
         set("chestshop.player.lore", Arrays.asList("&7View the players that have access to this shop"));
 
         set("chestshop.info.title", "&6&lShop Info");
-        set("chestshop.info.lore", Arrays.asList("&7owner: &e%player-name%", "&7material: &e%material%", "&7price: &6$&e%price%", "&7money earnd: &6$&e%money-earnd%", "&7sold items: &e%sold-items%",
+        set("chestshop.info.lore", Arrays.asList("&7owner: &e%player-name%", "&7material: &e%material%", "&7price: &6$&e%price%", "&7money earned: &6$&e%money-earned%", "&7sold items: &e%sold-items%",
                 "&7location: &e%location%", "&7created: &e%created%"));
 
         set("chestshop.notify.title", "&e&lBuy Notifications");
