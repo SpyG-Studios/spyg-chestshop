@@ -50,7 +50,7 @@ public class ChestShopGui {
                 ParseListPlaceholder.parse(config.getStringList("chestshop.info.lore"),
                         Map.of("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName(), "%material%", shop.getMaterial() == null ? "AIR" : shop.getMaterial().name(), "%price%",
                                 String.valueOf(shop.getPrice()), "%created%", shop.getCreatedAt(), "%location%", shop.getChestLocationString(), "%sold-items%", String.valueOf(shop.getSoldItems()),
-                                "%money-earnd%", String.valueOf(shop.getMoneyEarned()))));
+                                "%money-earned%", String.valueOf(shop.getMoneyEarned()))));
         inventory.setItem(8, infoItem);
 
         // notify item
