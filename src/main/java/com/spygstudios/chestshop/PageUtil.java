@@ -1,8 +1,16 @@
 package com.spygstudios.chestshop;
 
+import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Material;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.components.ComponentUtils;
 
 import lombok.experimental.UtilityClass;
@@ -41,5 +49,35 @@ public class PageUtil {
         } else {
             return Component.text().append(back).append(pagesComponent.build()).build();
         }
+    }
+
+    public static void setFillItems(Inventory inventory, String configPath) {
+        GuiConfig config = ChestShop.getInstance().getGuiConfig();
+        config.getConfigurationSection(configPath + ".fill-items").getKeys(false).forEach(key -> {
+            String itemPath = configPath + ".fill-items." + key;
+            Material material = Material.getMaterial(config.getString(itemPath + ".material"));
+            if (material == null) {
+                ChestShop.getInstance().getLogger().warning("Invalid material in " + configPath + " fill-items: " + config.getString(itemPath + ".material"));
+                return;
+            }
+            List<String> slots = config.getStringList(itemPath + ".slots");
+            ItemStack fillerItem = new ItemStack(material);
+            for (String s : slots) {
+                int slot = Integer.parseInt(s);
+                if (slot < 0 || slot >= inventory.getSize()) {
+                    ChestShop.getInstance().getLogger().warning("Invalid slot in " + configPath + " fill-items: " + s);
+                    continue;
+                }
+                if (inventory.getItem(slot) != null) {
+                    ChestShop.getInstance().getLogger().warning("Slot " + slot + " is already occupied in " + configPath + " fill-items.");
+                    continue;
+                }
+                ItemMeta glassMeta = fillerItem.getItemMeta();
+                glassMeta.displayName(TranslateColor.translate("&7"));
+                fillerItem.setItemMeta(glassMeta);
+                inventory.setItem(slot, fillerItem);
+            }
+        });
+
     }
 }

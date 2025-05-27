@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.PageUtil;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.shop.Shop;
@@ -42,7 +43,8 @@ public class ShopGui {
         inventory.setItem(13, shopItem);
 
         if (shop.getAddedPlayers().contains(player.getUniqueId())) {
-            ItemStack inventoryItem = ItemUtils.create(Material.CHEST, config.getString("chestshop.inventory.title"), config.getStringList("chestshop.inventory.lore"));
+            Material inventoryMaterial = Material.getMaterial(config.getString("chestshop.inventory.material", "CHEST"));
+            ItemStack inventoryItem = ItemUtils.create(inventoryMaterial, config.getString("chestshop.inventory.title"), config.getStringList("chestshop.inventory.lore"));
             PersistentData inventoryData = new PersistentData(plugin, inventoryItem);
             inventoryData.set("action", GuiAction.OPEN_SHOP_INVENTORY.name());
             inventoryData.save();
@@ -54,11 +56,13 @@ public class ShopGui {
             int amount = config.getInt("shop.amount.items." + key + ".amount");
             String title = config.getString("shop.amount.items." + key + ".title").replace("%amount%", String.valueOf(amount).replace("-", ""));
             List<String> lore = config.getStringList("shop.amount.items." + key + ".lore");
-            Material material = amount > 0 ? Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
+            Material material = Material.getMaterial(config.getString("shop.amount.items." + key + ".material", "GRAY_STAINED_GLASS_PANE"));
             addItemToInventory(plugin, inventory, slot, material, title, lore, amount);
         });
 
+        PageUtil.setFillItems(inventory, "shop");
         player.openInventory(inventory);
+
     }
 
     private void addItemToInventory(ChestShop plugin, Inventory inventory, int slot, Material material, String title, List<String> lore, int amount) {
