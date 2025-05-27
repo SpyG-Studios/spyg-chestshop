@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.PageUtil;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.shop.Shop;
@@ -34,6 +35,7 @@ public class ChestShopGui {
         Inventory inventory = player.getServer().createInventory(new ChestShopHolder(player, shop), 27,
                 TranslateColor.translate(config.getString("chestshop.title").replace("%shop-name%", shop.getName()).replace("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName())));
         setShopItems(plugin, shop, inventory);
+        PageUtil.setFillItems(inventory, "chestshop");
         player.openInventory(inventory);
     }
 
@@ -46,7 +48,8 @@ public class ChestShopGui {
         materialData.save();
 
         // info item
-        ItemStack infoItem = ItemUtils.create(Material.WRITABLE_BOOK, config.getString("chestshop.info.title"),
+        Material infoMaterial = Material.getMaterial(config.getString("chestshop.info.material", "WRITABLE_BOOK"));
+        ItemStack infoItem = ItemUtils.create(infoMaterial, config.getString("chestshop.info.title"),
                 ParseListPlaceholder.parse(config.getStringList("chestshop.info.lore"),
                         Map.of("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName(), "%material%", shop.getMaterial() == null ? "AIR" : shop.getMaterial().name(), "%price%",
                                 String.valueOf(shop.getPrice()), "%created%", shop.getCreatedAt(), "%location%", shop.getChestLocationString(), "%sold-items%", String.valueOf(shop.getSoldItems()),
@@ -54,7 +57,8 @@ public class ChestShopGui {
         inventory.setItem(8, infoItem);
 
         // notify item
-        ItemStack notifyItem = ItemUtils.create(Material.BELL, config.getString("chestshop.notify.title"),
+        Material notifyMaterial = Material.getMaterial(config.getString("chestshop.notify.material", "BELL"));
+        ItemStack notifyItem = ItemUtils.create(notifyMaterial, config.getString("chestshop.notify.title"),
                 Arrays.asList(shop.isNotify() ? config.getString("chestshop.notify.on") : config.getString("chestshop.notify.off")));
         PersistentData notifyData = new PersistentData(plugin, notifyItem);
         notifyData.set("action", GuiAction.TOGGLE_NOTIFY.name());
@@ -62,14 +66,16 @@ public class ChestShopGui {
         inventory.setItem(0, notifyItem);
 
         // money item
-        ItemStack moneyItem = ItemUtils.create(Material.GOLD_INGOT, config.getString("chestshop.money.title"), config.getStringList("chestshop.money.lore"));
+        Material moneyMaterial = Material.getMaterial(config.getString("chestshop.money.material", "GOLD_INGOT"));
+        ItemStack moneyItem = ItemUtils.create(moneyMaterial, config.getString("chestshop.money.title"), config.getStringList("chestshop.money.lore"));
         PersistentData moneyData = new PersistentData(plugin, moneyItem);
         moneyData.set("action", GuiAction.SET_ITEM_PRICE.name());
         moneyData.save();
         inventory.setItem(11, moneyItem);
 
         // inventory item
-        ItemStack inventoryItem = ItemUtils.create(Material.CHEST, config.getString("chestshop.inventory.title"), config.getStringList("chestshop.inventory.lore"));
+        Material inventoryMaterial = Material.getMaterial(config.getString("chestshop.inventory.material", "CHEST"));
+        ItemStack inventoryItem = ItemUtils.create(inventoryMaterial, config.getString("chestshop.inventory.title"), config.getStringList("chestshop.inventory.lore"));
         PersistentData inventoryData = new PersistentData(plugin, inventoryItem);
         inventoryData.set("action", GuiAction.OPEN_SHOP_INVENTORY.name());
         inventoryData.save();

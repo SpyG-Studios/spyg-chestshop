@@ -14,6 +14,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.PageUtil;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.shop.Shop;
@@ -33,7 +34,8 @@ public class PlayersGui {
         config = plugin.getGuiConfig();
         PlayersHolder holder = new PlayersHolder(player, shop);
         Inventory inventory = player.getServer().createInventory(holder, 27, TranslateColor.translate(config.getString("players.title").replace("%shop-name%", shop.getName())));
-        setGlassBackground(inventory);
+
+        PageUtil.setFillItems(inventory, "players");
         loadPlayerHeads(plugin, shop, inventory, holder.getPage());
         player.openInventory(inventory);
     }
@@ -42,18 +44,8 @@ public class PlayersGui {
         if (!(inventory.getHolder() instanceof PlayersHolder holder)) {
             return;
         }
-        setGlassBackground(inventory);
+        PageUtil.setFillItems(inventory, "players");
         loadPlayerHeads(plugin, holder.getShop(), inventory, holder.getPage());
-    }
-
-    private static void setGlassBackground(Inventory inventory) {
-        for (int i = 0; i < 27; i++) {
-            ItemStack glass = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-            ItemMeta glassMeta = glass.getItemMeta();
-            glassMeta.displayName(TranslateColor.translate("&7"));
-            glass.setItemMeta(glassMeta);
-            inventory.setItem(i, glass);
-        }
     }
 
     private static void loadPlayerHeads(ChestShop plugin, Shop shop, Inventory inventory, int page) {
@@ -102,7 +94,7 @@ public class PlayersGui {
     }
 
     private static ItemStack getArrowItem(ChestShop plugin, String displayName, GuiAction action) {
-        ItemStack arrow = new ItemStack(Material.ARROW);
+        ItemStack arrow = new ItemStack(Material.getMaterial(config.getString("players." + (action.equals(GuiAction.NEXT) ? "next" : "back") + ".material", "ARROW")));
         ItemMeta arrowMeta = arrow.getItemMeta();
         arrowMeta.displayName(TranslateColor.translate(displayName));
         arrow.setItemMeta(arrowMeta);
