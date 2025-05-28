@@ -89,8 +89,11 @@ public class ChestShop extends JavaPlugin {
 
         loadLocalizations();
 
-        // bStats
-        new Metrics(this, 24462);
+        try {
+            // bStats
+            new Metrics(this, 24462);
+        } catch (Exception e) {
+        }
 
         getLogger().info("Loading economy plugin...");
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);

@@ -11,9 +11,9 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.AmountHandler;
-import com.spygstudios.spyglib.components.ComponentUtils;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.TextComponent;
 
 public class ChatListener implements Listener {
     Config config;
@@ -31,7 +31,8 @@ public class ChatListener implements Listener {
             return;
         }
         event.setCancelled(true);
-        String message = ComponentUtils.fromComponent(event.message());
+        TextComponent messageComponent = (TextComponent) event.message();
+        String message = messageComponent.content();
         if (message.equalsIgnoreCase(config.getString("cancel"))) {
             pendingAmount.cancel();
             Message.ENTER_AMOUNT_CANCELLED.send(player);

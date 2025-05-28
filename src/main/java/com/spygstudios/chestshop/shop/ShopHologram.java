@@ -28,7 +28,8 @@ public class ShopHologram {
         while (!hologram.getRows().isEmpty()) {
             hologram.removeRow(0);
         }
-        plugin.getConf().getStringList("shop.lines").forEach(line -> hologram.addRow(TranslateColor.translate(line.replace("%owner%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName())
+        String owner = Bukkit.getOfflinePlayer(shop.getOwnerId()).getName();
+        plugin.getConf().getStringList("shop.lines").forEach(line -> hologram.addRow(TranslateColor.translate(line.replace("%owner%", owner == null ? "Unknown" : owner)
                 .replace("%shop-name%", shop.getName()).replace("%price%", String.valueOf(shop.getPrice())).replace("%material%", shop.getMaterialString()))));
         hologram.addRow(new ItemStack(
                 shop.getMaterial() == null || (shop.getItemsLeft() == 0 && ChestShop.getInstance().getConf().getBoolean("shops.barrier-when-empty")) ? Material.BARRIER : shop.getMaterial()));
