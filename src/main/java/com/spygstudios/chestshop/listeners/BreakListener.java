@@ -2,6 +2,7 @@ package com.spygstudios.chestshop.listeners;
 
 import java.util.Map;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,6 +23,9 @@ public class BreakListener implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         if (ShopUtils.isDisabledWorld(event.getBlock().getWorld().getName())) {
+            return;
+        }
+        if (!event.getBlock().getType().equals(Material.CHEST)) {
             return;
         }
         Shop shop = Shop.getShop(event.getBlock().getLocation());

@@ -191,11 +191,13 @@ public class Shop {
     }
 
     public static Shop getShop(Location location) {
-        location = location.getBlock().getLocation();
         for (Shop shop : SHOPS) {
-            Block shopBlock = shop.getChestLocation().getBlock();
-            if (shop.getChestLocation().equals(location) || (ShopUtils.isDoubleChest(shopBlock) && ShopUtils.getAdjacentChest(shopBlock).getLocation().equals(location))) {
-                return shop;
+            try {
+                Block shopBlock = shop.getChestLocation().getBlock();
+                if (shop.getChestLocation().equals(location) || (ShopUtils.isDoubleChest(shopBlock) && ShopUtils.getAdjacentChest(shopBlock).getLocation().equals(location))) {
+                    return shop;
+                }
+            } catch (Exception e) {
             }
         }
         return null;
