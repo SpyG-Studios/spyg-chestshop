@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
@@ -12,6 +13,7 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.gui.ChestShopGui;
 import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
+import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
 import com.spygstudios.chestshop.shop.Shop;
 
 public class InventoryCloseListener implements Listener {
@@ -25,24 +27,30 @@ public class InventoryCloseListener implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        InventoryHolder invHolder = event.getInventory().getHolder();
+        Inventory inventory = event.getInventory();
+        InventoryHolder invHolder = inventory.getHolder();
 
-        if (plugin.getConf().getBoolean("shops.barrier-when-empty") && event.getInventory().getLocation() != null) {
-            Shop shop = Shop.getShop(event.getInventory().getLocation());
-            if (shop != null) {
-                shop.getHologram().updateHologramRows();
+        if (!(invHolder instanceof ChestShopHolder || invHolder instanceof ShopGuiHolder || invHolder instanceof PlayersHolder) && inventory.getLocation() != null) {
+            Shop shop = Shop.getShop(inventory.getLocation());
+            if (plugin.getConf().getBoolean("shops.barrier-when-empty")) {
+                if (shop != null) {
+                    shop.getHologram().updateHologramRows();
+                }
             }
+
+            return;
         }
 
-        if (invHolder instanceof PlayersHolder holder && (event.getPlayer().getOpenInventory() == null || !(event.getPlayer().getOpenInventory().getTopInventory() instanceof PlayersHolder))) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> ChestShopGui.open(plugin, (Player) event.getPlayer(), holder.getShop()), 1);
-            return;
+        if (invHolder instanceof PlayersHolder holder) {
+            if (event.getPlayer().getOpenInventory() == null || !(event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof PlayersHolder)) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> ChestShopGui.open(plugin, (Player) event.getPlayer(), holder.getShop()), 1);
+                return;
+            }
         }
 
         if (invHolder instanceof ChestShopHolder holder) {
             itemAdding(event, holder);
         }
-
     }
 
     private void itemAdding(InventoryCloseEvent event, ChestShopHolder holdder) {
