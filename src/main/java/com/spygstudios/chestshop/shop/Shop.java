@@ -26,8 +26,7 @@ import lombok.Getter;
 public class Shop {
     @Getter
     private UUID ownerId;
-    @Getter
-    private int price;
+    private double price;
     @Getter
     private Material material;
     @Getter
@@ -55,10 +54,10 @@ public class Shop {
         shopFile.addShop(this);
     }
 
-    public Shop(UUID ownerId, String shopName, int price, Material material, Location chestLocation, String createdAt, boolean isNotify, List<UUID> addedPlayers, ShopFile shopFile) {
+    public Shop(UUID ownerId, String shopName, double price, Material material, Location chestLocation, String createdAt, boolean isNotify, List<UUID> addedPlayers, ShopFile shopFile) {
         this.ownerId = ownerId;
         this.name = shopName;
-        this.price = price;
+        this.price = ShopUtils.parsePrice(price);
         this.material = material;
         this.chestLocation = chestLocation;
         this.createdAt = createdAt;
@@ -94,7 +93,7 @@ public class Shop {
     public void setMaterial(Material material) {
         this.material = material;
         ShopFile.getShopFile(ownerId).setMaterial(name, material);
-        if (hologram.getHologram().getRows().get(plugin.getConf().getStringList("shop.lines").size()) instanceof HologramItemRow row) {
+        if (hologram.getHologram().getRows().get(plugin.getConf().getStringList("shops.lines").size()) instanceof HologramItemRow row) {
             row.setItem(new ItemStack(material));
         }
     }
@@ -105,9 +104,13 @@ public class Shop {
         hologram.updateHologramRows();
     }
 
-    public void setPrice(int price) {
-        this.price = price;
-        ShopFile.getShopFile(ownerId).setPrice(name, price);
+    public double getPrice() {
+        return ShopUtils.parsePrice(this.price);
+    }
+
+    public void setPrice(double price) {
+        this.price = ShopUtils.parsePrice(price);
+        ShopFile.getShopFile(ownerId).setPrice(name, this.price);
         hologram.updateHologramRows();
     }
 

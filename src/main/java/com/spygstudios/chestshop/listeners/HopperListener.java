@@ -20,7 +20,7 @@ public class HopperListener implements Listener {
 
     @EventHandler
     public void onHopper(InventoryMoveItemEvent event) {
-        if (!config.getBoolean("shop.hopper-protection")) {
+        if (!config.getBoolean("shops.hopper-protection")) {
             return;
         }
         if (ShopUtils.isDisabledWorld(event.getSource().getLocation().getWorld().getName())) {

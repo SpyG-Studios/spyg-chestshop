@@ -36,7 +36,7 @@ public class ShopTransactions {
             return;
         }
 
-        int itemsPrice = itemCount * shop.getPrice();
+        double itemsPrice = itemCount * shop.getPrice();
         Economy economy = plugin.getEconomy();
         EconomyResponse response = economy.withdrawPlayer(buyer, itemsPrice);
 

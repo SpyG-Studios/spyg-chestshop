@@ -18,6 +18,8 @@ public class Config extends YamlManager {
         set("colors.command.label", "&7");
         set("colors.command.args", "&f");
 
+        set("shops.decimals.enabled", false, Arrays.asList("Enable cents in the shops. This will allow prices to have decimal values (e.g. 1.99)."));
+        set("shops.decimals.max", 2, Arrays.asList("The maximum amount of decimal places allowed in the price."));
         set("shops.barrier-when-empty", false, Arrays.asList("Displays a barrier instead of the shop's item above the shop when it is out of stock."));
         set("shops.name.max-length", 16);
         set("shops.name.min-length", 3);
@@ -29,10 +31,10 @@ public class Config extends YamlManager {
         set("shops.max-players", 18, Arrays.asList("The maximum amount of players that can be added to a shop. Set to 0 for unlimited."));
         set("shops.save-interval", 60, Arrays.asList("The interval in seconds to save the shops data."));
 
-        set("shop.anti-explosion", true, Arrays.asList("Prevent shops from being destroyed by explosions."));
-        set("shop.hopper-protection", true,
+        set("shops.anti-explosion", true, Arrays.asList("Prevent shops from being destroyed by explosions."));
+        set("shops.hopper-protection", true,
                 Arrays.asList("Prevent hoppers from taking items from shops. !!!YOU MUST TURN OFF \"hopper.disable-move-event\" IN PAPER CONFIG IN ORDER TO PROTECT THE HOPPERS!!!"));
-        set("shop.lines", Arrays.asList("%shop-name%", "&#dddddd%owner%", "&2$&a%price%"), Arrays.asList("The lines of the shop."));
+        set("shops.lines", Arrays.asList("%shop-name%", "&#dddddd%owner%", "&2$&a%price%"), Arrays.asList("The lines of the shop."));
         saveConfig();
     }
 
