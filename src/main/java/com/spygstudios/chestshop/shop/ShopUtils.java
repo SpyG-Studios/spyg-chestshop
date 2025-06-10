@@ -32,6 +32,12 @@ public class ShopUtils {
         return false;
     }
 
+    public static double parsePrice(double price) {
+        boolean centsEnabled = plugin.getConf().getBoolean("shops.decimals.enabled");
+        double maxDecimals = centsEnabled ? Math.pow(10, plugin.getConf().getInt("shops.decimals.max")) : 1;
+        return Math.round(price * maxDecimals) / maxDecimals;
+    }
+
     public static boolean isDoubleChest(Block block) {
         if (!(block.getState() instanceof Chest chest)) {
             return false;

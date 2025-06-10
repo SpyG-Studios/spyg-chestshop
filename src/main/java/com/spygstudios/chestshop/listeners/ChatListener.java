@@ -40,7 +40,7 @@ public class ChatListener implements Listener {
         }
 
         try {
-            int amount = Integer.parseInt(message);
+            double amount = Double.parseDouble(message.replace(",", "."));
             if (amount < 0 || amount > 10000000000000L) {
                 Message.INVALID_NUMBER.send(player, Map.of("%entered%", message));
                 return;

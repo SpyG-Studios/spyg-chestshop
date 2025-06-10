@@ -36,7 +36,7 @@ public class AmountHandler {
         pendingAmount.add(this);
     }
 
-    public void create(int amount) {
+    public void create(double amount) {
         if (type.equals(GuiAction.SET_ITEM_PRICE)) {
             shop.setPrice(amount);
         }

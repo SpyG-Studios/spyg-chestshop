@@ -18,6 +18,8 @@ public class Config extends YamlManager {
         set("colors.command.label", "&7");
         set("colors.command.args", "&f");
 
+        set("shops.decimals.enabled", false, Arrays.asList("Enable cents in the shops. This will allow prices to have decimal values (e.g. 1.99)."));
+        set("shops.decimals.max", 2, Arrays.asList("The maximum amount of decimal places allowed in the price."));
         set("shops.barrier-when-empty", false, Arrays.asList("Displays a barrier instead of the shop's item above the shop when it is out of stock."));
         set("shops.name.max-length", 16);
         set("shops.name.min-length", 3);

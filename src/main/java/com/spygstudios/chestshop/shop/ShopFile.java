@@ -104,7 +104,7 @@ public class ShopFile extends YamlManager {
     }
 
     public void setName(String shopName, String name) {
-        set("shops." + name + ".price", getInt("shops." + shopName + ".price", 0));
+        set("shops." + name + ".price", getDouble("shops." + shopName + ".price", 0));
         set("shops." + name + ".material", getString("shops." + shopName + ".material", null));
         set("shops." + name + ".location", getString("shops." + shopName + ".location"));
         set("shops." + name + ".do-notify", getBoolean("shops." + shopName + ".do-notify", false));
@@ -119,7 +119,7 @@ public class ShopFile extends YamlManager {
         isSaved = false;
     }
 
-    public void setPrice(String shopName, int price) {
+    public void setPrice(String shopName, double price) {
         overwriteSet("shops." + shopName + ".price", price);
         isSaved = false;
     }
@@ -182,7 +182,7 @@ public class ShopFile extends YamlManager {
             shopFile.removeShop(shopName);
             return;
         }
-        int price = shopFile.getInt("shops." + shopName + ".price");
+        double price = shopFile.getDouble("shops." + shopName + ".price");
         Material material = Material.getMaterial(shopFile.getString("shops." + shopName + ".material"));
         String createdAt = shopFile.getString("shops." + shopName + ".created");
         boolean isNotify = shopFile.getBoolean("shops." + shopName + ".do-notify");
