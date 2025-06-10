@@ -24,7 +24,7 @@ public class ExplosionListener implements Listener {
 
     @EventHandler
     public void onEntityExplosion(EntityExplodeEvent event) {
-        if (config.getBoolean("shop.anti-explosion")) {
+        if (config.getBoolean("shops.anti-explosion")) {
             event.blockList().removeIf(block -> Shop.getShop(block.getLocation()) != null);
             return;
         }
@@ -39,7 +39,7 @@ public class ExplosionListener implements Listener {
 
     @EventHandler
     public void onBlockExplosion(BlockExplodeEvent event) {
-        if (config.getBoolean("shop.anti-explosion")) {
+        if (config.getBoolean("shops.anti-explosion")) {
             event.blockList().removeIf(block -> Shop.getShop(block.getLocation()) != null);
             return;
         }

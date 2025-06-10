@@ -93,7 +93,7 @@ public class Shop {
     public void setMaterial(Material material) {
         this.material = material;
         ShopFile.getShopFile(ownerId).setMaterial(name, material);
-        if (hologram.getHologram().getRows().get(plugin.getConf().getStringList("shop.lines").size()) instanceof HologramItemRow row) {
+        if (hologram.getHologram().getRows().get(plugin.getConf().getStringList("shops.lines").size()) instanceof HologramItemRow row) {
             row.setItem(new ItemStack(material));
         }
     }
