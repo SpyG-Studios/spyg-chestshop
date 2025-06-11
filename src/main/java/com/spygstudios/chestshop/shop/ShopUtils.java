@@ -1,5 +1,6 @@
 package com.spygstudios.chestshop.shop;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
@@ -39,20 +40,43 @@ public class ShopUtils {
     }
 
     public static boolean isDoubleChest(Block block) {
-        if (!(block.getState() instanceof Chest chest)) {
+        if (block.getType() != Material.CHEST)
             return false;
+
+        boolean hasAdjacentChest = false;
+        for (BlockFace face : new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST }) {
+            Block adjacent = block.getRelative(face);
+            if (adjacent.getType() == Material.CHEST) {
+                hasAdjacentChest = true;
+                break;
+            }
         }
-        Inventory inv = chest.getInventory();
-        return inv instanceof DoubleChestInventory;
+
+        if (!hasAdjacentChest)
+            return false;
+
+        if (!(block.getState() instanceof Chest chest))
+            return false;
+
+        return chest.getInventory() instanceof DoubleChestInventory;
     }
 
     public static Block getAdjacentChest(Block block) {
-        for (BlockFace face : new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST }) {
-            Block relativeBlock = block.getRelative(face);
-            if (relativeBlock.getState() instanceof Chest) {
-                return relativeBlock;
-            }
-        }
+        if (!(block.getState() instanceof Chest chest))
+            return null;
+
+        Inventory inv = chest.getInventory();
+        if (!(inv instanceof DoubleChestInventory doubleInv))
+            return null;
+
+        Chest left = (Chest) doubleInv.getLeftSide().getHolder();
+        Chest right = (Chest) doubleInv.getRightSide().getHolder();
+
+        if (left.getBlock().equals(block))
+            return right.getBlock();
+        if (right.getBlock().equals(block))
+            return left.getBlock();
+
         return null;
     }
 
