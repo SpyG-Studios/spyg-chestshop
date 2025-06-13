@@ -195,12 +195,18 @@ public class Shop {
 
     public static Shop getShop(Location location) {
         for (Shop shop : SHOPS) {
-            try {
-                Block shopBlock = shop.getChestLocation().getBlock();
-                if (shop.getChestLocation().equals(location) || (ShopUtils.isDoubleChest(shopBlock) && ShopUtils.getAdjacentChest(shopBlock).getLocation().equals(location))) {
+            Location shopLoc = shop.getChestLocation();
+            if (!shopLoc.getWorld().isChunkLoaded(shopLoc.getBlockX() >> 4, shopLoc.getBlockZ() >> 4))
+                continue;
+            Block shopBlock = shopLoc.getBlock();
+            if (shopLoc.equals(location)) {
+                return shop;
+            }
+            if (ShopUtils.isDoubleChest(shopBlock)) {
+                Block adj = ShopUtils.getAdjacentChest(shopBlock);
+                if (adj != null && adj.getLocation().equals(location)) {
                     return shop;
                 }
-            } catch (Exception e) {
             }
         }
         return null;

@@ -1,6 +1,7 @@
 package com.spygstudios.chestshop.listeners.gui;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -31,14 +32,17 @@ public class InventoryCloseListener implements Listener {
         InventoryHolder invHolder = inventory.getHolder();
 
         if (!(invHolder instanceof ChestShopHolder || invHolder instanceof ShopGuiHolder || invHolder instanceof PlayersHolder) && inventory.getLocation() != null) {
-            Shop shop = Shop.getShop(inventory.getLocation());
+            Location invLocation = inventory.getLocation();
+            Shop shop = Shop.getShop(invLocation);
             if (plugin.getConf().getBoolean("shops.barrier-when-empty")) {
-                if (shop != null) {
+                if (shop == null || !invLocation.getWorld().getChunkAt(invLocation).isLoaded()) {
+                    return;
+                }
+                try {
                     shop.getHologram().updateHologramRows();
+                } catch (IllegalStateException e) {
                 }
             }
-
-            return;
         }
 
         if (invHolder instanceof PlayersHolder holder) {
