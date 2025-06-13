@@ -6,7 +6,7 @@
 
     <groupId>com.spygstudios</groupId>
     <artifactId>spyg-chestshop</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.2</version>
 
     <properties>
         <bstats.version>3.1.0</bstats.version>
