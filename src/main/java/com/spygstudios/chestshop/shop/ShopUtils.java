@@ -4,9 +4,10 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.DoubleChestInventory;
-import org.bukkit.inventory.Inventory;
 
 import com.spygstudios.chestshop.ChestShop;
 
@@ -62,22 +63,42 @@ public class ShopUtils {
     }
 
     public static Block getAdjacentChest(Block block) {
-        if (!(block.getState() instanceof Chest chest))
+        if (block.getType() != Material.CHEST)
             return null;
 
-        Inventory inv = chest.getInventory();
-        if (!(inv instanceof DoubleChestInventory doubleInv))
+        BlockData data = block.getBlockData();
+        if (!(data instanceof Directional)) {
             return null;
+        }
+        if (!(data instanceof org.bukkit.block.data.type.Chest chestData)) {
+            return null;
+        }
 
-        Chest left = (Chest) doubleInv.getLeftSide().getHolder();
-        Chest right = (Chest) doubleInv.getRightSide().getHolder();
+        if (chestData.getType() == org.bukkit.block.data.type.Chest.Type.SINGLE) {
+            return null;
+        }
 
-        if (left.getBlock().equals(block))
-            return right.getBlock();
-        if (right.getBlock().equals(block))
-            return left.getBlock();
+        BlockFace facing = chestData.getFacing();
 
+        BlockFace offset = getConnectedChestOffset(facing, chestData.getType());
+        if (offset == null) {
+            return null;
+        }
+
+        Block otherBlock = block.getRelative(offset);
+        if (otherBlock.getType() == Material.CHEST)
+            return otherBlock;
         return null;
+    }
+
+    private static BlockFace getConnectedChestOffset(BlockFace facing, org.bukkit.block.data.type.Chest.Type type) {
+        return switch (facing) {
+        case NORTH -> (type == org.bukkit.block.data.type.Chest.Type.RIGHT ? BlockFace.WEST : BlockFace.EAST);
+        case SOUTH -> (type == org.bukkit.block.data.type.Chest.Type.RIGHT ? BlockFace.EAST : BlockFace.WEST);
+        case WEST -> (type == org.bukkit.block.data.type.Chest.Type.RIGHT ? BlockFace.SOUTH : BlockFace.NORTH);
+        case EAST -> (type == org.bukkit.block.data.type.Chest.Type.RIGHT ? BlockFace.NORTH : BlockFace.SOUTH);
+        default -> null;
+        };
     }
 
     public static int getMaxShops(Player player) {
