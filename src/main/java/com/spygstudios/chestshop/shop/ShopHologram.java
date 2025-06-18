@@ -20,7 +20,8 @@ public class ShopHologram {
     public ShopHologram(Shop shop, ChestShop plugin) {
         this.plugin = plugin;
         this.shop = shop;
-        this.hologram = plugin.getHologramManager().createHologram(shop.getChestLocation().clone().add(0.5, 0.7, 0.5));
+        int hologramRange = plugin.getConf().getInt("shops.holograms.range");
+        this.hologram = plugin.getHologramManager().createHologram(shop.getChestLocation().clone().add(0.5, 0.7, 0.5), hologramRange);
         updateHologramRows();
     }
 
