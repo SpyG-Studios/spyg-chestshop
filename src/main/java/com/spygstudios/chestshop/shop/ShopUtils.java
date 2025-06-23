@@ -3,11 +3,11 @@ package com.spygstudios.chestshop.shop;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Chest;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.type.Chest;
+import org.bukkit.block.data.type.Chest.Type;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.DoubleChestInventory;
 
 import com.spygstudios.chestshop.ChestShop;
 
@@ -44,22 +44,11 @@ public class ShopUtils {
         if (block.getType() != Material.CHEST)
             return false;
 
-        boolean hasAdjacentChest = false;
-        for (BlockFace face : new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST }) {
-            Block adjacent = block.getRelative(face);
-            if (adjacent.getType() == Material.CHEST) {
-                hasAdjacentChest = true;
-                break;
-            }
-        }
-
-        if (!hasAdjacentChest)
+        BlockData data = block.getBlockData();
+        if (!(data instanceof Chest chestData))
             return false;
 
-        if (!(block.getState() instanceof Chest chest))
-            return false;
-
-        return chest.getInventory() instanceof DoubleChestInventory;
+        return chestData.getType() != Chest.Type.SINGLE;
     }
 
     public static Block getAdjacentChest(Block block) {
@@ -70,11 +59,11 @@ public class ShopUtils {
         if (!(data instanceof Directional)) {
             return null;
         }
-        if (!(data instanceof org.bukkit.block.data.type.Chest chestData)) {
+        if (!(data instanceof Chest chestData)) {
             return null;
         }
 
-        if (chestData.getType() == org.bukkit.block.data.type.Chest.Type.SINGLE) {
+        if (chestData.getType() == Type.SINGLE) {
             return null;
         }
 
@@ -91,12 +80,12 @@ public class ShopUtils {
         return null;
     }
 
-    private static BlockFace getConnectedChestOffset(BlockFace facing, org.bukkit.block.data.type.Chest.Type type) {
+    private static BlockFace getConnectedChestOffset(BlockFace facing, Chest.Type type) {
         return switch (facing) {
-        case NORTH -> (type == org.bukkit.block.data.type.Chest.Type.RIGHT ? BlockFace.WEST : BlockFace.EAST);
-        case SOUTH -> (type == org.bukkit.block.data.type.Chest.Type.RIGHT ? BlockFace.EAST : BlockFace.WEST);
-        case WEST -> (type == org.bukkit.block.data.type.Chest.Type.RIGHT ? BlockFace.SOUTH : BlockFace.NORTH);
-        case EAST -> (type == org.bukkit.block.data.type.Chest.Type.RIGHT ? BlockFace.NORTH : BlockFace.SOUTH);
+        case NORTH -> (type == Type.RIGHT ? BlockFace.WEST : BlockFace.EAST);
+        case SOUTH -> (type == Type.RIGHT ? BlockFace.EAST : BlockFace.WEST);
+        case WEST -> (type == Type.RIGHT ? BlockFace.SOUTH : BlockFace.NORTH);
+        case EAST -> (type == Type.RIGHT ? BlockFace.NORTH : BlockFace.SOUTH);
         default -> null;
         };
     }
