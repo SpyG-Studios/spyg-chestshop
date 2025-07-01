@@ -50,7 +50,7 @@ public class InvalUsageHandler implements InvalidUsageHandler<CommandSender> {
             } else if (arg.startsWith("[") && arg.endsWith("]")) {
                 result.append(config.getString("colors.command.optional-arg")).append(arg);
             } else {
-                result.append(config.getString("colors.command.args")).append(" "+arg);
+                result.append(config.getString("colors.command.args")).append(" " + arg);
             }
         }
 

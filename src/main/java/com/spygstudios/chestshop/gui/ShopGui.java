@@ -54,7 +54,8 @@ public class ShopGui {
         config.getConfigurationSection("shop.amount.items").getKeys(false).forEach(key -> {
             int slot = config.getInt("shop.amount.items." + key + ".slot");
             int amount = config.getInt("shop.amount.items." + key + ".amount");
-            String title = config.getString("shop.amount.items." + key + ".title").replace("%amount%", String.valueOf(amount).replace("-", ""));
+            String title = config.getString("shop.amount.items." + key + ".title")
+                    .replace("%amount%", String.valueOf(amount).replace("-", ""));
             List<String> lore = config.getStringList("shop.amount.items." + key + ".lore");
             Material material = Material.getMaterial(config.getString("shop.amount.items." + key + ".material", "GRAY_STAINED_GLASS_PANE"));
             addItemToInventory(plugin, inventory, slot, material, title, lore, amount);

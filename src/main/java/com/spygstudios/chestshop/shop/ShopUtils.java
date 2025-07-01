@@ -82,11 +82,11 @@ public class ShopUtils {
 
     private static BlockFace getConnectedChestOffset(BlockFace facing, Chest.Type type) {
         return switch (facing) {
-        case NORTH -> (type == Type.RIGHT ? BlockFace.WEST : BlockFace.EAST);
-        case SOUTH -> (type == Type.RIGHT ? BlockFace.EAST : BlockFace.WEST);
-        case WEST -> (type == Type.RIGHT ? BlockFace.SOUTH : BlockFace.NORTH);
-        case EAST -> (type == Type.RIGHT ? BlockFace.NORTH : BlockFace.SOUTH);
-        default -> null;
+            case NORTH -> (type == Type.RIGHT ? BlockFace.WEST : BlockFace.EAST);
+            case SOUTH -> (type == Type.RIGHT ? BlockFace.EAST : BlockFace.WEST);
+            case WEST -> (type == Type.RIGHT ? BlockFace.SOUTH : BlockFace.NORTH);
+            case EAST -> (type == Type.RIGHT ? BlockFace.NORTH : BlockFace.SOUTH);
+            default -> null;
         };
     }
 
