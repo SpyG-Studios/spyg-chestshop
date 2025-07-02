@@ -7,3 +7,5 @@ depend: [Vault]
 
 libraries:
   - com.spygstudios:spyglib:${spyglib.version}
+  - org.xerial:sqlite-jdbc:${sqlite.version}
+  - com.mysql:mysql-connector-j:${mysql.version}

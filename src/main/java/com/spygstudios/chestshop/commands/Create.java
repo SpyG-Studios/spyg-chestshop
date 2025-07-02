@@ -16,8 +16,8 @@ import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.events.ShopCreateEvent;
 import com.spygstudios.chestshop.shop.Shop;
-import com.spygstudios.chestshop.shop.ShopFile;
 import com.spygstudios.chestshop.shop.ShopUtils;
+import com.spygstudios.chestshop.shop.yml.ShopYmlFile;
 
 import dev.rollczi.litecommands.annotations.argument.Arg;
 import dev.rollczi.litecommands.annotations.command.Command;
@@ -49,9 +49,9 @@ public class Create {
             return;
         }
 
-        ShopFile file = ShopFile.getShopFile(player);
+        ShopYmlFile file = ShopYmlFile.getShopFile(player);
         if (file == null) {
-            file = new ShopFile(ChestShop.getInstance(), player);
+            file = new ShopYmlFile(ChestShop.getInstance(), player);
         } else if (file.getPlayerShops().contains(name)) {
             Message.SHOP_ALREADY_EXISTS.send(player, Map.of("%shop-name%", name));
             return;

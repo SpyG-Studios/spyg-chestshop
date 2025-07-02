@@ -9,6 +9,7 @@ import com.spygstudios.chestshop.commands.RemovePlayer;
 import com.spygstudios.chestshop.commands.Rename;
 import com.spygstudios.chestshop.commands.ShopList;
 import com.spygstudios.chestshop.commands.admin.CustomerMode;
+import com.spygstudios.chestshop.commands.admin.Migrate;
 import com.spygstudios.chestshop.commands.admin.Reload;
 import com.spygstudios.chestshop.commands.admin.ShopListAdmin;
 import com.spygstudios.chestshop.commands.arguments.IntegerArgument;
@@ -39,7 +40,8 @@ public class CommandHandler {
                         new RemovePlayer(plugin),
                         new Create(),
                         new Rename(plugin),
-                        new CustomerMode())
+                        new CustomerMode(),
+                        new Migrate(plugin))
 
                 .message(LiteBukkitMessages.PLAYER_ONLY, Message.PLAYER_ONLY.get())
 

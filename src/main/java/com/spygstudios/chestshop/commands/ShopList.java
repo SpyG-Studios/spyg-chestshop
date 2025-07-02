@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import com.spygstudios.chestshop.PageUtil;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
-import com.spygstudios.chestshop.shop.ShopFile;
+import com.spygstudios.chestshop.shop.yml.ShopYmlFile;
 import com.spygstudios.spyglib.components.ComponentUtils;
 
 import dev.rollczi.litecommands.annotations.command.Command;
@@ -29,7 +29,7 @@ public class ShopList {
             page = 1;
         }
 
-        ShopFile file = ShopFile.getShopFile(player);
+        ShopYmlFile file = ShopYmlFile.getShopFile(player);
         if (file == null || file.getPlayerShops().isEmpty()) {
             Message.SHOP_NO_SHOPS.send(player);
             return;

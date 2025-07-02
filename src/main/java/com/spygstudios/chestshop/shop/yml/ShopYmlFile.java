@@ -1,4 +1,4 @@
-package com.spygstudios.chestshop.shop;
+package com.spygstudios.chestshop.shop.yml;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -16,21 +16,24 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.interfaces.ShopFile;
+import com.spygstudios.chestshop.shop.ShopUtils;
+import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.location.LocationUtils;
 import com.spygstudios.spyglib.yamlmanager.YamlManager;
 
 import lombok.Getter;
 
-public class ShopFile extends YamlManager {
+public class ShopYmlFile extends YamlManager implements ShopFile {
     @Getter
     private UUID ownerId;
     private boolean isSaved;
 
-    public ShopFile(ChestShop plugin, Player owner) {
+    public ShopYmlFile(ChestShop plugin, Player owner) {
         this(plugin, owner.getUniqueId());
     }
 
-    public ShopFile(ChestShop plugin, UUID ownerId) {
+    public ShopYmlFile(ChestShop plugin, UUID ownerId) {
         super("shops/" + ownerId + ".yml", plugin);
         if (SHOPS_FILES.containsKey(ownerId)) {
             return;
@@ -80,7 +83,7 @@ public class ShopFile extends YamlManager {
         }
     }
 
-    private static void setDefaultValues(ShopFile shopFile) {
+    private static void setDefaultValues(ShopYmlFile shopFile) {
         for (String shopName : shopFile.getPlayerShops()) {
             String shopPath = "shops." + shopName;
             shopFile.set(shopPath + ".price", 0);
@@ -159,13 +162,13 @@ public class ShopFile extends YamlManager {
             plugin.getLogger().warning("Invalid shop file: " + file.getName() + " (invalid UUID)");
             return;
         }
-        ShopFile shopFile = new ShopFile(plugin, ownerId);
+        ShopYmlFile shopFile = new ShopYmlFile(plugin, ownerId);
         for (String shopName : shopFile.getPlayerShops()) {
             processShop(plugin, file, shopFile, shopName);
         }
     }
 
-    private static void processShop(ChestShop plugin, File file, ShopFile shopFile, String shopName) {
+    private static void processShop(ChestShop plugin, File file, ShopYmlFile shopFile, String shopName) {
         String shopPath = "shops." + shopName;
         String locationString = shopFile.getString(shopPath + ".location");
         if (locationString == null) {
@@ -189,11 +192,11 @@ public class ShopFile extends YamlManager {
         new Shop(shopFile.getOwnerId(), shopName, price, material, location, createdAt, isNotify, shopFile.getAddedUuids(shopName), shopFile);
     }
 
-    public static ShopFile getShopFile(UUID ownerId) {
+    public static ShopYmlFile getShopFile(UUID ownerId) {
         return SHOPS_FILES.get(ownerId);
     }
 
-    public static ShopFile getShopFile(Player owner) {
+    public static ShopYmlFile getShopFile(Player owner) {
         return getShopFile(owner.getUniqueId());
     }
 
@@ -205,18 +208,18 @@ public class ShopFile extends YamlManager {
         removeShopFile(owner.getUniqueId());
     }
 
-    public static Map<UUID, ShopFile> getShopsFiles() {
+    public static Map<UUID, ShopYmlFile> getShopsFiles() {
         return new HashMap<>(SHOPS_FILES);
     }
 
-    private static final Map<UUID, ShopFile> SHOPS_FILES = new HashMap<>();
+    private static final Map<UUID, ShopYmlFile> SHOPS_FILES = new HashMap<>();
 
     public static void startSaveScheduler(ChestShop plugin) {
-        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, ShopFile::saveShops, 0, 20L * plugin.getConf().getInt("shops.save-interval", 60));
+        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, ShopYmlFile::saveShops, 0, 20L * plugin.getConf().getInt("shops.save-interval", 60));
     }
 
     public static void saveShops() {
-        for (ShopFile shopFile : SHOPS_FILES.values()) {
+        for (ShopYmlFile shopFile : SHOPS_FILES.values()) {
             if (shopFile.isSaved) {
                 continue;
             }

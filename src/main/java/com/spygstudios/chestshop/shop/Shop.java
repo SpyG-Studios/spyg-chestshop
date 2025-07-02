@@ -18,6 +18,12 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.enums.ShopRemoveCause;
 import com.spygstudios.chestshop.events.ShopRemoveEvent;
+import com.spygstudios.chestshop.interfaces.ShopFile;
+import com.spygstudios.chestshop.interfaces.ShopTransactions;
+import com.spygstudios.chestshop.shop.sql.DatabaseShopTransactions;
+import com.spygstudios.chestshop.shop.sqlite.SqliteShopFile;
+import com.spygstudios.chestshop.shop.yml.YmlShopTransactions;
+import com.spygstudios.chestshop.shop.yml.ShopYmlFile;
 import com.spygstudios.spyglib.hologram.HologramItemRow;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
 
@@ -44,13 +50,13 @@ public class Shop {
     @Getter
     private ShopHologram hologram;
 
-    private ShopFile shopFile;
+    private ShopFile shopFile; // Lehet ShopFile vagy SqliteShopFile
 
     private static final List<Shop> SHOPS = new ArrayList<>();
     private static ChestShop plugin = ChestShop.getInstance();
 
     public Shop(Player owner, String shopName, Location chestLocation, ShopFile shopFile) {
-        this(owner.getUniqueId(), shopName, 0, null, chestLocation, ShopFile.getDateString(), false, new ArrayList<>(), shopFile);
+        this(owner.getUniqueId(), shopName, 0, null, chestLocation, ShopYmlFile.getDateString(), false, new ArrayList<>(), shopFile);
         shopFile.addShop(this);
     }
 
@@ -64,7 +70,14 @@ public class Shop {
         this.isNotify = isNotify;
         this.addedPlayers = addedPlayers;
         this.shopFile = shopFile;
-        this.shopTransactions = new ShopTransactions(this, shopFile);
+
+        // Create the appropriate transactions object based on shopFile type
+        if (shopFile instanceof SqliteShopFile dbShopFile) {
+            this.shopTransactions = new DatabaseShopTransactions(this, dbShopFile);
+        } else {
+            this.shopTransactions = new YmlShopTransactions(this, shopFile);
+        }
+
         this.hologram = new ShopHologram(this, plugin);
 
         SHOPS.add(this);
@@ -92,14 +105,14 @@ public class Shop {
 
     public void setMaterial(Material material) {
         this.material = material;
-        ShopFile.getShopFile(ownerId).setMaterial(name, material);
+        shopFile.setMaterial(name, material);
         if (hologram.getHologram().getRows().get(plugin.getConf().getStringList("shops.lines").size()) instanceof HologramItemRow row) {
             row.setItem(new ItemStack(material));
         }
     }
 
     public void setName(String newName) {
-        ShopFile.getShopFile(ownerId).setName(name, newName);
+        shopFile.setName(name, newName);
         this.name = newName;
         hologram.updateHologramRows();
     }
@@ -110,7 +123,7 @@ public class Shop {
 
     public void setPrice(double price) {
         this.price = ShopUtils.parsePrice(price);
-        ShopFile.getShopFile(ownerId).setPrice(name, this.price);
+        shopFile.setPrice(name, this.price);
         hologram.updateHologramRows();
     }
 
@@ -213,7 +226,7 @@ public class Shop {
     }
 
     public static void removeShop(Shop shop) {
-        ShopFile.getShopFile(shop.getOwnerId()).removeShop(shop.getName());
+        shop.shopFile.removeShop(shop.getName());
         shop.hologram.removeHologram();
         SHOPS.remove(shop);
     }

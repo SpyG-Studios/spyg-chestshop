@@ -1,4 +1,4 @@
-package com.spygstudios.chestshop.shop;
+package com.spygstudios.chestshop.shop.yml;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,18 +11,21 @@ import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.chestshop.interfaces.ShopFile;
+import com.spygstudios.chestshop.interfaces.ShopTransactions;
+import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
 
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 
-public class ShopTransactions {
+public class YmlShopTransactions implements ShopTransactions {
 
     private final Shop shop;
     private final ChestShop plugin;
     private final ShopFile shopFile;
 
-    public ShopTransactions(Shop shop, ShopFile shopFile) {
+    public YmlShopTransactions(Shop shop, ShopFile shopFile) {
         this.shopFile = shopFile;
         this.shop = shop;
         this.plugin = ChestShop.getInstance();
@@ -59,6 +62,11 @@ public class ShopTransactions {
             Message.SHOP_SOLD.send(owner, Map.of("%price%", String.valueOf(itemsPrice), "%material%", shop.getMaterial().name(), "%player-name%", buyer.getName(), "%items-left%",
                     String.valueOf(itemsLeft), "%items-bought%", String.valueOf(itemCount)));
         }
+    }
+
+    public void buy(Player seller, int amount) {
+        // Implement the buy logic if needed
+        // This method is currently not used in the provided code
     }
 
     private int extractItems(Player buyer, Chest chest, int itemCount) {
