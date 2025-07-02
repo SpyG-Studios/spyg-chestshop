@@ -1,4 +1,4 @@
-package com.spygstudios.chestshop.shop.yml;
+package com.spygstudios.chestshop.shop.yaml;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,21 +11,20 @@ import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
-import com.spygstudios.chestshop.interfaces.ShopFile;
-import com.spygstudios.chestshop.interfaces.ShopTransactions;
+
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
 
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 
-public class YmlShopTransactions implements ShopTransactions {
+public class YamlShopTransactions {
 
     private final Shop shop;
     private final ChestShop plugin;
     private final ShopFile shopFile;
 
-    public YmlShopTransactions(Shop shop, ShopFile shopFile) {
+    public YamlShopTransactions(Shop shop, ShopFile shopFile) {
         this.shopFile = shopFile;
         this.shop = shop;
         this.plugin = ChestShop.getInstance();
@@ -56,7 +55,7 @@ public class YmlShopTransactions implements ShopTransactions {
                 Map.of("%price%", String.valueOf(itemsPrice), "%material%", shop.getMaterial().name(), "%items-left%", String.valueOf(itemsLeft), "%items-bought%", String.valueOf(itemCount)));
         shopFile.overwriteSet("shops." + shop.getName() + ".sold-items", shopFile.getInt("shops." + shop.getName() + ".sold-items") + itemCount);
         shopFile.overwriteSet("shops." + shop.getName() + ".money-earned", shopFile.getDouble("shops." + shop.getName() + ".money-earned") + itemsPrice);
-        shopFile.save();
+        shopFile.markUnsaved();
         Player owner = Bukkit.getPlayer(shop.getOwnerId());
         if (shop.isNotify() && owner != null) {
             Message.SHOP_SOLD.send(owner, Map.of("%price%", String.valueOf(itemsPrice), "%material%", shop.getMaterial().name(), "%player-name%", buyer.getName(), "%items-left%",

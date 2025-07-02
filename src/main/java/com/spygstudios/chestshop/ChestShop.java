@@ -23,7 +23,6 @@ import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.config.MessageConfig;
-import com.spygstudios.chestshop.database.DatabaseShopManager;
 import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
@@ -36,7 +35,7 @@ import com.spygstudios.chestshop.listeners.InteractListener;
 import com.spygstudios.chestshop.listeners.PlayerJoinListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
-import com.spygstudios.chestshop.shop.yml.ShopYmlFile;
+import com.spygstudios.chestshop.shop.yaml.ShopYmlFile;
 import com.spygstudios.spyglib.hologram.HologramManager;
 import com.spygstudios.spyglib.version.VersionChecker;
 
@@ -60,8 +59,6 @@ public class ChestShop extends JavaPlugin {
     @Getter
     @Setter
     private MessageConfig messageConfig;
-    @Getter
-    private DatabaseShopManager databaseShopManager;
     private static final String API_URL = "https://hangar.papermc.io/api/v1/projects/Spyg-ChestShop/latestrelease";
 
     public ChestShop() {
@@ -108,46 +105,9 @@ public class ChestShop extends JavaPlugin {
         economy = rsp.getProvider();
         getLogger().info("Loaded economy plugin: " + economy.getName());
 
-        // Tárolási rendszer inicializálása a konfiguráció alapján
-        String storageType = conf.getString("shops.storage-type", "sqlite").toLowerCase();
+        ShopYmlFile.loadShopFiles(instance);
 
-        if ("sqlite".equals(storageType)) {
-            // SQLite adatbázis manager inicializálása
-            databaseShopManager = new DatabaseShopManager(this);
-            databaseShopManager.initialize().thenAccept(success -> {
-                if (success) {
-                    getLogger().info("SQLite shop rendszer sikeresen inicializálva");
-                    databaseShopManager.startSaveScheduler();
-                } else {
-                    getLogger().severe("Hiba az SQLite shop rendszer inicializálása során!");
-                    getServer().getPluginManager().disablePlugin(this);
-                }
-            });
-        } else if ("mysql".equals(storageType)) {
-            // MySQL adatbázis manager inicializálása
-            String host = conf.getString("shops.mysql.host", "localhost");
-            int port = conf.getInt("shops.mysql.port", 3306);
-            String database = conf.getString("shops.mysql.database", "chestshop");
-            String username = conf.getString("shops.mysql.username", "username");
-            String password = conf.getString("shops.mysql.password", "password");
-
-            databaseShopManager = new DatabaseShopManager(this, host, port, database, username, password);
-            databaseShopManager.initialize().thenAccept(success -> {
-                if (success) {
-                    getLogger().info("MySQL shop rendszer sikeresen inicializálva");
-                    databaseShopManager.startSaveScheduler();
-                } else {
-                    getLogger().severe("Hiba a MySQL shop rendszer inicializálása során!");
-                    getServer().getPluginManager().disablePlugin(this);
-                }
-            });
-        } else {
-            // Régi YML rendszer használata
-            getLogger().info("YML tárolás használata...");
-            ShopYmlFile.loadShopFiles(instance);
-            ShopYmlFile.startSaveScheduler(instance);
-        }
-
+        ShopYmlFile.startSaveScheduler(instance);
         String info = String.format("%s v. %s plugin has been enabled!", getName(), getPluginMeta().getVersion());
         getLogger().info(info);
     }
@@ -157,17 +117,7 @@ public class ChestShop extends JavaPlugin {
         if (commandHandler != null) {
             commandHandler.unregister();
         }
-
-        // Tárolási rendszer mentése és bezárása
-        String storageType = conf != null ? conf.getString("shops.storage-type", "sqlite").toLowerCase() : "sqlite";
-
-        if (("sqlite".equals(storageType) || "mysql".equals(storageType)) && databaseShopManager != null) {
-            databaseShopManager.saveShops();
-            databaseShopManager.close();
-        } else {
-            // YML rendszer mentése
-            ShopYmlFile.saveShops();
-        }
+        ShopYmlFile.saveShops();
 
         List<Object> guis = Arrays.asList(ChestShopHolder.class, PlayersHolder.class, ShopGuiHolder.class);
         for (Player player : Bukkit.getOnlinePlayers()) {

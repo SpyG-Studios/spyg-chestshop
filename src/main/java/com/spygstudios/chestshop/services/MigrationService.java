@@ -1,18 +1,21 @@
-package com.spygstudios.chestshop.database;
+package com.spygstudios.chestshop.services;
 
 import java.io.File;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.database.ShopRepository;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.shop.sqlite.SqliteShopFile;
-import com.spygstudios.chestshop.shop.yml.ShopYmlFile;
+import com.spygstudios.chestshop.shop.yaml.ShopYmlFile;
 import com.spygstudios.spyglib.location.LocationUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -23,22 +26,24 @@ public class MigrationService {
     private final ChestShop plugin;
     private final ShopRepository repository;
 
-    public CompletableFuture<Boolean> migrateFromYml() {
-        return CompletableFuture.supplyAsync(() -> {
-
+    public void migrateFromYml(Consumer<Boolean> callback) {
+        BukkitScheduler scheduler = Bukkit.getScheduler();
+        scheduler.runTaskAsynchronously(plugin, () -> {
             try {
                 plugin.getLogger().info("Kezdődik a migráció YML-ről SQLite-ra...");
 
                 File shopsFolder = new File(plugin.getDataFolder(), "shops");
                 if (!shopsFolder.exists()) {
                     plugin.getLogger().info("Nincs shops mappa, nincs mit migrálni.");
-                    return true;
+                    scheduler.runTask(plugin, () -> callback.accept(true));
+                    return;
                 }
 
                 File[] ymlFiles = shopsFolder.listFiles((dir, name) -> name.endsWith(".yml"));
                 if (ymlFiles == null || ymlFiles.length == 0) {
                     plugin.getLogger().info("Nincsenek YML fájlok, nincs mit migrálni.");
-                    return true;
+                    scheduler.runTask(plugin, () -> callback.accept(true));
+                    return;
                 }
 
                 int migratedShops = 0;
@@ -145,22 +150,27 @@ public class MigrationService {
         }
     }
 
-    public CompletableFuture<Boolean> shouldMigrate() {
-        return CompletableFuture.supplyAsync(() -> {
+    public void shouldMigrate(Consumer<Boolean> callback) {
+        BukkitScheduler scheduler = Bukkit.getScheduler();
+        scheduler.runTaskAsynchronously(plugin, () -> {
             // Ellenőrzi, hogy van-e YML fájl és nincs-e már SQLite adat
             File shopsFolder = new File(plugin.getDataFolder(), "shops");
             if (!shopsFolder.exists()) {
-                return false;
+                scheduler.runTask(plugin, () -> callback.accept(false));
+                return;
             }
 
             File[] ymlFiles = shopsFolder.listFiles((dir, name) -> name.endsWith(".yml"));
             if (ymlFiles == null || ymlFiles.length == 0) {
-                return false;
+                scheduler.runTask(plugin, () -> callback.accept(false));
+                return;
             }
 
             // Ellenőrzi, hogy üres-e az SQLite adatbázis
-            List<Shop> existingShops = repository.getAllShops().join();
-            return existingShops.isEmpty();
+            repository.getAllShops(existingShops -> {
+                boolean shouldMigrate = existingShops.isEmpty();
+                callback.accept(shouldMigrate);
+            });
         });
     }
 }

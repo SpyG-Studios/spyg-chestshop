@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import com.spygstudios.chestshop.PageUtil;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
-import com.spygstudios.chestshop.shop.yml.ShopYmlFile;
+import com.spygstudios.chestshop.shop.yaml.ShopYmlFile;
 import com.spygstudios.spyglib.components.ComponentUtils;
 
 import dev.rollczi.litecommands.annotations.argument.Arg;

@@ -4,8 +4,10 @@ import java.io.File;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
+import java.util.function.Consumer;
+
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.database.DatabaseHandler;
@@ -17,23 +19,23 @@ public class SqLiteManager extends DatabaseHandler {
         this.plugin = plugin;
         this.databaseType = DatabaseType.SQLITE;
         this.databaseFile = new File(plugin.getDataFolder(), "shops.db");
-        this.executor = Executors.newFixedThreadPool(2);
     }
 
     @Override
-    public CompletableFuture<Boolean> initialize() {
-        return CompletableFuture.supplyAsync(() -> {
+    public void initialize(Consumer<Boolean> callback) {
+        BukkitScheduler scheduler = Bukkit.getScheduler();
+        scheduler.runTaskAsynchronously(plugin, () -> {
             try {
                 String url = "jdbc:sqlite:" + databaseFile.getAbsolutePath();
                 connection = DriverManager.getConnection(url);
                 createTables();
                 plugin.getLogger().info("SQLite database connection established: " + databaseFile.getAbsolutePath());
-                return true;
+                scheduler.runTask(plugin, () -> callback.accept(true));
             } catch (Exception e) {
                 plugin.getLogger().severe("Failed to connect to SQLite database: " + databaseFile.getAbsolutePath());
-                return false;
+                scheduler.runTask(plugin, () -> callback.accept(false));
             }
-        }, executor);
+        });
     }
 
     @Override
@@ -47,12 +49,18 @@ public class SqLiteManager extends DatabaseHandler {
                             price REAL NOT NULL DEFAULT 0,
                             material TEXT,
                             location TEXT NOT NULL,
+                            world TEXT NOT NULL,
+                            x INTEGER NOT NULL,
+                            y INTEGER NOT NULL,
+                            z INTEGER NOT NULL,
+                            chunk_x INTEGER NOT NULL,
+                            chunk_z INTEGER NOT NULL,
                             created_at TEXT NOT NULL,
                             do_notify INTEGER NOT NULL DEFAULT 0,
                             sold_items INTEGER NOT NULL DEFAULT 0,
                             money_earned REAL NOT NULL DEFAULT 0,
                             UNIQUE(owner_uuid, shop_name)
-                        )
+                        );
                     """);
 
             stmt.execute("""

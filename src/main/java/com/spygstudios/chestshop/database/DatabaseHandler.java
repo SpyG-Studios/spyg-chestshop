@@ -4,9 +4,11 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 import java.util.logging.Level;
+
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.enums.DatabaseType;
@@ -20,23 +22,29 @@ public abstract class DatabaseHandler {
     protected DatabaseType databaseType;
     protected File databaseFile;
     protected Connection connection;
-    protected ExecutorService executor;
 
-    public abstract CompletableFuture<Boolean> initialize();
+    public abstract void initialize(Consumer<Boolean> callback);
 
     public abstract void createTables() throws SQLException;
 
-    public CompletableFuture<Void> executeAsync(String sql, Object... params) {
-        return CompletableFuture.runAsync(() -> {
+    public void executeAsync(String sql, Object[] params, Runnable callback) {
+        BukkitScheduler scheduler = Bukkit.getScheduler();
+        scheduler.runTaskAsynchronously(plugin, () -> {
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 for (int i = 0; i < params.length; i++) {
                     stmt.setObject(i + 1, params[i]);
                 }
                 stmt.executeUpdate();
+                if (callback != null) {
+                    scheduler.runTask(plugin, callback);
+                }
             } catch (SQLException e) {
                 plugin.getLogger().log(Level.SEVERE, "Hiba az SQL végrehajtása során: " + sql, e);
+                if (callback != null) {
+                    scheduler.runTask(plugin, callback);
+                }
             }
-        }, executor);
+        });
     }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {
@@ -49,7 +57,6 @@ public abstract class DatabaseHandler {
     }
 
     public void close() {
-        executor.shutdown();
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();

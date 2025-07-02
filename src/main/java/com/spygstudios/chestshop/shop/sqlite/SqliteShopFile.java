@@ -38,26 +38,32 @@ public class SqliteShopFile implements ShopFile {
 
     public void setPlayers(List<UUID> players, String shopName) {
         // Jelenlegi játékosok eltávolítása és újak hozzáadása
-        int shopId = repository.getShopId(ownerId, shopName).join();
-        if (shopId != -1) {
-            // Meglévő játékosok törlése
-            List<UUID> currentPlayers = repository.getShopPlayers(shopId).join();
-            for (UUID player : currentPlayers) {
-                repository.removePlayerFromShop(shopId, player);
-            }
+        repository.getShopId(ownerId, shopName, shopId -> {
+            if (shopId != -1) {
+                // Meglévő játékosok törlése
+                repository.getShopPlayers(shopId, currentPlayers -> {
+                    for (UUID player : currentPlayers) {
+                        repository.removePlayerFromShop(shopId, player, () -> {
+                        });
+                    }
 
-            // Új játékosok hozzáadása
-            for (UUID player : players) {
-                repository.addPlayerToShop(shopId, player);
+                    // Új játékosok hozzáadása
+                    for (UUID player : players) {
+                        repository.addPlayerToShop(shopId, player, () -> {
+                        });
+                    }
+                });
             }
-        }
+        });
     }
 
     public void addPlayer(UUID player, String shopName) {
-        int shopId = repository.getShopId(ownerId, shopName).join();
-        if (shopId != -1) {
-            repository.addPlayerToShop(shopId, player);
-        }
+        repository.getShopId(ownerId, shopName, shopId -> {
+            if (shopId != -1) {
+                repository.addPlayerToShop(shopId, player, () -> {
+                });
+            }
+        });
     }
 
     public void removePlayer(UUID player, String shopName) {
@@ -90,7 +96,7 @@ public class SqliteShopFile implements ShopFile {
         repository.createShop(ownerId, shop.getName(), shop.getChestLocation(), getDateString());
     }
 
-    public void setName(String shopName, String newName) {
+    public void renameShop(String shopName, String newName) {
         repository.renameShop(ownerId, shopName, newName);
     }
 
@@ -102,7 +108,7 @@ public class SqliteShopFile implements ShopFile {
         repository.updateShopPrice(ownerId, shopName, price);
     }
 
-    public void save() {
+    public void markUnsaved() {
         // SQLite-ban automatikus mentés
     }
 

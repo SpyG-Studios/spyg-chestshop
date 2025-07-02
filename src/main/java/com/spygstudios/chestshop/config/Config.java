@@ -30,15 +30,6 @@ public class Config extends YamlManager {
                 "The maximum amount of shops a player can have (spygchestshop.max.<group>). Set to -1 for unlimited. If a player has more than one permission, the highest amount will be used."));
         set("shops.max-players", 18, Arrays.asList("The maximum amount of players that can be added to a shop. Set to 0 for unlimited."));
         set("shops.save-interval", 60, Arrays.asList("The interval in seconds to save the shops data."));
-        set("shops.storage-type", "sqlite", Arrays.asList("Storage type for shops. Options: 'yml', 'sqlite', 'mysql'. SQLite is recommended for better performance."));
-        
-        // MySQL konfiguráció
-        set("shops.mysql.host", "localhost", Arrays.asList("MySQL server host"));
-        set("shops.mysql.port", 3306, Arrays.asList("MySQL server port"));
-        set("shops.mysql.database", "chestshop", Arrays.asList("MySQL database name"));
-        set("shops.mysql.username", "username", Arrays.asList("MySQL username"));
-        set("shops.mysql.password", "password", Arrays.asList("MySQL password"));
-        
         set("shops.holograms.range", 16, Arrays.asList("The view range of the holograms. Restart required to apply changes."));
 
         set("shops.anti-explosion", true, Arrays.asList("Prevent shops from being destroyed by explosions."));

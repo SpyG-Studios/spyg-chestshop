@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import com.spygstudios.chestshop.shop.Shop;
 
 public interface ShopFile {
+    UUID getOwnerId();
 
     void setPlayers(List<UUID> players, String shopName);
 
@@ -24,21 +25,7 @@ public interface ShopFile {
 
     void addShop(Shop shop);
 
-    void setName(String shopName, String name);
+    void renameShop(String shopName, String newName);
 
     void setMaterial(String shopName, Material material);
-
-    void setPrice(String shopName, double price);
-
-    void save();
-
-    void overwriteSet(String path, Object value);
-
-    int getInt(String path);
-
-    double getDouble(String path);
-
-    boolean getBoolean(String path);
-
-    UUID getOwnerId();
 }

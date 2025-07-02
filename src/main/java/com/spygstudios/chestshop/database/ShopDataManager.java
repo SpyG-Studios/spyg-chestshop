@@ -13,48 +13,33 @@ import org.bukkit.entity.Player;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.database.sql.MysqlManager;
 import com.spygstudios.chestshop.database.sqlite.SqLiteManager;
+import com.spygstudios.chestshop.services.MigrationService;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.shop.ShopUtils;
 import com.spygstudios.chestshop.shop.sqlite.SqliteShopFile;
 
 import lombok.Getter;
 
-public class DatabaseShopManager {
+public class ShopDataManager {
 
     @Getter
     private final ShopRepository repository;
-    @Getter
-    private final MigrationService migrationService;
 
     private static final Map<UUID, SqliteShopFile> SHOP_FILES = new HashMap<>();
     private DatabaseHandler db;
 
-    public DatabaseShopManager(ChestShop plugin) {
+    public ShopDataManager(ChestShop plugin) {
         this.db = new SqLiteManager(plugin);
         this.repository = new ShopRepository(db, plugin);
-        this.migrationService = new MigrationService(plugin, repository);
     }
 
-    public DatabaseShopManager(ChestShop plugin, String host, int port, String database, String username, String password) {
+    public ShopDataManager(ChestShop plugin, String host, int port, String database, String username, String password) {
         this.db = new MysqlManager(plugin, host, port, database, username, password);
         this.repository = new ShopRepository(db, plugin);
-        this.migrationService = new MigrationService(plugin, repository);
     }
 
     public CompletableFuture<Boolean> initialize() {
         return db.initialize().thenCompose(success -> {
-            if (!success) {
-                return CompletableFuture.completedFuture(false);
-            }
-
-            return migrationService.shouldMigrate().thenCompose(shouldMigrate -> {
-                if (shouldMigrate) {
-                    db.plugin.getLogger().info("YML files found, starting automatic migration...");
-                    return migrationService.migrateFromYml();
-                }
-                return CompletableFuture.completedFuture(true);
-            });
-        }).thenCompose(success -> {
             if (success) {
                 return loadAllShops();
             }
@@ -116,12 +101,11 @@ public class DatabaseShopManager {
         return repository.getPlayerShops(ownerId);
     }
 
-    public void startSaveScheduler() {
-        // Adatbázisban nincs szükség periodikus mentésre, minden változás azonnal
-        // commitált
-        String dbType = db.getDatabaseType().name();
-        db.plugin.getLogger().info(dbType + " módban nincs szükség mentési ütemezőre");
-    }
+    // public void startSaveScheduler() {
+    // String dbType = db.getDatabaseType().name();
+    // db.plugin.getLogger().info(dbType + " módban nincs szükség mentési
+    // ütemezőre");
+    // }
 
     public void saveShops() {
         // Adatbázisban minden változás automatikusan mentődik
@@ -133,12 +117,10 @@ public class DatabaseShopManager {
         }
     }
 
-    // Migráció manuális futtatása adminoknak
     public CompletableFuture<Boolean> forceMigration() {
-        return migrationService.migrateFromYml();
+        return new MigrationService(db.plugin, repository).migrateFromYml();
     }
 
-    // Statisztikák lekérdezése
     public CompletableFuture<Integer> getTotalShopsCount() {
         return repository.getAllShops().thenApply(List::size);
     }

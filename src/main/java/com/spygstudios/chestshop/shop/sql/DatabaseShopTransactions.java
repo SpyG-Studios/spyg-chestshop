@@ -12,7 +12,6 @@ import org.bukkit.inventory.ItemStack;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.database.ShopRepository;
-import com.spygstudios.chestshop.interfaces.ShopTransactions;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.shop.sqlite.SqliteShopFile;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
@@ -20,7 +19,7 @@ import com.spygstudios.spyglib.inventory.InventoryUtils;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 
-public class DatabaseShopTransactions implements ShopTransactions {
+public class DatabaseShopTransactions {
 
     private final Shop shop;
     private final ChestShop plugin;
