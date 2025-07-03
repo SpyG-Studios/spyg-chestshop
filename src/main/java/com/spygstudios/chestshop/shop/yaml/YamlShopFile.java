@@ -17,7 +17,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.interfaces.ShopFile;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.shop.ShopUtils;
 import com.spygstudios.spyglib.location.LocationUtils;
@@ -25,17 +24,17 @@ import com.spygstudios.spyglib.yamlmanager.YamlManager;
 
 import lombok.Getter;
 
-public class ShopYmlFile extends YamlManager implements ShopFile {
+public class YamlShopFile extends YamlManager {
     @Getter
     private UUID ownerId;
     private boolean isSaved;
-    private static final Map<UUID, ShopYmlFile> SHOPS_FILES = new HashMap<>();
+    private static final Map<UUID, YamlShopFile> SHOPS_FILES = new HashMap<>();
 
-    public ShopYmlFile(ChestShop plugin, Player owner) {
+    public YamlShopFile(ChestShop plugin, Player owner) {
         this(plugin, owner.getUniqueId());
     }
 
-    public ShopYmlFile(ChestShop plugin, UUID ownerId) {
+    public YamlShopFile(ChestShop plugin, UUID ownerId) {
         super("shops/" + ownerId + ".yml", plugin);
         if (SHOPS_FILES.containsKey(ownerId)) {
             return;
@@ -77,13 +76,14 @@ public class ShopYmlFile extends YamlManager implements ShopFile {
     }
 
     public void removeShop(String shopName) {
-        if (getPlayerShops().contains(shopName)) {
-            overwriteSet("shops." + shopName, null);
-            isSaved = false;
+        if (!getPlayerShops().contains(shopName)) {
+            return;
         }
+        overwriteSet("shops." + shopName, null);
+        isSaved = false;
     }
 
-    private static void setDefaultValues(ShopYmlFile shopFile) {
+    private static void setDefaultValues(YamlShopFile shopFile) {
         for (String shopName : shopFile.getPlayerShops()) {
             String shopPath = "shops." + shopName;
             shopFile.set(shopPath + ".price", 0);
@@ -161,41 +161,41 @@ public class ShopYmlFile extends YamlManager implements ShopFile {
             plugin.getLogger().warning("Invalid shop file: " + file.getName() + " (invalid UUID)");
             return;
         }
-        ShopYmlFile shopFile = new ShopYmlFile(plugin, ownerId);
+        YamlShopFile shopFile = new YamlShopFile(plugin, ownerId);
         for (String shopName : shopFile.getPlayerShops()) {
-            processShop(plugin, file, shopFile, shopName);
+            loadShop(plugin, file.getName(), shopFile, shopName);
         }
     }
 
-    private static void processShop(ChestShop plugin, File file, ShopYmlFile shopFile, String shopName) {
+    public static Shop loadShop(ChestShop plugin, String fileName, YamlShopFile shopFile, String shopName) {
         String shopPath = "shops." + shopName;
         String locationString = shopFile.getString(shopPath + ".location");
         if (locationString == null) {
-            plugin.getLogger().warning("Invalid shop file: " + file.getName() + " (location is null) removing shop...");
+            plugin.getLogger().warning("Invalid shop file: " + fileName + " (location is null) removing shop...");
             shopFile.removeShop(shopName);
-            return;
+            return null;
         }
         Location location = LocationUtils.toLocation(locationString);
         if (location.getWorld() == null || ShopUtils.isDisabledWorld(location.getWorld().getName())) {
-            return;
+            return null;
         }
         if (!location.getBlock().getType().equals(Material.CHEST)) {
-            plugin.getLogger().warning("Invalid shop in: " + file.getName() + " (chest is not a chest) removing shop...");
+            plugin.getLogger().warning("Invalid shop in: " + fileName + " (chest is not a chest) removing shop...");
             shopFile.removeShop(shopName);
-            return;
+            return null;
         }
         double price = shopFile.getDouble("shops." + shopName + ".price");
         Material material = Material.getMaterial(shopFile.getString("shops." + shopName + ".material"));
         String createdAt = shopFile.getString("shops." + shopName + ".created");
         boolean isNotify = shopFile.getBoolean("shops." + shopName + ".do-notify");
-        new Shop(shopFile.getOwnerId(), shopName, price, material, location, createdAt, isNotify, shopFile.getAddedUuids(shopName), shopFile);
+        return new Shop(shopFile.getOwnerId(), shopName, price, material, location, createdAt, isNotify, shopFile.getAddedUuids(shopName));
     }
 
-    public static ShopYmlFile getShopFile(UUID ownerId) {
+    public static YamlShopFile getShopFile(UUID ownerId) {
         return SHOPS_FILES.get(ownerId);
     }
 
-    public static ShopYmlFile getShopFile(Player owner) {
+    public static YamlShopFile getShopFile(Player owner) {
         return getShopFile(owner.getUniqueId());
     }
 
@@ -207,7 +207,7 @@ public class ShopYmlFile extends YamlManager implements ShopFile {
         removeShopFile(owner.getUniqueId());
     }
 
-    public static Map<UUID, ShopYmlFile> getShopFiles() {
+    public static Map<UUID, YamlShopFile> getShopFiles() {
         return new HashMap<>(SHOPS_FILES);
     }
 
@@ -215,11 +215,11 @@ public class ShopYmlFile extends YamlManager implements ShopFile {
         long interval = plugin.getConf().getInt("shops.save-interval", 60);
         if (interval <= 0)
             interval = 60;
-        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, ShopYmlFile::saveShops, 0, 20L * interval);
+        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, YamlShopFile::saveShops, 0, 20L * interval);
     }
 
     public static void saveShops() {
-        for (ShopYmlFile shopFile : SHOPS_FILES.values()) {
+        for (YamlShopFile shopFile : SHOPS_FILES.values()) {
             if (shopFile.isSaved) {
                 continue;
             }
@@ -228,7 +228,7 @@ public class ShopYmlFile extends YamlManager implements ShopFile {
         }
     }
 
-    private String getPath(String shopName, String key) {
+    public static String getPath(String shopName, String key) {
         return "shops." + shopName + "." + key;
     }
 

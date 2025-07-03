@@ -12,6 +12,7 @@ public class Config extends YamlManager {
         set("check-for-updates", true, Arrays.asList("Check for updates on join (spygchestshop.admin.updates)."));
         set("locale", "en_US", Arrays.asList("The locale of the plugin. (file name)"));
         set("cancel", "cancel", Arrays.asList("The text to cancel the amount action."));
+        set("storage-type", "yaml", Arrays.asList("The storage type of the plugin. (yaml, sqlite, mysql)"));
         set("colors.command.required-arg", " &c");
         set("colors.command.optional-arg", " &7");
         set("colors.command.list", "&8- ");

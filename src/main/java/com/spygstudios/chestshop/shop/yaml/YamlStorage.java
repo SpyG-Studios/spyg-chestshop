@@ -9,114 +9,209 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.interfaces.ShopDataStore;
+import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.shop.Shop;
 
-public class YamlStorage implements ShopDataStore {
+public class YamlStorage implements DataManager {
 
     private final ChestShop plugin;
 
     public YamlStorage(ChestShop plugin) {
         this.plugin = plugin;
-    }
-
-    @Override
-    public void createShop(UUID ownerId, String shopName, Location location, String createdAt, Consumer<Integer> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createShop'");
-    }
-
-    @Override
-    public void getPlayerShops(UUID ownerId, Consumer<List<Shop>> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPlayerShops'");
-    }
-
-    @Override
-    public void getShopByLocation(Location location, Consumer<Shop> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getShopByLocation'");
-    }
-
-    @Override
-    public void getShop(UUID ownerId, String shopName, Consumer<Shop> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getShop'");
-    }
-
-    @Override
-    public void updateShopPrice(UUID ownerId, String shopName, double price, Runnable callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopPrice'");
-    }
-
-    @Override
-    public void updateShopMaterial(UUID ownerId, String shopName, Material material, Runnable callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopMaterial'");
-    }
-
-    @Override
-    public void updateShopNotify(UUID ownerId, String shopName, boolean notify, Runnable callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopNotify'");
-    }
-
-    @Override
-    public void updateShopStats(UUID ownerId, String shopName, int soldItems, double moneyEarned, Runnable callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopStats'");
-    }
-
-    @Override
-    public void renameShop(UUID ownerId, String oldName, String newName, Runnable callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'renameShop'");
-    }
-
-    @Override
-    public void deleteShop(UUID ownerId, String shopName, Runnable callback) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            ShopYmlFile.getShopFile(ownerId).removeShop(shopName);
-            if (callback != null) {
-                Bukkit.getScheduler().runTask(plugin, callback);
+        initialize(success -> {
+            if (success) {
+                plugin.getLogger().info("YamlStorage initialized successfully.");
+            } else {
+                plugin.getLogger().severe("Failed to initialize YamlStorage.");
             }
         });
     }
 
     @Override
-    public void getShopPlayers(int shopId, Consumer<List<UUID>> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getShopPlayers'");
+    public void createShop(UUID ownerId, String shopName, Location location, String createdAt, Consumer<Shop> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        Shop shop = new Shop(ownerId, shopName, location);
+        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+        shopFile.addShop(shop);
+
+        callback.accept(shop);
     }
 
     @Override
-    public void addPlayerToShop(int shopId, UUID playerId, Runnable callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addPlayerToShop'");
+    public void getPlayerShops(UUID ownerId, Consumer<List<Shop>> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+        List<Shop> shops = Shop.getShops(ownerId);
+        callback.accept(shops);
     }
 
     @Override
-    public void removePlayerFromShop(int shopId, UUID playerId, Runnable callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'removePlayerFromShop'");
+    public void getShopsInChunk(Location location, Consumer<List<Shop>> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
     }
 
     @Override
-    public void getShopId(UUID ownerId, String shopName, Consumer<Integer> callback) {
-        Bukkit.getScheduler().runTask(plugin, () -> callback.accept(-1));
+    public void getShop(UUID ownerId, String shopName, Consumer<Shop> callback) {
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            callback.accept(shop);
+        } else {
+            callback.accept(YamlShopFile.loadShop(plugin, shopName, null, shopName));
+        }
+    }
+
+    @Override
+    public void updateShopPrice(UUID ownerId, String shopName, double price, Consumer<Boolean> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+        shopFile.setPrice(shopName, price);
+        callback.accept(true);
+    }
+
+    @Override
+    public void updateShopMaterial(UUID ownerId, String shopName, Material material, Consumer<Boolean> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+        shopFile.setMaterial(shopName, material);
+        callback.accept(true);
+    }
+
+    @Override
+    public void updateShopNotify(UUID ownerId, String shopName, boolean notify, Consumer<Boolean> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+        shopFile.overwriteSet("shops." + shopName + ".do-notify", notify);
+        shopFile.markUnsaved();
+        callback.accept(true);
+    }
+
+    @Override
+    public void updateSoldItems(UUID ownerId, String shopName, int soldItems, Consumer<Boolean> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+        String shopPath = "shops." + shopName;
+        shopFile.overwriteSet(shopPath + ".sold-items", shopFile.getInt(shopPath + ".sold-items") + soldItems);
+        shopFile.markUnsaved();
+        callback.accept(true);
+    }
+
+    @Override
+    public void updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned, Consumer<Boolean> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+        String shopPath = "shops." + shopName;
+        shopFile.overwriteSet(shopPath + ".money-earned", shopFile.getDouble(shopPath + ".money-earned") + moneyEarned);
+        shopFile.markUnsaved();
+        callback.accept(true);
+    }
+
+    @Override
+    public void updateShopStats(UUID ownerId, String shopName, int soldItems, double moneyEarned, Consumer<Boolean> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+        updateMoneyEarned(ownerId, shopName, moneyEarned, callback);
+        updateSoldItems(ownerId, shopName, soldItems, callback);
+        callback.accept(true);
+    }
+
+    @Override
+    public void renameShop(UUID ownerId, String oldName, String newName, Consumer<Boolean> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+        shopFile.renameShop(oldName, newName);
+        callback.accept(true);
+    }
+
+    @Override
+    public void deleteShop(UUID ownerId, String shopName, Consumer<Boolean> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+        YamlShopFile.getShopFile(ownerId).removeShop(shopName);
+        callback.accept(true);
+    }
+
+    @Override
+    public void getShopPlayers(UUID ownerId, String shopName, Consumer<List<UUID>> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+        List<UUID> players = shopFile.getAddedUuids(shopName);
+        if (players != null) {
+            callback.accept(players);
+        } else {
+            callback.accept(List.of());
+            Bukkit.getLogger().warning("No players found for shop: " + shopName);
+        }
+    }
+
+    @Override
+    public void addPlayerToShop(UUID ownerId, String shopName, UUID toAdd, Consumer<Boolean> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        getShop(ownerId, shopName, shop -> {
+            if (shop == null) {
+                callback.accept(false);
+                Bukkit.getLogger().warning("Shop not found with while adding player. Shopname: " + shopName);
+                return;
+            }
+
+            YamlShopFile shopFile = YamlShopFile.getShopFile(shop.getOwnerId());
+            shopFile.addPlayer(toAdd, shop.getName());
+            callback.accept(true);
+        });
+    }
+
+    @Override
+    public void removePlayerFromShop(UUID ownerId, String shopName, UUID toRemove, Consumer<Boolean> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+        getShop(ownerId, shopName, shop -> {
+            if (shop == null) {
+                callback.accept(false);
+                Bukkit.getLogger().warning("Shop not found for owner: " + ownerId + ", shop name: " + shopName);
+                return;
+            }
+
+            YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+            shopFile.removePlayer(toRemove, shopName);
+            callback.accept(true);
+        });
     }
 
     @Override
     public void initialize(Consumer<Boolean> callback) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
-                ShopYmlFile.loadShopFiles(plugin);
-                ShopYmlFile.startSaveScheduler(plugin);
-                plugin.getLogger().info("YamlStorage initialized successfully.");
+                YamlShopFile.loadShopFiles(plugin);
+                YamlShopFile.startSaveScheduler(plugin);
                 Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
             } catch (Exception e) {
-                plugin.getLogger().severe("Failed to initialize YamlShopRepository: " + e.getMessage());
                 Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
             }
         });
@@ -124,7 +219,7 @@ public class YamlStorage implements ShopDataStore {
 
     @Override
     public void close() {
-        ShopYmlFile.saveShops();
+        YamlShopFile.saveShops();
     }
 
 }

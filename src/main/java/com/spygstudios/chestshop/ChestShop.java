@@ -26,6 +26,7 @@ import com.spygstudios.chestshop.config.MessageConfig;
 import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
+import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.listeners.BreakListener;
 import com.spygstudios.chestshop.listeners.BuildListener;
 import com.spygstudios.chestshop.listeners.ChatListener;
@@ -35,7 +36,8 @@ import com.spygstudios.chestshop.listeners.InteractListener;
 import com.spygstudios.chestshop.listeners.PlayerJoinListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
-import com.spygstudios.chestshop.shop.yaml.ShopYmlFile;
+import com.spygstudios.chestshop.shop.yaml.YamlShopFile;
+import com.spygstudios.chestshop.shop.yaml.YamlStorage;
 import com.spygstudios.spyglib.hologram.HologramManager;
 import com.spygstudios.spyglib.version.VersionChecker;
 
@@ -59,6 +61,8 @@ public class ChestShop extends JavaPlugin {
     @Getter
     @Setter
     private MessageConfig messageConfig;
+    @Getter
+    private DataManager dataManager;
     private static final String API_URL = "https://hangar.papermc.io/api/v1/projects/Spyg-ChestShop/latestrelease";
 
     public ChestShop() {
@@ -105,9 +109,13 @@ public class ChestShop extends JavaPlugin {
         economy = rsp.getProvider();
         getLogger().info("Loaded economy plugin: " + economy.getName());
 
-        ShopYmlFile.loadShopFiles(instance);
+        String storageType = conf.getString("storage-type");
+        switch (storageType) {
+            case "yaml":
+                dataManager = new YamlStorage(this);
+                break;
+        }
 
-        ShopYmlFile.startSaveScheduler(instance);
         String info = String.format("%s v. %s plugin has been enabled!", getName(), getPluginMeta().getVersion());
         getLogger().info(info);
     }
@@ -117,7 +125,7 @@ public class ChestShop extends JavaPlugin {
         if (commandHandler != null) {
             commandHandler.unregister();
         }
-        ShopYmlFile.saveShops();
+        YamlShopFile.saveShops();
 
         List<Object> guis = Arrays.asList(ChestShopHolder.class, PlayersHolder.class, ShopGuiHolder.class);
         for (Player player : Bukkit.getOnlinePlayers()) {

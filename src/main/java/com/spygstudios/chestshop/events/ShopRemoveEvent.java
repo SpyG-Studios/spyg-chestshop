@@ -8,6 +8,7 @@ import com.spygstudios.chestshop.enums.ShopRemoveCause;
 import com.spygstudios.chestshop.shop.Shop;
 
 import lombok.Getter;
+import lombok.Setter;
 
 public class ShopRemoveEvent extends Event {
 
@@ -19,6 +20,10 @@ public class ShopRemoveEvent extends Event {
 
     @Getter
     private final Player shopRemover;
+
+    @Getter
+    @Setter
+    private boolean cancelled = false;
 
     private static final HandlerList HANDLERS = new HandlerList();
 
