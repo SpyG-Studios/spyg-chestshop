@@ -39,7 +39,7 @@ public abstract class DatabaseHandler {
                     scheduler.runTask(plugin, callback);
                 }
             } catch (SQLException e) {
-                plugin.getLogger().log(Level.SEVERE, "Hiba az SQL végrehajtása során: " + sql, e);
+                plugin.getLogger().log(Level.SEVERE, "Error during executing SQL: " + sql, e);
                 if (callback != null) {
                     scheduler.runTask(plugin, callback);
                 }
