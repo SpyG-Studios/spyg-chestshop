@@ -24,6 +24,8 @@ public class CustomerMode {
     private static List<UUID> customerMode = new ArrayList<>();
 
     @Execute
+    @Permission("spygchestshop.*")
+    @Permission("spygchestshop.admin.*")
     @Permission("spygchestshop.admin.customermode")
     public void onCustomerMode(@Context Player player, @Arg Optional<Player> target) {
         Player targetPlayer = target.orElse(player);

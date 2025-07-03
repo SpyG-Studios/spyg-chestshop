@@ -27,6 +27,8 @@ public class ShopListAdmin {
 
     @Execute
     @Permission("spygchestshop.admin.list")
+    @Permission("spygchestshop.*")
+    @Permission("spygchestshop.admin.*")
     public void onList(@Context Player player, @Async @Arg OfflinePlayer target, @OptionalArg Integer page) {
         if (page == null) {
             page = 1;

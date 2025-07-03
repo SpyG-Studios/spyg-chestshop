@@ -23,6 +23,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 public class ShopList {
 
     @Execute
+    @Permission("spygchestshop.*")
     @Permission("spygchestshop.use")
     public void onList(@Context Player player, @OptionalArg Integer page) {
         if (page == null) {

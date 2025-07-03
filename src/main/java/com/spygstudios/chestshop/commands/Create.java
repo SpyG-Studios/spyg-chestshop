@@ -37,6 +37,7 @@ public class Create {
 
     @Execute
     @Permission("spygchestshop.use")
+    @Permission("spygchestshop.*")
     public void onCreate(@Context Player player, @Arg String name) {
         Block targetBlock = player.getTargetBlock((Set<Material>) null, 4);
         if (targetBlock == null || targetBlock.getType() != Material.CHEST) {
