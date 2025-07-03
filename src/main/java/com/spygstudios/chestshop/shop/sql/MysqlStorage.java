@@ -13,7 +13,7 @@ import com.spygstudios.chestshop.shop.Shop;
 public class MysqlStorage implements DataManager {
 
     @Override
-    public void createShop(UUID ownerId, String shopName, Location location, String createdAt, Consumer<Shop> callback) {
+    public void createShop(UUID ownerId, String shopName, Location location, Consumer<Shop> callback) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'createShop'");
     }

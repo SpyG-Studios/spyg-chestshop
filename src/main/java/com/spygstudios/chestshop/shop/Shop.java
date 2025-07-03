@@ -55,12 +55,12 @@ public class Shop {
     private static final List<Shop> SHOPS = new ArrayList<>();
     private static ChestShop plugin = ChestShop.getInstance();
 
-    public Shop(Player owner, String shopName, Location chestLocation) {
-        this(owner.getUniqueId(), shopName, 0, null, chestLocation, plugin.getDataManager().getDateString(), false, new ArrayList<>());
+    public Shop(Player owner, String shopName, Location chestLocation, String createdAt) {
+        this(owner.getUniqueId(), shopName, 0, null, chestLocation, createdAt, false, new ArrayList<>());
     }
 
-    public Shop(UUID owner, String shopName, Location chestLocation) {
-        this(owner, shopName, 0, null, chestLocation, plugin.getDataManager().getDateString(), false, new ArrayList<>());
+    public Shop(UUID owner, String shopName, Location chestLocation, String createdAt) {
+        this(owner, shopName, 0, null, chestLocation, createdAt, false, new ArrayList<>());
     }
 
     public Shop(UUID ownerId, String shopName, double price, Material material, Location chestLocation, String createdAt, boolean isNotify, List<UUID> addedPlayers) {

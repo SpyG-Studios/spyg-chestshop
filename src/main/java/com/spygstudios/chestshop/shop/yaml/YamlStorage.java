@@ -28,12 +28,12 @@ public class YamlStorage implements DataManager {
     }
 
     @Override
-    public void createShop(UUID ownerId, String shopName, Location location, String createdAt, Consumer<Shop> callback) {
+    public void createShop(UUID ownerId, String shopName, Location location, Consumer<Shop> callback) {
         if (callback == null) {
             throw new IllegalArgumentException("Callback cannot be null");
         }
-
-        Shop shop = new Shop(ownerId, shopName, location);
+        String createdAt = plugin.getDataManager().getDateString();
+        Shop shop = new Shop(ownerId, shopName, location, createdAt);
         YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
         shopFile.addShop(shop);
 
