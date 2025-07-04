@@ -1,5 +1,6 @@
 package com.spygstudios.chestshop.shop.sqlite;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -8,10 +9,11 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import com.spygstudios.chestshop.database.DatabaseHandler;
 import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.shop.Shop;
 
-public class SqlliteStorage implements DataManager {
+public class SqlliteStorage extends DatabaseHandler implements DataManager {
 
     @Override
     public void initialize(Consumer<Boolean> callback) {
@@ -110,9 +112,15 @@ public class SqlliteStorage implements DataManager {
     }
 
     @Override
-    public void close() {
+    public void saveShop(Shop shop, Consumer<Boolean> callback) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'close'");
+        throw new UnsupportedOperationException("Unimplemented method 'saveShop'");
+    }
+
+    @Override
+    public void createTables() throws SQLException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'createTables'");
     }
 
 }

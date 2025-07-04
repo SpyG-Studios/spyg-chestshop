@@ -79,30 +79,11 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
         if (callback == null) {
             throw new IllegalArgumentException("Callback cannot be null");
         }
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            String createdAt = plugin.getDataManager().getDateString();
-            String sql = "INSERT INTO shops (owner_uuid, shop_name, price, material, location, world, x, y, z, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-                stmt.setString(1, ownerId.toString());
-                stmt.setString(2, shopName);
-                stmt.setDouble(3, 0);
-                stmt.setString(4, null);
-                stmt.setString(5, location.serialize().toString());
-                stmt.setString(6, location.getWorld().getName());
-                stmt.setInt(7, location.getBlockX());
-                stmt.setInt(8, location.getBlockY());
-                stmt.setInt(9, location.getBlockZ());
-                stmt.setString(10, createdAt);
-                stmt.executeUpdate();
-
-                Shop shop = new Shop(ownerId, shopName, location, createdAt);
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(shop));
-            } catch (SQLException e) {
-                plugin.getLogger().severe("Failed to create shop: " + e.getMessage());
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(null));
-            }
-        });
+        String createdAt = plugin.getDataManager().getDateString();
+        Shop shop = new Shop(ownerId, shopName, location, createdAt);
+        shop.setSaved(false);
+        callback.accept(shop);
     }
 
     @Override
@@ -210,8 +191,32 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
 
     @Override
     public void updateShopPrice(UUID ownerId, String shopName, double price, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopPrice'");
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+            plugin.getLogger().info("Shop price updated in memory for owner: " + ownerId + ", shopName: " + shopName);
+            return;
+        }
+        String sql = "UPDATE shops SET price = ? WHERE owner_uuid = ? AND shop_name = ?";
+        Object[] params = new Object[] {
+                price,
+                ownerId.toString(),
+                shopName
+        };
+
+        executeAsync(sql, params, success -> {
+            if (success) {
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+                plugin.getLogger().info("Shop price updated in database for owner: " + ownerId + ", shopName: " + shopName);
+            } else {
+                plugin.getLogger().severe("Failed to update shop price for owner: " + ownerId + ", shopName: " + shopName);
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
+            }
+        });
     }
 
     @Override
@@ -275,9 +280,91 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
     }
 
     @Override
+    public void saveShop(Shop shop, Consumer<Boolean> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        String selectSql = "SELECT 1 FROM shops WHERE owner_uuid = ? AND shop_name = ?";
+        try (PreparedStatement selectStmt = connection.prepareStatement(selectSql)) {
+            selectStmt.setString(1, shop.getOwnerId().toString());
+            selectStmt.setString(2, shop.getName());
+
+            try (ResultSet rs = selectStmt.executeQuery()) {
+                boolean exists = rs.next();
+
+                String sql;
+                Object[] params;
+
+                if (exists) {
+                    sql = "UPDATE shops SET price = ?, material = ?, location = ?, world = ?, x = ?, y = ?, z = ?, created_at = ?, do_notify = ? " +
+                            "WHERE owner_uuid = ? AND shop_name = ?";
+                    params = new Object[] {
+                            shop.getPrice(),
+                            shop.getMaterial() != null ? shop.getMaterial().name() : null,
+                            shop.getChestLocation().serialize().toString(),
+                            shop.getChestLocation().getWorld().getName(),
+                            shop.getChestLocation().getBlockX(),
+                            shop.getChestLocation().getBlockY(),
+                            shop.getChestLocation().getBlockZ(),
+                            shop.getCreatedAt(),
+                            shop.isNotify(),
+                            shop.getOwnerId().toString(),
+                            shop.getName()
+                    };
+                } else {
+                    sql = "INSERT INTO shops (owner_uuid, shop_name, price, material, location, world, x, y, z, created_at, do_notify) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    params = new Object[] {
+                            shop.getOwnerId().toString(),
+                            shop.getName(),
+                            shop.getPrice(),
+                            shop.getMaterial() != null ? shop.getMaterial().name() : null,
+                            shop.getChestLocation().serialize().toString(),
+                            shop.getChestLocation().getWorld().getName(),
+                            shop.getChestLocation().getBlockX(),
+                            shop.getChestLocation().getBlockY(),
+                            shop.getChestLocation().getBlockZ(),
+                            shop.getCreatedAt(),
+                            shop.isNotify()
+                    };
+                }
+
+                String finalSql = sql;
+                Object[] finalParams = params;
+
+                executeSync(finalSql, finalParams, success -> {
+                    if (!success) {
+                        plugin.getLogger().severe("Failed to save shop: " + shop.getName() + " for owner: " + shop.getOwnerId());
+                    }
+                    callback.accept(success);
+                });
+
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Failed to save shop: " + shop.getName() + " for owner: " + shop.getOwnerId());
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
+        }
+    }
+
     public void close() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'close'");
+        plugin.getLogger().info("Closing MySQL connection and saving shops...");
+        for (Shop shop : Shop.getShops()) {
+            if (shop.isSaved()) {
+                continue;
+            }
+            try {
+                saveShop(shop, success -> {
+                    if (success) {
+                        shop.setSaved(true);
+                    }
+                });
+            } catch (Exception e) {
+                plugin.getLogger().severe("Failed to save shop: " + shop.getName() + " for owner: " + shop.getOwnerId());
+                plugin.getLogger().severe("Error: " + e.getMessage());
+            }
+        }
+        super.close();
     }
 
     @Override

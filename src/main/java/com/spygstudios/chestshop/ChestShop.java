@@ -36,7 +36,6 @@ import com.spygstudios.chestshop.listeners.InteractListener;
 import com.spygstudios.chestshop.listeners.PlayerJoinListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
-import com.spygstudios.chestshop.shop.yaml.YamlShopFile;
 import com.spygstudios.chestshop.shop.yaml.YamlStorage;
 import com.spygstudios.spyglib.hologram.HologramManager;
 import com.spygstudios.spyglib.version.VersionChecker;
@@ -125,7 +124,7 @@ public class ChestShop extends JavaPlugin {
         if (commandHandler != null) {
             commandHandler.unregister();
         }
-        YamlShopFile.saveShops();
+        dataManager.close();
 
         List<Object> guis = Arrays.asList(ChestShopHolder.class, PlayersHolder.class, ShopGuiHolder.class);
         for (Player player : Bukkit.getOnlinePlayers()) {

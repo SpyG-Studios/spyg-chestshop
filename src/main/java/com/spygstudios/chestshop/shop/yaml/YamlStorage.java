@@ -233,9 +233,14 @@ public class YamlStorage implements DataManager {
         });
     }
 
-    @Override
     public void close() {
         YamlShopFile.saveShops();
+    }
+
+    @Override
+    public void saveShop(Shop shop, Consumer<Boolean> callback) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'saveShop'");
     }
 
 }

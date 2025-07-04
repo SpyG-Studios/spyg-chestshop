@@ -24,6 +24,7 @@ import com.spygstudios.spyglib.hologram.HologramItemRow;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 
@@ -49,8 +50,10 @@ public class Shop {
     private int soldItems;
     @Getter
     private ShopHologram hologram;
-
     private DataManager dataManager;
+    @Getter
+    @Setter
+    private boolean isSaved = false;
 
     private static final List<Shop> SHOPS = new ArrayList<>();
     private static ChestShop plugin = ChestShop.getInstance();
@@ -89,6 +92,7 @@ public class Shop {
     }
 
     public void setSoldItems(int soldItems) {
+        isSaved = false;
         dataManager.updateSoldItems(ownerId, name, soldItems, success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop stats for " + name);

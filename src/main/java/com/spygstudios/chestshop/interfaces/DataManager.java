@@ -13,6 +13,8 @@ import org.bukkit.Material;
 import com.spygstudios.chestshop.shop.Shop;
 
 public interface DataManager {
+    void initialize(Consumer<Boolean> callback);
+
     void createShop(UUID ownerId, String shopName, Location location, Consumer<Shop> callback);
 
     void getPlayerShops(UUID ownerId, Consumer<List<Shop>> callback);
@@ -43,7 +45,7 @@ public interface DataManager {
 
     void updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned, Consumer<Boolean> callback);
 
-    void initialize(Consumer<Boolean> callback);
+    void saveShop(Shop shop, Consumer<Boolean> callback);
 
     void close();
 
