@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -13,7 +14,12 @@ import com.spygstudios.chestshop.shop.Shop;
 public class SqlliteStorage implements DataManager {
 
     @Override
-    public void createShop(UUID ownerId, String shopName, Location location, String createdAt, Consumer<Shop> callback) {
+    public void initialize(Consumer<Boolean> callback) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'initialize'");
+    }
+
+    @Override
     public void createShop(UUID ownerId, String shopName, Location location, Consumer<Shop> callback) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'createShop'");
@@ -26,7 +32,7 @@ public class SqlliteStorage implements DataManager {
     }
 
     @Override
-    public void getShopsInChunk(Location location, Consumer<List<Shop>> callback) {
+    public void getShopsInChunk(Chunk chunk, Consumer<List<Shop>> callback) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getShopsInChunk'");
     }
@@ -101,12 +107,6 @@ public class SqlliteStorage implements DataManager {
     public void updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned, Consumer<Boolean> callback) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'updateMoneyEarned'");
-    }
-
-    @Override
-    public void initialize(Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'initialize'");
     }
 
     @Override

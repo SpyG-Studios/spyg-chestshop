@@ -6,17 +6,18 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
 import com.spygstudios.chestshop.shop.Shop;
 
 public interface DataManager {
-    void createShop(UUID ownerId, String shopName, Location location, String createdAt, Consumer<Shop> callback);
+    void createShop(UUID ownerId, String shopName, Location location, Consumer<Shop> callback);
 
     void getPlayerShops(UUID ownerId, Consumer<List<Shop>> callback);
 
-    void getShopsInChunk(Location location, Consumer<List<Shop>> callback);
+    void getShopsInChunk(Chunk chunk, Consumer<List<Shop>> callback);
 
     void getShop(UUID ownerId, String shopName, Consumer<Shop> callback);
 

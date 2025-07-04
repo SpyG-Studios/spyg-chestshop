@@ -65,6 +65,9 @@ public class Shop {
 
     public Shop(UUID ownerId, String shopName, double price, Material material, Location chestLocation, String createdAt, boolean isNotify, List<UUID> addedPlayers) {
         this.ownerId = ownerId;
+        if (Shop.getShop(ownerId, shopName) != null) {
+            return;
+        }
         this.name = shopName;
         this.price = ShopUtils.parsePrice(price);
         this.material = material;
@@ -74,7 +77,6 @@ public class Shop {
         this.addedPlayers = addedPlayers;
         this.dataManager = plugin.getDataManager();
         this.hologram = new ShopHologram(this, plugin);
-
         SHOPS.add(this);
     }
 

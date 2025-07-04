@@ -1,23 +1,32 @@
 package com.spygstudios.chestshop.shop.yaml;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.enums.DatabaseType;
 import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.shop.Shop;
 
+import lombok.Getter;
+
 public class YamlStorage implements DataManager {
 
+    @Getter
+    private final DatabaseType databaseType;
     private final ChestShop plugin;
 
     public YamlStorage(ChestShop plugin) {
         this.plugin = plugin;
+        databaseType = DatabaseType.YAML;
+
         initialize(success -> {
             if (success) {
                 plugin.getLogger().info("YamlStorage initialized successfully.");
@@ -36,7 +45,6 @@ public class YamlStorage implements DataManager {
         Shop shop = new Shop(ownerId, shopName, location, createdAt);
         YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
         shopFile.addShop(shop);
-
         callback.accept(shop);
     }
 
@@ -50,11 +58,19 @@ public class YamlStorage implements DataManager {
     }
 
     @Override
-    public void getShopsInChunk(Location location, Consumer<List<Shop>> callback) {
+    public void getShopsInChunk(Chunk chunk, Consumer<List<Shop>> callback) {
         if (callback == null) {
             throw new IllegalArgumentException("Callback cannot be null");
         }
-
+        List<Shop> shops = new ArrayList<>();
+        for (Shop shop : Shop.getShops()) {
+            if (shop.getChestLocation().getWorld() != null && shop.getChestLocation().getWorld().equals(chunk.getWorld())) {
+                if (shop.getChestLocation().getChunk().equals(chunk)) {
+                    shops.add(shop);
+                }
+            }
+        }
+        callback.accept(shops);
     }
 
     @Override
