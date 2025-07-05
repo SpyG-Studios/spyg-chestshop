@@ -30,10 +30,12 @@ import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.listeners.BreakListener;
 import com.spygstudios.chestshop.listeners.BuildListener;
 import com.spygstudios.chestshop.listeners.ChatListener;
+import com.spygstudios.chestshop.listeners.ChunkUnloadListener;
 import com.spygstudios.chestshop.listeners.ExplosionListener;
 import com.spygstudios.chestshop.listeners.HopperListener;
 import com.spygstudios.chestshop.listeners.InteractListener;
 import com.spygstudios.chestshop.listeners.PlayerJoinListener;
+import com.spygstudios.chestshop.listeners.PlayerQuitListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
 import com.spygstudios.chestshop.shop.sql.MysqlStorage;
@@ -64,6 +66,10 @@ public class ChestShop extends JavaPlugin {
     private MessageConfig messageConfig;
     @Getter
     private DataManager dataManager;
+    @Getter
+    private boolean latestVersion = true;
+    @Getter
+    private String currentVersion;
     private static final String API_URL = "https://hangar.papermc.io/api/v1/projects/Spyg-ChestShop/latestrelease";
 
     public ChestShop() {
@@ -77,19 +83,23 @@ public class ChestShop extends JavaPlugin {
         messageConfig = new MessageConfig(this, conf.getString("locale"));
         Message.init(messageConfig);
 
-        hologramManager = HologramManager.getManager(instance);
-        commandHandler = new CommandHandler(instance);
+        hologramManager = HologramManager.getManager(this);
+        commandHandler = new CommandHandler(this);
         new InteractListener(this);
         new BreakListener(this);
         new BuildListener(this);
-        new InventoryClickListener(instance);
-        new InventoryCloseListener(instance);
-        new ExplosionListener(instance);
-        new ChatListener(instance);
-        new HopperListener(instance);
-        Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+        new InventoryClickListener(this);
+        new InventoryCloseListener(this);
+        new ExplosionListener(this);
+        new ChatListener(this);
+        new HopperListener(this);
+        new PlayerQuitListener(this);
+        new PlayerJoinListener(this);
+        new ChunkUnloadListener(this);
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             Entry<String, Boolean> versionInfo = VersionChecker.isLatestVersion(API_URL, getPluginMeta().getVersion());
-            new PlayerJoinListener(instance, versionInfo.getKey(), versionInfo.getValue());
+            this.currentVersion = versionInfo.getKey();
+            this.latestVersion = versionInfo.getValue();
         });
 
         loadLocalizations();
