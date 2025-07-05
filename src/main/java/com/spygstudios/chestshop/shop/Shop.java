@@ -92,7 +92,6 @@ public class Shop {
     }
 
     public void setSoldItems(int soldItems) {
-        isSaved = false;
         dataManager.updateSoldItems(ownerId, name, soldItems, success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop stats for " + name);
@@ -100,6 +99,7 @@ public class Shop {
             }
             this.soldItems = soldItems;
             hologram.updateHologramRows();
+            isSaved = false;
         });
     }
 
@@ -111,6 +111,7 @@ public class Shop {
             }
             this.moneyEarned = moneyEarned;
             hologram.updateHologramRows();
+            isSaved = false;
         });
     }
 
@@ -128,6 +129,7 @@ public class Shop {
             if (hologram.getHologram().getRows().get(plugin.getConf().getStringList("shops.lines").size()) instanceof HologramItemRow row) {
                 row.setItem(new ItemStack(material));
             }
+            isSaved = false;
         });
     }
 
@@ -139,6 +141,7 @@ public class Shop {
             }
             this.name = newName;
             hologram.updateHologramRows();
+            isSaved = false;
         });
     }
 
@@ -155,6 +158,7 @@ public class Shop {
             }
             this.price = parsedPrice;
             hologram.updateHologramRows();
+            isSaved = false;
         });
     }
 
@@ -165,6 +169,7 @@ public class Shop {
                 return;
             }
             isNotify = notify;
+            isSaved = false;
         });
     }
 
@@ -184,6 +189,7 @@ public class Shop {
             }
             addedPlayers.add(uuid);
             Message.PLAYER_ADDED.send(Bukkit.getPlayer(ownerId), Map.of("%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
+            isSaved = false;
         });
     }
 
@@ -203,6 +209,7 @@ public class Shop {
             }
             addedPlayers.remove(uuid);
             Message.PLAYER_REMOVED.send(Bukkit.getPlayer(ownerId), Map.of("%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
+            isSaved = false;
         });
     }
 
@@ -264,7 +271,11 @@ public class Shop {
         dataManager.updateShopStats(ownerId, name, itemCount, itemsPrice, success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop stats for " + name + " owned by " + ownerId);
+                return;
             }
+            setSoldItems(getSoldItems() + itemCount);
+            setMoneyEarned(getMoneyEarned() + itemsPrice);
+            isSaved = false;
         });
 
         Player owner = Bukkit.getPlayer(ownerId);

@@ -239,8 +239,11 @@ public class YamlStorage implements DataManager {
 
     @Override
     public void saveShop(Shop shop, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'saveShop'");
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+        YamlShopFile.saveShops();
+        callback.accept(true);
     }
 
 }

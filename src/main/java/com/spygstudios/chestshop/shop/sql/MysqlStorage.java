@@ -5,13 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
@@ -131,7 +131,7 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
         }
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            String sql = "SELECT * FROM shops WHERE world = ? AND s.x >= ? AND s.x < ? AND s.z >= ? AND s.z < ?";
+            String sql = "SELECT * FROM shops WHERE world = ? AND x >= ? AND x < ? AND z >= ? AND z < ?";
 
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 stmt.setString(1, chunk.getWorld().getName());
@@ -202,81 +202,297 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
             return;
         }
         String sql = "UPDATE shops SET price = ? WHERE owner_uuid = ? AND shop_name = ?";
-        Object[] params = new Object[] {
-                price,
-                ownerId.toString(),
-                shopName
-        };
+        Object[] params = new Object[] { price, ownerId.toString(), shopName };
 
         executeAsync(sql, params, success -> {
             if (success) {
                 Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
                 plugin.getLogger().info("Shop price updated in database for owner: " + ownerId + ", shopName: " + shopName);
-            } else {
-                plugin.getLogger().severe("Failed to update shop price for owner: " + ownerId + ", shopName: " + shopName);
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
+                return;
             }
+            plugin.getLogger().severe("Failed to update shop price for owner: " + ownerId + ", shopName: " + shopName);
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
         });
     }
 
     @Override
     public void updateShopMaterial(UUID ownerId, String shopName, Material material, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopMaterial'");
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+            plugin.getLogger().info("Shop price updated in memory for owner: " + ownerId + ", shopName: " + shopName);
+            return;
+        }
+        String sql = "UPDATE shops SET material = ? WHERE owner_uuid = ? AND shop_name = ?";
+        Object[] params = new Object[] { material != null ? material.name() : null, ownerId.toString(), shopName };
+
+        executeAsync(sql, params, success -> {
+            if (success) {
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+                plugin.getLogger().info("Shop material updated in database for owner: " + ownerId + ", shopName: " + shopName);
+                return;
+            }
+            plugin.getLogger().severe("Failed to update shop material for owner: " + ownerId + ", shopName: " + shopName);
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
+        });
     }
 
     @Override
     public void updateShopNotify(UUID ownerId, String shopName, boolean notify, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopNotify'");
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+            plugin.getLogger().info("Shop notify updated in memory for owner: " + ownerId + ", shopName: " + shopName);
+            return;
+        }
+        String sql = "UPDATE shops SET do_notify = ? WHERE owner_uuid = ? AND shop_name = ?";
+        Object[] params = new Object[] { true, ownerId.toString(), shopName };
+
+        executeAsync(sql, params, success -> {
+            if (success) {
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+                plugin.getLogger().info("Shop notify updated in database for owner: " + ownerId + ", shopName: " + shopName);
+                return;
+            }
+            plugin.getLogger().severe("Failed to update shop notify for owner: " + ownerId + ", shopName: " + shopName);
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
+        });
     }
 
     @Override
     public void updateShopStats(UUID ownerId, String shopName, int soldItems, double moneyEarned, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopStats'");
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+            plugin.getLogger().info("Shop stats updated in memory for owner: " + ownerId + ", shopName: " + shopName);
+            return;
+        }
+        String sql = "UPDATE shops SET sold_items = ?, money_earned = ? WHERE owner_uuid = ? AND shop_name = ?";
+        Object[] params = new Object[] { soldItems, moneyEarned, ownerId.toString(), shopName };
+
+        executeAsync(sql, params, success -> {
+            if (success) {
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+                plugin.getLogger().info("Shop stats updated in database for owner: " + ownerId + ", shopName: " + shopName);
+                return;
+            }
+            plugin.getLogger().severe("Failed to update shop stats for owner: " + ownerId + ", shopName: " + shopName);
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
+
+        });
     }
 
     @Override
     public void renameShop(UUID ownerId, String oldName, String newName, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'renameShop'");
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        Shop shop = Shop.getShop(ownerId, oldName);
+        if (shop != null) {
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+            plugin.getLogger().info("Shop name updated in memory for owner: " + ownerId + ", oldName: " + oldName + ", newName: " + newName);
+            return;
+        }
+        String sql = "UPDATE shops SET shop_name = ? WHERE owner_uuid = ? AND shop_name = ?";
+        Object[] params = new Object[] { newName, ownerId.toString(), oldName };
+
+        executeAsync(sql, params, success -> {
+            if (success) {
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+                plugin.getLogger().info("Shop name updated in database for owner: " + ownerId + ", oldName: " + oldName + ", newName: " + newName);
+                return;
+            }
+            plugin.getLogger().severe("Failed to update shop stats for owner: " + ownerId + ", oldName: " + oldName + ", newName: " + newName);
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
+        });
     }
 
     @Override
     public void deleteShop(UUID ownerId, String shopName, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteShop'");
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            callback.accept(true);
+            plugin.getLogger().info("Shop deleted in memory for owner: " + ownerId + ", shopName: " + shopName);
+            return;
+        }
+        String sql = "DELETE FROM shops WHERE owner_uuid = ? AND shop_name = ?";
+        Object[] params = new Object[] { ownerId.toString(), shopName };
+
+        executeAsync(sql, params, success -> {
+            if (success) {
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+                plugin.getLogger().info("Shop deleted from database for owner: " + ownerId + ", shopName: " + shopName);
+                return;
+            }
+            plugin.getLogger().severe("Failed to delete shop for owner: " + ownerId + ", shopName: " + shopName);
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
+        });
     }
 
     @Override
     public void getShopPlayers(UUID ownerId, String shopName, Consumer<List<UUID>> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getShopPlayers'");
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(shop.getAddedPlayers()));
+            return;
+        }
+
+        String sql = "SELECT player_uuid FROM shop_players WHERE shop_id = (SELECT id FROM shops WHERE owner_uuid = ? AND shop_name = ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, ownerId.toString());
+            stmt.setString(2, shopName);
+            ResultSet rs = stmt.executeQuery();
+
+            List<UUID> players = new ArrayList<>();
+            while (rs.next()) {
+                players.add(UUID.fromString(rs.getString("player_uuid")));
+            }
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(players));
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Failed to get shop players: " + e.getMessage());
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(List.of()));
+        }
     }
 
     @Override
     public void addPlayerToShop(UUID ownerId, String shopName, UUID toAdd, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addPlayerToShop'");
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            if (shop.getAddedPlayers().contains(toAdd)) {
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+                return;
+            }
+            shop.addPlayer(toAdd);
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+            plugin.getLogger().info("Player added to shop in memory for owner: " + ownerId + ", shopName: " + shopName);
+            return;
+        }
+
+        String sql = "INSERT INTO shop_players (shop_id, player_uuid) VALUES ((SELECT id FROM shops WHERE owner_uuid = ? AND shop_name = ?), ?)";
+        Object[] params = new Object[] { ownerId.toString(), shopName, toAdd.toString() };
+
+        executeAsync(sql, params, success -> {
+            if (success) {
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+                plugin.getLogger().info("Player added to shop in database for owner: " + ownerId + ", shopName: " + shopName);
+                return;
+            }
+            plugin.getLogger().severe("Failed to add player to shop for owner: " + ownerId + ", shopName: " + shopName);
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
+        });
     }
 
     @Override
     public void removePlayerFromShop(UUID ownerId, String shopName, UUID toRemove, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'removePlayerFromShop'");
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            if (!shop.getAddedPlayers().contains(toRemove)) {
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+                return;
+            }
+            shop.removePlayer(toRemove);
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+            plugin.getLogger().info("Player removed from shop in memory for owner: " + ownerId + ", shopName: " + shopName);
+            return;
+        }
+
+        String sql = "DELETE FROM shop_players WHERE shop_id = (SELECT id FROM shops WHERE owner_uuid = ? AND shop_name = ?) AND player_uuid = ?";
+        Object[] params = new Object[] { ownerId.toString(), shopName, toRemove.toString() };
+
+        executeAsync(sql, params, success -> {
+            if (success) {
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+                plugin.getLogger().info("Player removed from shop in database for owner: " + ownerId + ", shopName: " + shopName);
+                return;
+            }
+            plugin.getLogger().severe("Failed to remove player from shop for owner: " + ownerId + ", shopName: " + shopName);
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
+        });
     }
 
     @Override
     public void updateSoldItems(UUID ownerId, String shopName, int soldItems, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateSoldItems'");
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            shop.setSoldItems(shop.getSoldItems() + soldItems);
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+            plugin.getLogger().info("Sold items updated in memory for owner: " + ownerId + ", shopName: " + shopName);
+            return;
+        }
+
+        String sql = "UPDATE shops SET sold_items = sold_items + ? WHERE owner_uuid = ? AND shop_name = ?";
+        Object[] params = new Object[] { soldItems, ownerId.toString(), shopName };
+
+        executeAsync(sql, params, success -> {
+            if (success) {
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+                plugin.getLogger().info("Sold items updated in database for owner: " + ownerId + ", shopName: " + shopName);
+                return;
+            }
+            plugin.getLogger().severe("Failed to update sold items for owner: " + ownerId + ", shopName: " + shopName);
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
+        });
     }
 
     @Override
     public void updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateMoneyEarned'");
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback cannot be null");
+        }
+
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            shop.setMoneyEarned(shop.getMoneyEarned() + moneyEarned);
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+            plugin.getLogger().info("Money earned updated in memory for owner: " + ownerId + ", shopName: " + shopName);
+            return;
+        }
+
+        String sql = "UPDATE shops SET money_earned = money_earned + ? WHERE owner_uuid = ? AND shop_name = ?";
+        Object[] params = new Object[] { moneyEarned, ownerId.toString(), shopName };
+
+        executeAsync(sql, params, success -> {
+            if (success) {
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+                plugin.getLogger().info("Money earned updated in database for owner: " + ownerId + ", shopName: " + shopName);
+                return;
+            }
+            plugin.getLogger().severe("Failed to update money earned for owner: " + ownerId + ", shopName: " + shopName);
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
+        });
     }
 
     @Override
@@ -293,47 +509,26 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
             try (ResultSet rs = selectStmt.executeQuery()) {
                 boolean exists = rs.next();
 
-                String sql;
-                Object[] params;
+                String sql = null;
+                Object[] params = null;
 
                 if (exists) {
                     sql = "UPDATE shops SET price = ?, material = ?, location = ?, world = ?, x = ?, y = ?, z = ?, created_at = ?, do_notify = ? " +
                             "WHERE owner_uuid = ? AND shop_name = ?";
-                    params = new Object[] {
-                            shop.getPrice(),
-                            shop.getMaterial() != null ? shop.getMaterial().name() : null,
-                            shop.getChestLocation().serialize().toString(),
-                            shop.getChestLocation().getWorld().getName(),
-                            shop.getChestLocation().getBlockX(),
-                            shop.getChestLocation().getBlockY(),
-                            shop.getChestLocation().getBlockZ(),
-                            shop.getCreatedAt(),
-                            shop.isNotify(),
-                            shop.getOwnerId().toString(),
-                            shop.getName()
+                    params = new Object[] { shop.getPrice(), shop.getMaterial() != null ? shop.getMaterial().name() : null, shop.getChestLocation().serialize().toString(),
+                            shop.getChestLocation().getWorld().getName(), shop.getChestLocation().getBlockX(), shop.getChestLocation().getBlockY(), shop.getChestLocation().getBlockZ(),
+                            shop.getCreatedAt(), shop.isNotify(), shop.getOwnerId().toString(), shop.getName()
                     };
                 } else {
                     sql = "INSERT INTO shops (owner_uuid, shop_name, price, material, location, world, x, y, z, created_at, do_notify) " +
                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                    params = new Object[] {
-                            shop.getOwnerId().toString(),
-                            shop.getName(),
-                            shop.getPrice(),
-                            shop.getMaterial() != null ? shop.getMaterial().name() : null,
-                            shop.getChestLocation().serialize().toString(),
-                            shop.getChestLocation().getWorld().getName(),
-                            shop.getChestLocation().getBlockX(),
-                            shop.getChestLocation().getBlockY(),
-                            shop.getChestLocation().getBlockZ(),
-                            shop.getCreatedAt(),
-                            shop.isNotify()
+                    params = new Object[] { shop.getOwnerId().toString(), shop.getName(), shop.getPrice(), shop.getMaterial() != null ? shop.getMaterial().name() : null,
+                            shop.getChestLocation().serialize().toString(), shop.getChestLocation().getWorld().getName(), shop.getChestLocation().getBlockX(), shop.getChestLocation().getBlockY(),
+                            shop.getChestLocation().getBlockZ(), shop.getCreatedAt(), shop.isNotify()
                     };
                 }
 
-                String finalSql = sql;
-                Object[] finalParams = params;
-
-                executeSync(finalSql, finalParams, success -> {
+                executeSync(sql, params, success -> {
                     if (!success) {
                         plugin.getLogger().severe("Failed to save shop: " + shop.getName() + " for owner: " + shop.getOwnerId());
                     }
@@ -377,7 +572,6 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                                 shop_name VARCHAR(255) NOT NULL,
                                 price DECIMAL(15,2) NOT NULL DEFAULT 0,
                                 material VARCHAR(255),
-                                location TEXT NOT NULL,
                                 world VARCHAR(100) NOT NULL,
                                 x INT NOT NULL,
                                 y INT NOT NULL,
@@ -428,6 +622,8 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
     }
 
     private void loadShopPlayers(Map<Integer, Shop> shops) throws SQLException {
+        if (shops.isEmpty())
+            return;
         String sql = "SELECT player_uuid, shop_id FROM shop_players where shop_id IN (" + String.join(",", shops.keySet().stream().map(String::valueOf).toList()) + ")";
         try (Statement playerStmt = connection.createStatement()) {
             ResultSet playerRs = playerStmt.executeQuery(sql);
