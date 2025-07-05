@@ -323,6 +323,13 @@ public class Shop {
         return itemCount;
     }
 
+    public void unload() {
+        if (hologram != null) {
+            hologram.removeHologram();
+        }
+        SHOPS.remove(this);
+    }
+
     public static List<Shop> getShops(Player owner) {
         return getShops(owner.getUniqueId());
     }
