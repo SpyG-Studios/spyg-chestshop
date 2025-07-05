@@ -67,6 +67,9 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                 connection = DriverManager.getConnection(url, username, password);
                 createTables();
                 plugin.getLogger().info("MySQL connection established: " + host + ":" + port + "/" + database);
+                Bukkit.getServer().getOnlinePlayers().forEach(player -> {
+                    loadPlayerShops(player.getUniqueId(), null);
+                });
                 scheduler.runTask(plugin, () -> callback.accept(true));
             } catch (Exception e) {
                 plugin.getLogger().severe("Failed to connect to MySQL database: " + host + ":" + port + "/" + database);
