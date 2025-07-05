@@ -548,14 +548,14 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                     };
                 } else {
                     sql = "INSERT INTO shops (owner_uuid, shop_name, price, material, world, x, y, z, created_at, do_notify) " +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     params = new Object[] { shop.getOwnerId().toString(), shop.getName(), shop.getPrice(), shop.getMaterial() != null ? shop.getMaterial().name() : null,
                             shop.getChestLocation().getWorld().getName(), shop.getChestLocation().getBlockX(), shop.getChestLocation().getBlockY(),
                             shop.getChestLocation().getBlockZ(), shop.getCreatedAt(), shop.isNotify()
                     };
                 }
 
-                executeSync(sql, params, success -> {
+                execute(sql, params, success -> {
                     if (!success) {
                         plugin.getLogger().severe("Failed to save shop: " + shop.getName() + " for owner: " + shop.getOwnerId());
                     }
