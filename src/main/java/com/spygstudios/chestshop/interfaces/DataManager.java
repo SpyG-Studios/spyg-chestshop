@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -13,43 +13,43 @@ import org.bukkit.Material;
 import com.spygstudios.chestshop.shop.Shop;
 
 public interface DataManager {
-    void initialize(Consumer<Boolean> callback);
+    CompletableFuture<Boolean> initialize();
 
-    void createShop(UUID ownerId, String shopName, Location location, Consumer<Shop> callback);
+    CompletableFuture<Shop> createShop(UUID ownerId, String shopName, Location location);
 
-    void loadPlayerShops(UUID ownerId, Consumer<List<Shop>> callback);
+    CompletableFuture<List<Shop>> loadPlayerShops(UUID ownerId);
 
-    void unloadPlayerShops(UUID ownerId, Consumer<Boolean> callback);
+    CompletableFuture<Boolean> unloadPlayerShops(UUID ownerId);
 
-    void getPlayerShops(UUID ownerId, Consumer<List<Shop>> callback);
+    CompletableFuture<List<Shop>> getPlayerShops(UUID ownerId);
 
-    void getShopsInChunk(Chunk chunk, Consumer<List<Shop>> callback);
+    CompletableFuture<List<Shop>> getShopsInChunk(Chunk chunk);
 
-    void getShop(UUID ownerId, String shopName, Consumer<Shop> callback);
+    CompletableFuture<Shop> getShop(UUID ownerId, String shopName);
 
-    void updateShopPrice(UUID ownerId, String shopName, double price, Consumer<Boolean> callback);
+    CompletableFuture<Boolean> updateShopPrice(UUID ownerId, String shopName, double price);
 
-    void updateShopMaterial(UUID ownerId, String shopName, Material material, Consumer<Boolean> callback);
+    CompletableFuture<Boolean> updateShopMaterial(UUID ownerId, String shopName, Material material);
 
-    void updateShopNotify(UUID ownerId, String shopName, boolean notify, Consumer<Boolean> callback);
+    CompletableFuture<Boolean> updateShopNotify(UUID ownerId, String shopName, boolean notify);
 
-    void updateShopStats(UUID ownerId, String shopName, int soldItems, double moneyEarned, Consumer<Boolean> callback);
+    CompletableFuture<Boolean> updateShopStats(UUID ownerId, String shopName, int soldItems, double moneyEarned);
 
-    void renameShop(UUID ownerId, String oldName, String newName, Consumer<Boolean> callback);
+    CompletableFuture<Boolean> renameShop(UUID ownerId, String oldName, String newName);
 
-    void deleteShop(UUID ownerId, String shopName, Consumer<Boolean> callback);
+    CompletableFuture<Boolean> deleteShop(UUID ownerId, String shopName);
 
-    void getShopPlayers(UUID ownerId, String shopName, Consumer<List<UUID>> callback);
+    CompletableFuture<List<UUID>> getShopPlayers(UUID ownerId, String shopName);
 
-    void addPlayerToShop(UUID ownerId, String shopName, UUID toAdd, Consumer<Boolean> callback);
+    CompletableFuture<Boolean> addPlayerToShop(UUID ownerId, String shopName, UUID toAdd);
 
-    void removePlayerFromShop(UUID ownerId, String shopName, UUID toRemove, Consumer<Boolean> callback);
+    CompletableFuture<Boolean> removePlayerFromShop(UUID ownerId, String shopName, UUID toRemove);
 
-    void updateSoldItems(UUID ownerId, String shopName, int soldItems, Consumer<Boolean> callback);
+    CompletableFuture<Boolean> updateSoldItems(UUID ownerId, String shopName, int soldItems);
 
-    void updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned, Consumer<Boolean> callback);
+    CompletableFuture<Boolean> updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned);
 
-    void saveShop(Shop shop, Consumer<Boolean> callback);
+    CompletableFuture<Boolean> saveShop(Shop shop);
 
     void startSaveScheduler();
 

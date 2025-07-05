@@ -3,7 +3,7 @@ package com.spygstudios.chestshop.shop.yaml;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -27,7 +27,7 @@ public class YamlStorage implements DataManager {
         this.plugin = plugin;
         databaseType = DatabaseType.YAML;
 
-        initialize(success -> {
+        initialize().thenAccept(success -> {
             if (success) {
                 plugin.getLogger().info("YamlStorage initialized successfully.");
             } else {
@@ -37,197 +37,172 @@ public class YamlStorage implements DataManager {
     }
 
     @Override
-    public void createShop(UUID ownerId, String shopName, Location location, Consumer<Shop> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        String createdAt = plugin.getDataManager().getDateString();
-        Shop shop = new Shop(ownerId, shopName, location, createdAt);
-        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
-        shopFile.addShop(shop);
-        callback.accept(shop);
+    public CompletableFuture<Shop> createShop(UUID ownerId, String shopName, Location location) {
+        return CompletableFuture.supplyAsync(() -> {
+            String createdAt = plugin.getDataManager().getDateString();
+            Shop shop = new Shop(ownerId, shopName, location, createdAt);
+            YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+            shopFile.addShop(shop);
+            return shop;
+        });
     }
 
     @Override
-    public void getPlayerShops(UUID ownerId, Consumer<List<Shop>> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        List<Shop> shops = Shop.getShops(ownerId);
-        callback.accept(shops);
+    public CompletableFuture<List<Shop>> getPlayerShops(UUID ownerId) {
+        return CompletableFuture.supplyAsync(() -> Shop.getShops(ownerId));
     }
 
     @Override
-    public void getShopsInChunk(Chunk chunk, Consumer<List<Shop>> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        List<Shop> shops = new ArrayList<>();
-        for (Shop shop : Shop.getShops()) {
-            if (shop.getChestLocation().getWorld() != null && shop.getChestLocation().getWorld().equals(chunk.getWorld())) {
-                if (shop.getChestLocation().getChunk().equals(chunk)) {
-                    shops.add(shop);
+    public CompletableFuture<List<Shop>> getShopsInChunk(Chunk chunk) {
+        return CompletableFuture.supplyAsync(() -> {
+            List<Shop> shops = new ArrayList<>();
+            for (Shop shop : Shop.getShops()) {
+                if (shop.getChestLocation().getWorld() != null && shop.getChestLocation().getWorld().equals(chunk.getWorld())) {
+                    if (shop.getChestLocation().getChunk().equals(chunk)) {
+                        shops.add(shop);
+                    }
                 }
             }
-        }
-        callback.accept(shops);
+            return shops;
+        });
     }
 
     @Override
-    public void getShop(UUID ownerId, String shopName, Consumer<Shop> callback) {
-        Shop shop = Shop.getShop(ownerId, shopName);
-        if (shop != null) {
-            callback.accept(shop);
-        } else {
-            callback.accept(YamlShopFile.loadShop(plugin, shopName, null, shopName));
-        }
+    public CompletableFuture<Shop> getShop(UUID ownerId, String shopName) {
+        return CompletableFuture.supplyAsync(() -> {
+            Shop shop = Shop.getShop(ownerId, shopName);
+            if (shop != null) {
+                return shop;
+            } else {
+                return YamlShopFile.loadShop(plugin, shopName, null, shopName);
+            }
+        });
     }
 
     @Override
-    public void updateShopPrice(UUID ownerId, String shopName, double price, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
-        shopFile.setPrice(shopName, price);
-        callback.accept(true);
+    public CompletableFuture<Boolean> updateShopPrice(UUID ownerId, String shopName, double price) {
+        return CompletableFuture.supplyAsync(() -> {
+            YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+            shopFile.setPrice(shopName, price);
+            return true;
+        });
     }
 
     @Override
-    public void updateShopMaterial(UUID ownerId, String shopName, Material material, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
-        shopFile.setMaterial(shopName, material);
-        callback.accept(true);
+    public CompletableFuture<Boolean> updateShopMaterial(UUID ownerId, String shopName, Material material) {
+        return CompletableFuture.supplyAsync(() -> {
+            YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+            shopFile.setMaterial(shopName, material);
+            return true;
+        });
     }
 
     @Override
-    public void updateShopNotify(UUID ownerId, String shopName, boolean notify, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
-        shopFile.overwriteSet("shops." + shopName + ".do-notify", notify);
-        shopFile.markUnsaved();
-        callback.accept(true);
+    public CompletableFuture<Boolean> updateShopNotify(UUID ownerId, String shopName, boolean notify) {
+        return CompletableFuture.supplyAsync(() -> {
+            YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+            shopFile.overwriteSet("shops." + shopName + ".do-notify", notify);
+            shopFile.markUnsaved();
+            return true;
+        });
     }
 
     @Override
-    public void updateSoldItems(UUID ownerId, String shopName, int soldItems, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
-        String shopPath = "shops." + shopName;
-        shopFile.overwriteSet(shopPath + ".sold-items", shopFile.getInt(shopPath + ".sold-items") + soldItems);
-        shopFile.markUnsaved();
-        callback.accept(true);
+    public CompletableFuture<Boolean> updateSoldItems(UUID ownerId, String shopName, int soldItems) {
+        return CompletableFuture.supplyAsync(() -> {
+            YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+            String shopPath = "shops." + shopName;
+            shopFile.overwriteSet(shopPath + ".sold-items", shopFile.getInt(shopPath + ".sold-items") + soldItems);
+            shopFile.markUnsaved();
+            return true;
+        });
     }
 
     @Override
-    public void updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
-        String shopPath = "shops." + shopName;
-        shopFile.overwriteSet(shopPath + ".money-earned", shopFile.getDouble(shopPath + ".money-earned") + moneyEarned);
-        shopFile.markUnsaved();
-        callback.accept(true);
+    public CompletableFuture<Boolean> updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned) {
+        return CompletableFuture.supplyAsync(() -> {
+            YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+            String shopPath = "shops." + shopName;
+            shopFile.overwriteSet(shopPath + ".money-earned", shopFile.getDouble(shopPath + ".money-earned") + moneyEarned);
+            shopFile.markUnsaved();
+            return true;
+        });
     }
 
     @Override
-    public void updateShopStats(UUID ownerId, String shopName, int soldItems, double moneyEarned, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        updateMoneyEarned(ownerId, shopName, moneyEarned, callback);
-        updateSoldItems(ownerId, shopName, soldItems, callback);
-        callback.accept(true);
+    public CompletableFuture<Boolean> updateShopStats(UUID ownerId, String shopName, int soldItems, double moneyEarned) {
+        return updateMoneyEarned(ownerId, shopName, moneyEarned)
+                .thenCompose(result1 -> updateSoldItems(ownerId, shopName, soldItems))
+                .thenApply(result2 -> true);
     }
 
     @Override
-    public void renameShop(UUID ownerId, String oldName, String newName, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
-        shopFile.renameShop(oldName, newName);
-        callback.accept(true);
+    public CompletableFuture<Boolean> renameShop(UUID ownerId, String oldName, String newName) {
+        return CompletableFuture.supplyAsync(() -> {
+            YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+            shopFile.renameShop(oldName, newName);
+            return true;
+        });
     }
 
     @Override
-    public void deleteShop(UUID ownerId, String shopName, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        YamlShopFile.getShopFile(ownerId).removeShop(shopName);
-        callback.accept(true);
+    public CompletableFuture<Boolean> deleteShop(UUID ownerId, String shopName) {
+        return CompletableFuture.supplyAsync(() -> {
+            YamlShopFile.getShopFile(ownerId).removeShop(shopName);
+            return true;
+        });
     }
 
     @Override
-    public void getShopPlayers(UUID ownerId, String shopName, Consumer<List<UUID>> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-
-        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
-        List<UUID> players = shopFile.getAddedUuids(shopName);
-        if (players != null) {
-            callback.accept(players);
-        } else {
-            callback.accept(List.of());
-            Bukkit.getLogger().warning("No players found for shop: " + shopName);
-        }
+    public CompletableFuture<List<UUID>> getShopPlayers(UUID ownerId, String shopName) {
+        return CompletableFuture.supplyAsync(() -> {
+            YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+            List<UUID> players = shopFile.getAddedUuids(shopName);
+            if (players != null) {
+                return players;
+            } else {
+                Bukkit.getLogger().warning("No players found for shop: " + shopName);
+                return List.of();
+            }
+        });
     }
 
     @Override
-    public void addPlayerToShop(UUID ownerId, String shopName, UUID toAdd, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-
-        getShop(ownerId, shopName, shop -> {
+    public CompletableFuture<Boolean> addPlayerToShop(UUID ownerId, String shopName, UUID toAdd) {
+        return getShop(ownerId, shopName).thenApply(shop -> {
             if (shop == null) {
-                callback.accept(false);
                 Bukkit.getLogger().warning("Shop not found with while adding player. Shopname: " + shopName);
-                return;
+                return false;
             }
 
             YamlShopFile shopFile = YamlShopFile.getShopFile(shop.getOwnerId());
             shopFile.addPlayer(toAdd, shop.getName());
-            callback.accept(true);
+            return true;
         });
     }
 
     @Override
-    public void removePlayerFromShop(UUID ownerId, String shopName, UUID toRemove, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        getShop(ownerId, shopName, shop -> {
+    public CompletableFuture<Boolean> removePlayerFromShop(UUID ownerId, String shopName, UUID toRemove) {
+        return getShop(ownerId, shopName).thenApply(shop -> {
             if (shop == null) {
-                callback.accept(false);
                 Bukkit.getLogger().warning("Shop not found for owner: " + ownerId + ", shop name: " + shopName);
-                return;
+                return false;
             }
 
             YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
             shopFile.removePlayer(toRemove, shopName);
-            callback.accept(true);
+            return true;
         });
     }
 
     @Override
-    public void initialize(Consumer<Boolean> callback) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+    public CompletableFuture<Boolean> initialize() {
+        return CompletableFuture.supplyAsync(() -> {
             try {
                 YamlShopFile.loadShopFiles(plugin);
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+                return true;
             } catch (Exception e) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
+                return false;
             }
         });
     }
@@ -237,18 +212,16 @@ public class YamlStorage implements DataManager {
     }
 
     @Override
-    public void saveShop(Shop shop, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        YamlShopFile shopFile = YamlShopFile.getShopFile(shop.getOwnerId());
-        if (shopFile == null) {
-            callback.accept(false);
-            return;
-        }
+    public CompletableFuture<Boolean> saveShop(Shop shop) {
+        return CompletableFuture.supplyAsync(() -> {
+            YamlShopFile shopFile = YamlShopFile.getShopFile(shop.getOwnerId());
+            if (shopFile == null) {
+                return false;
+            }
 
-        YamlShopFile.saveShopFile(shopFile);
-        callback.accept(true);
+            YamlShopFile.saveShopFile(shopFile);
+            return true;
+        });
     }
 
     @Override
@@ -260,15 +233,17 @@ public class YamlStorage implements DataManager {
     }
 
     @Override
-    public void loadPlayerShops(UUID ownerId, Consumer<List<Shop>> callback) {
+    public CompletableFuture<List<Shop>> loadPlayerShops(UUID ownerId) {
         // This method is not used in YamlStorage, as shops are loaded on
         // initialization.
+        return CompletableFuture.completedFuture(List.of());
     }
 
     @Override
-    public void unloadPlayerShops(UUID ownerId, Consumer<Boolean> callback) {
+    public CompletableFuture<Boolean> unloadPlayerShops(UUID ownerId) {
         // This method is not used in YamlStorage, as shops are loaded on
         // initialization.
+        return CompletableFuture.completedFuture(true);
     }
 
 }

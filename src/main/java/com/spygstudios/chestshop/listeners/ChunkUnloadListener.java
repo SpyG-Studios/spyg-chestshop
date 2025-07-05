@@ -21,7 +21,7 @@ public class ChunkUnloadListener implements Listener {
     public void onChunkUnload(ChunkUnloadEvent event) {
         plugin.getLogger().info(Shop.getShops().size() + " shops in total");
         DataManager dManager = plugin.getDataManager();
-        dManager.getShopsInChunk(event.getChunk(), shops -> {
+        dManager.getShopsInChunk(event.getChunk()).thenAccept(shops -> {
             for (Shop shop : shops) {
                 shop.unload();
             }
@@ -33,7 +33,7 @@ public class ChunkUnloadListener implements Listener {
             // shop.getChestLocation().isChunkLoaded()) {
             // continue;
             // }
-            // dManager.saveShop(shop, success -> {
+            // dManager.saveShop(shop).thenAccept(success -> {
             // if (success) {
             // shop.setSaved(true);
             // }

@@ -90,7 +90,7 @@ public class Create {
         }
 
         DataManager shopData = plugin.getDataManager();
-        shopData.createShop(player.getUniqueId(), name, targetBlock.getLocation(), shop -> {
+        shopData.createShop(player.getUniqueId(), name, targetBlock.getLocation()).thenAccept(shop -> {
             if (shop == null) {
                 plugin.getLogger().warning("Failed to create shop for " + player.getName() + " at " + targetBlock.getLocation());
                 return;

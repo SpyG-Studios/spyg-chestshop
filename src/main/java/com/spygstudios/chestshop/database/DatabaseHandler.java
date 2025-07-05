@@ -3,10 +3,7 @@ package com.spygstudios.chestshop.database;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.function.Consumer;
-import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
+import java.util.concurrent.CompletableFuture;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.enums.DatabaseType;
@@ -23,36 +20,9 @@ public abstract class DatabaseHandler {
         this.connection = null;
     }
 
-    public abstract void initialize(Consumer<Boolean> callback);
+    public abstract CompletableFuture<Boolean> initialize();
 
     public abstract void createTables() throws SQLException;
-
-    public void executeAsync(String sql, Object[] params, Consumer<Boolean> callback) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            execute(sql, params, success -> {
-                if (callback != null) {
-                    Bukkit.getScheduler().runTask(plugin, () -> callback.accept(success));
-                }
-            });
-        });
-    }
-
-    public void execute(String sql, Object[] params, Consumer<Boolean> callback) {
-        try (PreparedStatement stmt = prepareStatement(sql)) {
-            for (int i = 0; i < params.length; i++) {
-                stmt.setObject(i + 1, params[i]);
-            }
-            stmt.executeUpdate();
-            if (callback != null) {
-                callback.accept(true);
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, "Error during executing SQL: " + sql, e);
-            if (callback != null) {
-                callback.accept(false);
-            }
-        }
-    }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {
         return connection.prepareStatement(sql);

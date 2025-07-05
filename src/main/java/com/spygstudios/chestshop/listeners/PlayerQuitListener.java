@@ -18,7 +18,7 @@ public class PlayerQuitListener implements Listener {
     @EventHandler
     public void onQuit(org.bukkit.event.player.PlayerQuitEvent event) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            plugin.getDataManager().unloadPlayerShops(event.getPlayer().getUniqueId(), success -> {
+            plugin.getDataManager().unloadPlayerShops(event.getPlayer().getUniqueId()).thenAccept(success -> {
                 if (success) {
                     plugin.getLogger().info("Successful unload check for player: " + event.getPlayer().getName());
                 }

@@ -12,14 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.database.DatabaseHandler;
@@ -47,20 +46,17 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
         this.database = database;
         this.username = username;
         this.password = password;
-
-        initialize(success -> {
-            if (success) {
-                plugin.getLogger().info("MySQL initialized successfully.");
-            } else {
-                plugin.getLogger().severe("Failed to initialize MySQL.");
-            }
-        });
+        initialize();
     }
 
     @Override
-    public void initialize(Consumer<Boolean> callback) {
-        BukkitScheduler scheduler = Bukkit.getScheduler();
-        scheduler.runTaskAsynchronously(plugin, () -> {
+    public CompletableFuture<Boolean> initialize() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            plugin.getLogger().severe("MySQL driver not found: " + e.getMessage());
+        }
+        return CompletableFuture.supplyAsync(() -> {
             try {
                 String url = String.format("jdbc:mysql://%s:%d/%s?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8",
                         host, port, database);
@@ -68,42 +64,38 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                 createTables();
                 plugin.getLogger().info("MySQL connection established: " + host + ":" + port + "/" + database);
                 Bukkit.getServer().getOnlinePlayers().forEach(player -> {
-                    loadPlayerShops(player.getUniqueId(), null);
+                    loadPlayerShops(player.getUniqueId());
                 });
-                scheduler.runTask(plugin, () -> callback.accept(true));
+                return true;
             } catch (Exception e) {
+                e.printStackTrace();
                 plugin.getLogger().severe("Failed to connect to MySQL database: " + host + ":" + port + "/" + database);
-                scheduler.runTask(plugin, () -> callback.accept(false));
+                return false;
             }
         });
     }
 
     @Override
-    public void createShop(UUID ownerId, String shopName, Location location, Consumer<Shop> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-
-        String createdAt = plugin.getDataManager().getDateString();
-        Shop shop = new Shop(ownerId, shopName, location, createdAt);
-        shop.setSaved(false);
-        callback.accept(shop);
+    public CompletableFuture<Shop> createShop(UUID ownerId, String shopName, Location location) {
+        return CompletableFuture.supplyAsync(() -> {
+            String createdAt = plugin.getDataManager().getDateString();
+            Shop shop = new Shop(ownerId, shopName, location, createdAt);
+            shop.setSaved(false);
+            return shop;
+        });
     }
 
     @Override
-    public void getPlayerShops(UUID ownerId, Consumer<List<Shop>> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        OfflinePlayer player = Bukkit.getOfflinePlayer(ownerId);
-        if (player != null && player.isOnline()) {
-            List<Shop> playerShops = Shop.getShops().stream()
-                    .filter(shop -> shop.getOwnerId().equals(ownerId))
-                    .toList();
-            callback.accept(playerShops);
-            return;
-        }
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+    public CompletableFuture<List<Shop>> getPlayerShops(UUID ownerId) {
+        return CompletableFuture.supplyAsync(() -> {
+            OfflinePlayer player = Bukkit.getOfflinePlayer(ownerId);
+            if (player != null && player.isOnline()) {
+                List<Shop> playerShops = Shop.getShops().stream()
+                        .filter(shop -> shop.getOwnerId().equals(ownerId))
+                        .toList();
+                return playerShops;
+            }
+
             String sql = "SELECT * FROM shops WHERE owner_uuid = ?";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 stmt.setString(1, ownerId.toString());
@@ -116,17 +108,16 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                 }
                 loadShopPlayers(shops);
 
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(new ArrayList<>(shops.values())));
+                return new ArrayList<>(shops.values());
             } catch (SQLException e) {
                 plugin.getLogger().severe("Failed to get player shops: " + e.getMessage());
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(List.of()));
+                return List.of();
             }
         });
-
     }
 
-    public void loadPlayerShops(UUID ownerId, Consumer<List<Shop>> callback) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+    public CompletableFuture<List<Shop>> loadPlayerShops(UUID ownerId) {
+        return CompletableFuture.supplyAsync(() -> {
             String sql = "SELECT * FROM shops WHERE owner_uuid = ?";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 stmt.setString(1, ownerId.toString());
@@ -139,28 +130,21 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                 }
                 loadShopPlayers(shops);
 
-                if (callback != null) {
-                    Bukkit.getScheduler().runTask(plugin, () -> callback.accept(new ArrayList<>(shops.values())));
-                }
+                return new ArrayList<>(shops.values());
             } catch (SQLException e) {
                 plugin.getLogger().severe("Failed to load player shops: " + e.getMessage());
-                if (callback != null) {
-                    Bukkit.getScheduler().runTask(plugin, () -> callback.accept(List.of()));
-                }
+                return List.of();
             }
         });
     }
 
     @Override
-    public void getShopsInChunk(Chunk chunk, Consumer<List<Shop>> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
+    public CompletableFuture<List<Shop>> getShopsInChunk(Chunk chunk) {
         if (!chunk.isLoaded()) {
-            throw new IllegalArgumentException("Chunk must be loaded to get shops");
+            return CompletableFuture.failedFuture(new IllegalArgumentException("Chunk must be loaded to get shops"));
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        return CompletableFuture.supplyAsync(() -> {
             String sql = "SELECT * FROM shops WHERE world = ? AND x >= ? AND x < ? AND z >= ? AND z < ?";
 
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -178,25 +162,21 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                 }
                 loadShopPlayers(shops);
 
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(new ArrayList<>(shops.values())));
+                return new ArrayList<>(shops.values());
 
             } catch (SQLException e) {
                 plugin.getLogger().severe("Failed to get shops in chunk: " + e.getMessage());
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(List.of()));
+                return List.of();
             }
         });
     }
 
     @Override
-    public void getShop(UUID ownerId, String shopName, Consumer<Shop> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+    public CompletableFuture<Shop> getShop(UUID ownerId, String shopName) {
+        return CompletableFuture.supplyAsync(() -> {
             Shop existingShop = Shop.getShop(ownerId, shopName);
             if (existingShop != null) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(existingShop));
-                return;
+                return existingShop;
             }
             String sql = "SELECT * FROM shops WHERE owner_uuid = ? AND shop_name = ?";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -205,371 +185,395 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                 ResultSet rs = stmt.executeQuery();
 
                 if (!rs.next()) {
-                    Bukkit.getScheduler().runTask(plugin, () -> callback.accept(null));
-                    return;
+                    return null;
                 }
 
                 Entry<Integer, Shop> shopEntry = loadShopMapFromResult(rs);
                 loadShopPlayers(shopEntry);
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(shopEntry.getValue()));
+                return shopEntry.getValue();
             } catch (SQLException e) {
                 plugin.getLogger().severe("Failed to get shop: " + e.getMessage());
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(null));
+                return null;
             }
         });
     }
 
     @Override
-    public void updateShopPrice(UUID ownerId, String shopName, double price, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-
+    public CompletableFuture<Boolean> updateShopPrice(UUID ownerId, String shopName, double price) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
             plugin.getLogger().info("Shop price updated in memory for owner: " + ownerId + ", shopName: " + shopName);
-            return;
+            return CompletableFuture.completedFuture(true);
         }
-        String sql = "UPDATE shops SET price = ? WHERE owner_uuid = ? AND shop_name = ?";
-        Object[] params = new Object[] { price, ownerId.toString(), shopName };
 
-        executeAsync(sql, params, success -> {
-            if (success) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
-                plugin.getLogger().info("Shop price updated in database for owner: " + ownerId + ", shopName: " + shopName);
-                return;
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "UPDATE shops SET price = ? WHERE owner_uuid = ? AND shop_name = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setDouble(1, price);
+                stmt.setString(2, ownerId.toString());
+                stmt.setString(3, shopName);
+                int rowsAffected = stmt.executeUpdate();
+                boolean success = rowsAffected > 0;
+                if (success) {
+                    plugin.getLogger().info("Shop price updated in database for owner: " + ownerId + ", shopName: " + shopName);
+                } else {
+                    plugin.getLogger().severe("Failed to update shop price for owner: " + ownerId + ", shopName: " + shopName);
+                }
+                return success;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to update shop price: " + e.getMessage());
+                return false;
             }
-            plugin.getLogger().severe("Failed to update shop price for owner: " + ownerId + ", shopName: " + shopName);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
         });
     }
 
     @Override
-    public void updateShopMaterial(UUID ownerId, String shopName, Material material, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-
+    public CompletableFuture<Boolean> updateShopMaterial(UUID ownerId, String shopName, Material material) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
-            plugin.getLogger().info("Shop price updated in memory for owner: " + ownerId + ", shopName: " + shopName);
-            return;
+            plugin.getLogger().info("Shop material updated in memory for owner: " + ownerId + ", shopName: " + shopName);
+            return CompletableFuture.completedFuture(true);
         }
-        String sql = "UPDATE shops SET material = ? WHERE owner_uuid = ? AND shop_name = ?";
-        Object[] params = new Object[] { material != null ? material.name() : null, ownerId.toString(), shopName };
 
-        executeAsync(sql, params, success -> {
-            if (success) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
-                plugin.getLogger().info("Shop material updated in database for owner: " + ownerId + ", shopName: " + shopName);
-                return;
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "UPDATE shops SET material = ? WHERE owner_uuid = ? AND shop_name = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, material != null ? material.name() : null);
+                stmt.setString(2, ownerId.toString());
+                stmt.setString(3, shopName);
+                int rowsAffected = stmt.executeUpdate();
+                boolean success = rowsAffected > 0;
+                if (success) {
+                    plugin.getLogger().info("Shop material updated in database for owner: " + ownerId + ", shopName: " + shopName);
+                } else {
+                    plugin.getLogger().severe("Failed to update shop material for owner: " + ownerId + ", shopName: " + shopName);
+                }
+                return success;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to update shop material: " + e.getMessage());
+                return false;
             }
-            plugin.getLogger().severe("Failed to update shop material for owner: " + ownerId + ", shopName: " + shopName);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
         });
     }
 
     @Override
-    public void updateShopNotify(UUID ownerId, String shopName, boolean notify, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-
+    public CompletableFuture<Boolean> updateShopNotify(UUID ownerId, String shopName, boolean notify) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
             plugin.getLogger().info("Shop notify updated in memory for owner: " + ownerId + ", shopName: " + shopName);
-            return;
+            return CompletableFuture.completedFuture(true);
         }
-        String sql = "UPDATE shops SET do_notify = ? WHERE owner_uuid = ? AND shop_name = ?";
-        Object[] params = new Object[] { true, ownerId.toString(), shopName };
 
-        executeAsync(sql, params, success -> {
-            if (success) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
-                plugin.getLogger().info("Shop notify updated in database for owner: " + ownerId + ", shopName: " + shopName);
-                return;
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "UPDATE shops SET do_notify = ? WHERE owner_uuid = ? AND shop_name = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setBoolean(1, notify);
+                stmt.setString(2, ownerId.toString());
+                stmt.setString(3, shopName);
+                int rowsAffected = stmt.executeUpdate();
+                boolean success = rowsAffected > 0;
+                if (success) {
+                    plugin.getLogger().info("Shop notify updated in database for owner: " + ownerId + ", shopName: " + shopName);
+                } else {
+                    plugin.getLogger().severe("Failed to update shop notify for owner: " + ownerId + ", shopName: " + shopName);
+                }
+                return success;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to update shop notify: " + e.getMessage());
+                return false;
             }
-            plugin.getLogger().severe("Failed to update shop notify for owner: " + ownerId + ", shopName: " + shopName);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
         });
     }
 
     @Override
-    public void updateShopStats(UUID ownerId, String shopName, int soldItems, double moneyEarned, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-
+    public CompletableFuture<Boolean> updateShopStats(UUID ownerId, String shopName, int soldItems, double moneyEarned) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
             plugin.getLogger().info("Shop stats updated in memory for owner: " + ownerId + ", shopName: " + shopName);
-            return;
+            return CompletableFuture.completedFuture(true);
         }
-        String sql = "UPDATE shops SET sold_items = ?, money_earned = ? WHERE owner_uuid = ? AND shop_name = ?";
-        Object[] params = new Object[] { soldItems, moneyEarned, ownerId.toString(), shopName };
 
-        executeAsync(sql, params, success -> {
-            if (success) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
-                plugin.getLogger().info("Shop stats updated in database for owner: " + ownerId + ", shopName: " + shopName);
-                return;
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "UPDATE shops SET sold_items = ?, money_earned = ? WHERE owner_uuid = ? AND shop_name = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setInt(1, soldItems);
+                stmt.setDouble(2, moneyEarned);
+                stmt.setString(3, ownerId.toString());
+                stmt.setString(4, shopName);
+                int rowsAffected = stmt.executeUpdate();
+                boolean success = rowsAffected > 0;
+                if (success) {
+                    plugin.getLogger().info("Shop stats updated in database for owner: " + ownerId + ", shopName: " + shopName);
+                } else {
+                    plugin.getLogger().severe("Failed to update shop stats for owner: " + ownerId + ", shopName: " + shopName);
+                }
+                return success;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to update shop stats: " + e.getMessage());
+                return false;
             }
-            plugin.getLogger().severe("Failed to update shop stats for owner: " + ownerId + ", shopName: " + shopName);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
-
         });
     }
 
     @Override
-    public void renameShop(UUID ownerId, String oldName, String newName, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-
+    public CompletableFuture<Boolean> renameShop(UUID ownerId, String oldName, String newName) {
         Shop shop = Shop.getShop(ownerId, oldName);
         if (shop != null) {
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
             plugin.getLogger().info("Shop name updated in memory for owner: " + ownerId + ", oldName: " + oldName + ", newName: " + newName);
-            return;
+            return CompletableFuture.completedFuture(true);
         }
-        String sql = "UPDATE shops SET shop_name = ? WHERE owner_uuid = ? AND shop_name = ?";
-        Object[] params = new Object[] { newName, ownerId.toString(), oldName };
 
-        executeAsync(sql, params, success -> {
-            if (success) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
-                plugin.getLogger().info("Shop name updated in database for owner: " + ownerId + ", oldName: " + oldName + ", newName: " + newName);
-                return;
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "UPDATE shops SET shop_name = ? WHERE owner_uuid = ? AND shop_name = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, newName);
+                stmt.setString(2, ownerId.toString());
+                stmt.setString(3, oldName);
+                int rowsAffected = stmt.executeUpdate();
+                boolean success = rowsAffected > 0;
+                if (success) {
+                    plugin.getLogger().info("Shop name updated in database for owner: " + ownerId + ", oldName: " + oldName + ", newName: " + newName);
+                } else {
+                    plugin.getLogger().severe("Failed to update shop name for owner: " + ownerId + ", oldName: " + oldName + ", newName: " + newName);
+                }
+                return success;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to rename shop: " + e.getMessage());
+                return false;
             }
-            plugin.getLogger().severe("Failed to update shop stats for owner: " + ownerId + ", oldName: " + oldName + ", newName: " + newName);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
         });
     }
 
     @Override
-    public void deleteShop(UUID ownerId, String shopName, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-
-        Shop shop = Shop.getShop(ownerId, shopName);
-        if (shop != null) {
-            callback.accept(true);
-            plugin.getLogger().info("Shop deleted in memory for owner: " + ownerId + ", shopName: " + shopName);
-            return;
-        }
-        String sql = "DELETE FROM shops WHERE owner_uuid = ? AND shop_name = ?";
-        Object[] params = new Object[] { ownerId.toString(), shopName };
-
-        executeAsync(sql, params, success -> {
-            if (success) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
-                plugin.getLogger().info("Shop deleted from database for owner: " + ownerId + ", shopName: " + shopName);
-                return;
+    public CompletableFuture<Boolean> deleteShop(UUID ownerId, String shopName) {
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "DELETE FROM shops WHERE owner_uuid = ? AND shop_name = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, ownerId.toString());
+                stmt.setString(2, shopName);
+                int rowsAffected = stmt.executeUpdate();
+                boolean success = rowsAffected > 0;
+                if (success) {
+                    plugin.getLogger().info("Shop deleted from database for owner: " + ownerId + ", shopName: " + shopName);
+                } else {
+                    plugin.getLogger().severe("Failed to delete shop for owner: " + ownerId + ", shopName: " + shopName);
+                }
+                return success;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to delete shop: " + e.getMessage());
+                return false;
             }
-            plugin.getLogger().severe("Failed to delete shop for owner: " + ownerId + ", shopName: " + shopName);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
         });
     }
 
     @Override
-    public void getShopPlayers(UUID ownerId, String shopName, Consumer<List<UUID>> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-
+    public CompletableFuture<List<UUID>> getShopPlayers(UUID ownerId, String shopName) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(shop.getAddedPlayers()));
-            return;
+            return CompletableFuture.completedFuture(shop.getAddedPlayers());
         }
 
-        String sql = "SELECT player_uuid FROM shop_players WHERE shop_id = (SELECT id FROM shops WHERE owner_uuid = ? AND shop_name = ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, ownerId.toString());
-            stmt.setString(2, shopName);
-            ResultSet rs = stmt.executeQuery();
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "SELECT player_uuid FROM shop_players WHERE shop_id = (SELECT id FROM shops WHERE owner_uuid = ? AND shop_name = ?)";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, ownerId.toString());
+                stmt.setString(2, shopName);
+                ResultSet rs = stmt.executeQuery();
 
-            List<UUID> players = new ArrayList<>();
-            while (rs.next()) {
-                players.add(UUID.fromString(rs.getString("player_uuid")));
+                List<UUID> players = new ArrayList<>();
+                while (rs.next()) {
+                    players.add(UUID.fromString(rs.getString("player_uuid")));
+                }
+                return players;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to get shop players: " + e.getMessage());
+                return List.of();
             }
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(players));
-        } catch (SQLException e) {
-            plugin.getLogger().severe("Failed to get shop players: " + e.getMessage());
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(List.of()));
-        }
+        });
     }
 
     @Override
-    public void addPlayerToShop(UUID ownerId, String shopName, UUID toAdd, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-
+    public CompletableFuture<Boolean> addPlayerToShop(UUID ownerId, String shopName, UUID toAdd) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
             if (shop.getAddedPlayers().contains(toAdd)) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
-                return;
+                return CompletableFuture.completedFuture(true);
             }
             shop.addPlayer(toAdd);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
             plugin.getLogger().info("Player added to shop in memory for owner: " + ownerId + ", shopName: " + shopName);
-            return;
+            return CompletableFuture.completedFuture(true);
         }
 
-        String sql = "INSERT INTO shop_players (shop_id, player_uuid) VALUES ((SELECT id FROM shops WHERE owner_uuid = ? AND shop_name = ?), ?)";
-        Object[] params = new Object[] { ownerId.toString(), shopName, toAdd.toString() };
-
-        executeAsync(sql, params, success -> {
-            if (success) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
-                plugin.getLogger().info("Player added to shop in database for owner: " + ownerId + ", shopName: " + shopName);
-                return;
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "INSERT INTO shop_players (shop_id, player_uuid) VALUES ((SELECT id FROM shops WHERE owner_uuid = ? AND shop_name = ?), ?)";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, ownerId.toString());
+                stmt.setString(2, shopName);
+                stmt.setString(3, toAdd.toString());
+                int rowsAffected = stmt.executeUpdate();
+                boolean success = rowsAffected > 0;
+                if (success) {
+                    plugin.getLogger().info("Player added to shop in database for owner: " + ownerId + ", shopName: " + shopName);
+                } else {
+                    plugin.getLogger().severe("Failed to add player to shop for owner: " + ownerId + ", shopName: " + shopName);
+                }
+                return success;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to add player to shop: " + e.getMessage());
+                return false;
             }
-            plugin.getLogger().severe("Failed to add player to shop for owner: " + ownerId + ", shopName: " + shopName);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
         });
     }
 
     @Override
-    public void removePlayerFromShop(UUID ownerId, String shopName, UUID toRemove, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-
+    public CompletableFuture<Boolean> removePlayerFromShop(UUID ownerId, String shopName, UUID toRemove) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
             if (!shop.getAddedPlayers().contains(toRemove)) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
-                return;
+                return CompletableFuture.completedFuture(true);
             }
             shop.removePlayer(toRemove);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
             plugin.getLogger().info("Player removed from shop in memory for owner: " + ownerId + ", shopName: " + shopName);
-            return;
+            return CompletableFuture.completedFuture(true);
         }
 
-        String sql = "DELETE FROM shop_players WHERE shop_id = (SELECT id FROM shops WHERE owner_uuid = ? AND shop_name = ?) AND player_uuid = ?";
-        Object[] params = new Object[] { ownerId.toString(), shopName, toRemove.toString() };
-
-        executeAsync(sql, params, success -> {
-            if (success) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
-                plugin.getLogger().info("Player removed from shop in database for owner: " + ownerId + ", shopName: " + shopName);
-                return;
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "DELETE FROM shop_players WHERE shop_id = (SELECT id FROM shops WHERE owner_uuid = ? AND shop_name = ?) AND player_uuid = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, ownerId.toString());
+                stmt.setString(2, shopName);
+                stmt.setString(3, toRemove.toString());
+                int rowsAffected = stmt.executeUpdate();
+                boolean success = rowsAffected > 0;
+                if (success) {
+                    plugin.getLogger().info("Player removed from shop in database for owner: " + ownerId + ", shopName: " + shopName);
+                } else {
+                    plugin.getLogger().severe("Failed to remove player from shop for owner: " + ownerId + ", shopName: " + shopName);
+                }
+                return success;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to remove player from shop: " + e.getMessage());
+                return false;
             }
-            plugin.getLogger().severe("Failed to remove player from shop for owner: " + ownerId + ", shopName: " + shopName);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
         });
     }
 
     @Override
-    public void updateSoldItems(UUID ownerId, String shopName, int soldItems, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-
+    public CompletableFuture<Boolean> updateSoldItems(UUID ownerId, String shopName, int soldItems) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
             shop.setSoldItems(shop.getSoldItems() + soldItems);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
             plugin.getLogger().info("Sold items updated in memory for owner: " + ownerId + ", shopName: " + shopName);
-            return;
+            return CompletableFuture.completedFuture(true);
         }
 
-        String sql = "UPDATE shops SET sold_items = sold_items + ? WHERE owner_uuid = ? AND shop_name = ?";
-        Object[] params = new Object[] { soldItems, ownerId.toString(), shopName };
-
-        executeAsync(sql, params, success -> {
-            if (success) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
-                plugin.getLogger().info("Sold items updated in database for owner: " + ownerId + ", shopName: " + shopName);
-                return;
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "UPDATE shops SET sold_items = sold_items + ? WHERE owner_uuid = ? AND shop_name = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setInt(1, soldItems);
+                stmt.setString(2, ownerId.toString());
+                stmt.setString(3, shopName);
+                int rowsAffected = stmt.executeUpdate();
+                boolean success = rowsAffected > 0;
+                if (success) {
+                    plugin.getLogger().info("Sold items updated in database for owner: " + ownerId + ", shopName: " + shopName);
+                } else {
+                    plugin.getLogger().severe("Failed to update sold items for owner: " + ownerId + ", shopName: " + shopName);
+                }
+                return success;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to update sold items: " + e.getMessage());
+                return false;
             }
-            plugin.getLogger().severe("Failed to update sold items for owner: " + ownerId + ", shopName: " + shopName);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
         });
     }
 
     @Override
-    public void updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
-
+    public CompletableFuture<Boolean> updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
             shop.setMoneyEarned(shop.getMoneyEarned() + moneyEarned);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
             plugin.getLogger().info("Money earned updated in memory for owner: " + ownerId + ", shopName: " + shopName);
-            return;
+            return CompletableFuture.completedFuture(true);
         }
 
-        String sql = "UPDATE shops SET money_earned = money_earned + ? WHERE owner_uuid = ? AND shop_name = ?";
-        Object[] params = new Object[] { moneyEarned, ownerId.toString(), shopName };
-
-        executeAsync(sql, params, success -> {
-            if (success) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
-                plugin.getLogger().info("Money earned updated in database for owner: " + ownerId + ", shopName: " + shopName);
-                return;
+        return CompletableFuture.supplyAsync(() -> {
+            String sql = "UPDATE shops SET money_earned = money_earned + ? WHERE owner_uuid = ? AND shop_name = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setDouble(1, moneyEarned);
+                stmt.setString(2, ownerId.toString());
+                stmt.setString(3, shopName);
+                int rowsAffected = stmt.executeUpdate();
+                boolean success = rowsAffected > 0;
+                if (success) {
+                    plugin.getLogger().info("Money earned updated in database for owner: " + ownerId + ", shopName: " + shopName);
+                } else {
+                    plugin.getLogger().severe("Failed to update money earned for owner: " + ownerId + ", shopName: " + shopName);
+                }
+                return success;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to update money earned: " + e.getMessage());
+                return false;
             }
-            plugin.getLogger().severe("Failed to update money earned for owner: " + ownerId + ", shopName: " + shopName);
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
         });
     }
 
     @Override
-    public void saveShop(Shop shop, Consumer<Boolean> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Callback cannot be null");
-        }
+    public CompletableFuture<Boolean> saveShop(Shop shop) {
+        return CompletableFuture.supplyAsync(() -> {
+            String selectSql = "SELECT 1 FROM shops WHERE owner_uuid = ? AND shop_name = ?";
+            try (PreparedStatement selectStmt = connection.prepareStatement(selectSql)) {
+                selectStmt.setString(1, shop.getOwnerId().toString());
+                selectStmt.setString(2, shop.getName());
 
-        String selectSql = "SELECT 1 FROM shops WHERE owner_uuid = ? AND shop_name = ?";
-        try (PreparedStatement selectStmt = connection.prepareStatement(selectSql)) {
-            selectStmt.setString(1, shop.getOwnerId().toString());
-            selectStmt.setString(2, shop.getName());
+                try (ResultSet rs = selectStmt.executeQuery()) {
+                    boolean exists = rs.next();
 
-            try (ResultSet rs = selectStmt.executeQuery()) {
-                boolean exists = rs.next();
+                    String sql = null;
+                    PreparedStatement stmt = null;
 
-                String sql = null;
-                Object[] params = null;
+                    if (exists) {
+                        sql = "UPDATE shops SET price = ?, material = ?, world = ?, x = ?, y = ?, z = ?, created_at = ?, do_notify = ? " +
+                                "WHERE owner_uuid = ? AND shop_name = ?";
+                        stmt = connection.prepareStatement(sql);
+                        stmt.setDouble(1, shop.getPrice());
+                        stmt.setString(2, shop.getMaterial() != null ? shop.getMaterial().name() : null);
+                        stmt.setString(3, shop.getChestLocation().getWorld().getName());
+                        stmt.setInt(4, shop.getChestLocation().getBlockX());
+                        stmt.setInt(5, shop.getChestLocation().getBlockY());
+                        stmt.setInt(6, shop.getChestLocation().getBlockZ());
+                        stmt.setString(7, shop.getCreatedAt());
+                        stmt.setBoolean(8, shop.isNotify());
+                        stmt.setString(9, shop.getOwnerId().toString());
+                        stmt.setString(10, shop.getName());
+                    } else {
+                        sql = "INSERT INTO shops (owner_uuid, shop_name, price, material, world, x, y, z, created_at, do_notify) " +
+                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        stmt = connection.prepareStatement(sql);
+                        stmt.setString(1, shop.getOwnerId().toString());
+                        stmt.setString(2, shop.getName());
+                        stmt.setDouble(3, shop.getPrice());
+                        stmt.setString(4, shop.getMaterial() != null ? shop.getMaterial().name() : null);
+                        stmt.setString(5, shop.getChestLocation().getWorld().getName());
+                        stmt.setInt(6, shop.getChestLocation().getBlockX());
+                        stmt.setInt(7, shop.getChestLocation().getBlockY());
+                        stmt.setInt(8, shop.getChestLocation().getBlockZ());
+                        stmt.setString(9, shop.getCreatedAt());
+                        stmt.setBoolean(10, shop.isNotify());
+                    }
 
-                if (exists) {
-                    sql = "UPDATE shops SET price = ?, material = ?, world = ?, x = ?, y = ?, z = ?, created_at = ?, do_notify = ? " +
-                            "WHERE owner_uuid = ? AND shop_name = ?";
-                    params = new Object[] { shop.getPrice(), shop.getMaterial() != null ? shop.getMaterial().name() : null,
-                            shop.getChestLocation().getWorld().getName(), shop.getChestLocation().getBlockX(), shop.getChestLocation().getBlockY(), shop.getChestLocation().getBlockZ(),
-                            shop.getCreatedAt(), shop.isNotify(), shop.getOwnerId().toString(), shop.getName()
-                    };
-                } else {
-                    sql = "INSERT INTO shops (owner_uuid, shop_name, price, material, world, x, y, z, created_at, do_notify) " +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                    params = new Object[] { shop.getOwnerId().toString(), shop.getName(), shop.getPrice(), shop.getMaterial() != null ? shop.getMaterial().name() : null,
-                            shop.getChestLocation().getWorld().getName(), shop.getChestLocation().getBlockX(), shop.getChestLocation().getBlockY(),
-                            shop.getChestLocation().getBlockZ(), shop.getCreatedAt(), shop.isNotify()
-                    };
-                }
-
-                execute(sql, params, success -> {
+                    int rowsAffected = stmt.executeUpdate();
+                    boolean success = rowsAffected > 0;
                     if (!success) {
                         plugin.getLogger().severe("Failed to save shop: " + shop.getName() + " for owner: " + shop.getOwnerId());
                     }
-                    callback.accept(success);
-                });
-
+                    return success;
+                }
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to save shop: " + shop.getName() + " for owner: " + shop.getOwnerId() + ": " + e.getMessage());
+                return false;
             }
-        } catch (SQLException e) {
-            plugin.getLogger().severe("Failed to save shop: " + shop.getName() + " for owner: " + shop.getOwnerId());
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
-        }
+        });
     }
 
     public void close() {
@@ -579,7 +583,7 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                 continue;
             }
             try {
-                saveShop(shop, success -> {
+                saveShop(shop).thenAccept(success -> {
                     if (success) {
                         shop.setSaved(true);
                     }
@@ -685,7 +689,7 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                     continue;
                 }
                 try {
-                    saveShop(shop, success -> {
+                    saveShop(shop).thenAccept(success -> {
                         if (success) {
                             shop.setSaved(true);
                         }
@@ -699,28 +703,30 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
     }
 
     @Override
-    public void unloadPlayerShops(UUID ownerId, Consumer<Boolean> callback) {
-        for (Shop shop : Shop.getShops()) {
-            if (shop.getOwnerId() == null || !shop.getOwnerId().equals(ownerId)) {
-                continue;
-            }
-            if (shop.getChestLocation().isChunkLoaded()) {
-                continue;
-            }
-            if (shop.isSaved()) {
-                shop.unload();
-                plugin.getLogger().info("Shop already saved and unloaded: " + shop.getName() + " for owner: " + ownerId);
-                continue;
-            }
-            saveShop(shop, success -> {
-                if (success) {
-                    shop.setSaved(true);
+    public CompletableFuture<Boolean> unloadPlayerShops(UUID ownerId) {
+        return CompletableFuture.supplyAsync(() -> {
+            for (Shop shop : Shop.getShops()) {
+                if (shop.getOwnerId() == null || !shop.getOwnerId().equals(ownerId)) {
+                    continue;
                 }
-                shop.unload();
-                plugin.getLogger().info("Unloaded shop: " + shop.getName() + " for owner: " + ownerId);
-            });
-        }
-        callback.accept(true);
+                if (shop.getChestLocation().isChunkLoaded()) {
+                    continue;
+                }
+                if (shop.isSaved()) {
+                    shop.unload();
+                    plugin.getLogger().info("Shop already saved and unloaded: " + shop.getName() + " for owner: " + ownerId);
+                    continue;
+                }
+                saveShop(shop).thenAccept(success -> {
+                    if (success) {
+                        shop.setSaved(true);
+                    }
+                    shop.unload();
+                    plugin.getLogger().info("Unloaded shop: " + shop.getName() + " for owner: " + ownerId);
+                });
+            }
+            return true;
+        });
     }
 
 }

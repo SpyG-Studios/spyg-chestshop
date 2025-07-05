@@ -92,7 +92,7 @@ public class Shop {
     }
 
     public void setSoldItems(int soldItems) {
-        dataManager.updateSoldItems(ownerId, name, soldItems, success -> {
+        dataManager.updateSoldItems(ownerId, name, soldItems).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop stats for " + name);
                 return;
@@ -104,7 +104,7 @@ public class Shop {
     }
 
     public void setMoneyEarned(double moneyEarned) {
-        dataManager.updateMoneyEarned(ownerId, name, moneyEarned, success -> {
+        dataManager.updateMoneyEarned(ownerId, name, moneyEarned).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop stats for " + name);
                 return;
@@ -120,7 +120,7 @@ public class Shop {
     }
 
     public void setMaterial(Material material) {
-        dataManager.updateShopMaterial(ownerId, name, material, success -> {
+        dataManager.updateShopMaterial(ownerId, name, material).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop material for " + name);
                 return;
@@ -134,7 +134,7 @@ public class Shop {
     }
 
     public void setName(String newName) {
-        dataManager.renameShop(ownerId, newName, newName, success -> {
+        dataManager.renameShop(ownerId, name, newName).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to rename shop " + name + " to " + newName);
                 return;
@@ -151,7 +151,7 @@ public class Shop {
 
     public void setPrice(double price) {
         double parsedPrice = ShopUtils.parsePrice(price);
-        dataManager.updateShopPrice(ownerId, name, parsedPrice, success -> {
+        dataManager.updateShopPrice(ownerId, name, parsedPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop price for " + name);
                 return;
@@ -163,7 +163,7 @@ public class Shop {
     }
 
     public void setNotify(boolean notify) {
-        dataManager.updateShopNotify(ownerId, name, notify, success -> {
+        dataManager.updateShopNotify(ownerId, name, notify).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop notify setting for " + name);
                 return;
@@ -182,7 +182,7 @@ public class Shop {
             Message.PLAYER_ALREADY_ADDED.send(Bukkit.getPlayer(ownerId), Map.of("%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
             return;
         }
-        dataManager.addPlayerToShop(ownerId, name, uuid, success -> {
+        dataManager.addPlayerToShop(ownerId, name, uuid).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to add player " + uuid + " to shop " + name);
                 return;
@@ -202,7 +202,7 @@ public class Shop {
             Message.PLAYER_NOT_ADDED.send(Bukkit.getPlayer(ownerId), Map.of("%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
             return;
         }
-        dataManager.removePlayerFromShop(ownerId, name, uuid, success -> {
+        dataManager.removePlayerFromShop(ownerId, name, uuid).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to remove player " + uuid + " from shop " + name);
                 return;
@@ -219,7 +219,7 @@ public class Shop {
         if (shopRemoveEvent.isCancelled()) {
             return;
         }
-        dataManager.deleteShop(ownerId, name, success -> {
+        dataManager.deleteShop(ownerId, name).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to remove shop " + name);
                 return;
@@ -268,7 +268,7 @@ public class Shop {
                 "%items-left%", String.valueOf(itemsLeft),
                 "%items-bought%", String.valueOf(itemCount)));
 
-        dataManager.updateShopStats(ownerId, name, itemCount, itemsPrice, success -> {
+        dataManager.updateShopStats(ownerId, name, itemCount, itemsPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop stats for " + name + " owned by " + ownerId);
                 return;

@@ -3,7 +3,7 @@ package com.spygstudios.chestshop.shop.sqlite;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -22,117 +22,108 @@ public class SqliteStorage extends DatabaseHandler implements DataManager {
     }
 
     @Override
-    public void initialize(Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'initialize'");
+    public CompletableFuture<Boolean> initialize() {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void createShop(UUID ownerId, String shopName, Location location, Consumer<Shop> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createShop'");
+    public CompletableFuture<Shop> createShop(UUID ownerId, String shopName, Location location) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void getPlayerShops(UUID ownerId, Consumer<List<Shop>> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPlayerShops'");
+    public CompletableFuture<List<Shop>> getPlayerShops(UUID ownerId) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void getShopsInChunk(Chunk chunk, Consumer<List<Shop>> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getShopsInChunk'");
+    public CompletableFuture<List<Shop>> getShopsInChunk(Chunk chunk) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void getShop(UUID ownerId, String shopName, Consumer<Shop> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getShop'");
+    public CompletableFuture<Shop> getShop(UUID ownerId, String shopName) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void updateShopPrice(UUID ownerId, String shopName, double price, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopPrice'");
+    public CompletableFuture<Boolean> updateShopPrice(UUID ownerId, String shopName, double price) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void updateShopMaterial(UUID ownerId, String shopName, Material material, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopMaterial'");
+    public CompletableFuture<Boolean> updateShopMaterial(UUID ownerId, String shopName, Material material) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void updateShopNotify(UUID ownerId, String shopName, boolean notify, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopNotify'");
+    public CompletableFuture<Boolean> updateShopNotify(UUID ownerId, String shopName, boolean notify) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void updateShopStats(UUID ownerId, String shopName, int soldItems, double moneyEarned, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopStats'");
+    public CompletableFuture<Boolean> updateShopStats(UUID ownerId, String shopName, int soldItems, double moneyEarned) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void renameShop(UUID ownerId, String oldName, String newName, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'renameShop'");
+    public CompletableFuture<Boolean> renameShop(UUID ownerId, String oldName, String newName) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void deleteShop(UUID ownerId, String shopName, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteShop'");
+    public CompletableFuture<Boolean> deleteShop(UUID ownerId, String shopName) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void getShopPlayers(UUID ownerId, String shopName, Consumer<List<UUID>> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getShopPlayers'");
+    public CompletableFuture<List<UUID>> getShopPlayers(UUID ownerId, String shopName) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void addPlayerToShop(UUID ownerId, String shopName, UUID toAdd, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addPlayerToShop'");
+    public CompletableFuture<Boolean> addPlayerToShop(UUID ownerId, String shopName, UUID toAdd) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void removePlayerFromShop(UUID ownerId, String shopName, UUID toRemove, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'removePlayerFromShop'");
+    public CompletableFuture<Boolean> removePlayerFromShop(UUID ownerId, String shopName, UUID toRemove) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void updateSoldItems(UUID ownerId, String shopName, int soldItems, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateSoldItems'");
+    public CompletableFuture<Boolean> updateSoldItems(UUID ownerId, String shopName, int soldItems) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateMoneyEarned'");
+    public CompletableFuture<Boolean> updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
-    public void saveShop(Shop shop, Consumer<Boolean> callback) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'saveShop'");
+    public CompletableFuture<Boolean> saveShop(Shop shop) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
     @Override
     public void createTables() throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createTables'");
+        throw new UnsupportedOperationException("SQLite storage not implemented");
     }
 
     @Override
     public void startSaveScheduler() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'startSaveScheduler'");
+        throw new UnsupportedOperationException("SQLite storage not implemented");
+    }
+
+    @Override
+    public CompletableFuture<List<Shop>> loadPlayerShops(UUID ownerId) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
+    }
+
+    @Override
+    public CompletableFuture<Boolean> unloadPlayerShops(UUID ownerId) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
 }
