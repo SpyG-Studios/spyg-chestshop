@@ -13,6 +13,11 @@ public class Config extends YamlManager {
         set("locale", "en_US", Arrays.asList("The locale of the plugin. (file name)"));
         set("cancel", "cancel", Arrays.asList("The text to cancel the amount action."));
         set("storage-type", "yaml", Arrays.asList("The storage type of the plugin. (yaml, sqlite, mysql)"));
+        set("mysql.host", "localhost", Arrays.asList("The host of the MySQL database."));
+        set("mysql.port", 3306, Arrays.asList("The port of the MySQL database."));
+        set("mysql.database", "chestshop", Arrays.asList("The database name of the MySQL database."));
+        set("mysql.username", "root", Arrays.asList("The username of the MySQL database."));
+        set("mysql.password", "password", Arrays.asList("The password of the MySQL database."));
         set("colors.command.required-arg", " &c");
         set("colors.command.optional-arg", " &7");
         set("colors.command.list", "&8- ");

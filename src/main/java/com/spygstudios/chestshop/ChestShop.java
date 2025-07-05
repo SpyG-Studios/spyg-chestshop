@@ -36,6 +36,8 @@ import com.spygstudios.chestshop.listeners.InteractListener;
 import com.spygstudios.chestshop.listeners.PlayerJoinListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
+import com.spygstudios.chestshop.shop.sql.MysqlStorage;
+import com.spygstudios.chestshop.shop.sqlite.SqliteStorage;
 import com.spygstudios.chestshop.shop.yaml.YamlStorage;
 import com.spygstudios.spyglib.hologram.HologramManager;
 import com.spygstudios.spyglib.version.VersionChecker;
@@ -113,7 +115,31 @@ public class ChestShop extends JavaPlugin {
             case "yaml":
                 dataManager = new YamlStorage(this);
                 break;
+            case "mysql":
+                String host = conf.getString("mysql.host");
+                int port = conf.getInt("mysql.port");
+                String database = conf.getString("mysql.database");
+                String username = conf.getString("mysql.username");
+                String password = conf.getString("mysql.password");
+                if (host == null || database == null || username == null || password == null) {
+                    getLogger().severe("MySQL configuration is incomplete! Disabling plugin...");
+                    getServer().getPluginManager().disablePlugin(this);
+                    return;
+                }
+                dataManager = new MysqlStorage(this, host, port, database, username, password);
+                break;
+            case "sqlite":
+                dataManager = new SqliteStorage(this);
+                break;
         }
+        if (dataManager == null) {
+            getLogger().severe("Invalid storage type in config! Disabling plugin...");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        dataManager.startSaveScheduler();
+
+        getLogger().info("Using " + storageType + " storage type.");
 
         String info = String.format("%s v. %s plugin has been enabled!", getName(), getPluginMeta().getVersion());
         getLogger().info(info);

@@ -9,11 +9,17 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.database.DatabaseHandler;
+import com.spygstudios.chestshop.enums.DatabaseType;
 import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.shop.Shop;
 
-public class SqlliteStorage extends DatabaseHandler implements DataManager {
+public class SqliteStorage extends DatabaseHandler implements DataManager {
+
+    public SqliteStorage(ChestShop plugin) {
+        super(plugin, DatabaseType.SQLITE);
+    }
 
     @Override
     public void initialize(Consumer<Boolean> callback) {
@@ -121,6 +127,12 @@ public class SqlliteStorage extends DatabaseHandler implements DataManager {
     public void createTables() throws SQLException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'createTables'");
+    }
+
+    @Override
+    public void startSaveScheduler() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'startSaveScheduler'");
     }
 
 }
