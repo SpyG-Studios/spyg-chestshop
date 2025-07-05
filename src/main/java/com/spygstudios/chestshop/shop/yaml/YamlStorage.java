@@ -259,4 +259,16 @@ public class YamlStorage implements DataManager {
         plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, YamlShopFile::saveShopFiles, 0, 20L * interval);
     }
 
+    @Override
+    public void loadPlayerShops(UUID ownerId, Consumer<List<Shop>> callback) {
+        // This method is not used in YamlStorage, as shops are loaded on
+        // initialization.
+    }
+
+    @Override
+    public void unloadPlayerShops(UUID ownerId, Consumer<Boolean> callback) {
+        // This method is not used in YamlStorage, as shops are loaded on
+        // initialization.
+    }
+
 }

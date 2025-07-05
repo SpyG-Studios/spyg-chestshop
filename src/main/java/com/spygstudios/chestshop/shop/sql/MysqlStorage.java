@@ -122,6 +122,32 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
 
     }
 
+    public void loadPlayerShops(UUID ownerId, Consumer<List<Shop>> callback) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            String sql = "SELECT * FROM shops WHERE owner_uuid = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, ownerId.toString());
+                ResultSet rs = stmt.executeQuery();
+
+                Map<Integer, Shop> shops = new HashMap<>();
+                while (rs.next()) {
+                    Entry<Integer, Shop> shopEntry = loadShopMapFromResult(rs);
+                    shops.put(shopEntry.getKey(), shopEntry.getValue());
+                }
+                loadShopPlayers(shops);
+
+                if (callback != null) {
+                    Bukkit.getScheduler().runTask(plugin, () -> callback.accept(new ArrayList<>(shops.values())));
+                }
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to load player shops: " + e.getMessage());
+                if (callback != null) {
+                    Bukkit.getScheduler().runTask(plugin, () -> callback.accept(List.of()));
+                }
+            }
+        });
+    }
+
     @Override
     public void getShopsInChunk(Chunk chunk, Consumer<List<Shop>> callback) {
         if (callback == null) {
@@ -667,6 +693,31 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                 }
             }
         }, 0, 20L * interval);
+    }
+
+    @Override
+    public void unloadPlayerShops(UUID ownerId, Consumer<Boolean> callback) {
+        for (Shop shop : Shop.getShops()) {
+            if (shop.getOwnerId() == null || !shop.getOwnerId().equals(ownerId)) {
+                continue;
+            }
+            if (shop.getChestLocation().isChunkLoaded()) {
+                continue;
+            }
+            if (shop.isSaved()) {
+                shop.unload();
+                plugin.getLogger().info("Shop already saved and unloaded: " + shop.getName() + " for owner: " + ownerId);
+                continue;
+            }
+            saveShop(shop, success -> {
+                if (success) {
+                    shop.setSaved(true);
+                }
+                shop.unload();
+                plugin.getLogger().info("Unloaded shop: " + shop.getName() + " for owner: " + ownerId);
+            });
+        }
+        callback.accept(true);
     }
 
 }

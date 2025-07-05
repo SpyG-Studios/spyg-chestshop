@@ -29,7 +29,7 @@ public abstract class DatabaseHandler {
 
     public void executeAsync(String sql, Object[] params, Consumer<Boolean> callback) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            executeSync(sql, params, success -> {
+            execute(sql, params, success -> {
                 if (callback != null) {
                     Bukkit.getScheduler().runTask(plugin, () -> callback.accept(success));
                 }
@@ -37,19 +37,19 @@ public abstract class DatabaseHandler {
         });
     }
 
-    public void executeSync(String sql, Object[] params, Consumer<Boolean> callback) {
+    public void execute(String sql, Object[] params, Consumer<Boolean> callback) {
         try (PreparedStatement stmt = prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                 stmt.setObject(i + 1, params[i]);
             }
             stmt.executeUpdate();
             if (callback != null) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
+                callback.accept(true);
             }
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, "Error during executing SQL: " + sql, e);
             if (callback != null) {
-                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
+                callback.accept(false);
             }
         }
     }

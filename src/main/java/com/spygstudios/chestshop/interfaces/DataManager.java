@@ -17,6 +17,10 @@ public interface DataManager {
 
     void createShop(UUID ownerId, String shopName, Location location, Consumer<Shop> callback);
 
+    void loadPlayerShops(UUID ownerId, Consumer<List<Shop>> callback);
+
+    void unloadPlayerShops(UUID ownerId, Consumer<Boolean> callback);
+
     void getPlayerShops(UUID ownerId, Consumer<List<Shop>> callback);
 
     void getShopsInChunk(Chunk chunk, Consumer<List<Shop>> callback);
