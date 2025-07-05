@@ -33,7 +33,7 @@ public class CommandHandler {
 
                 .commands(
                         new Reload(plugin),
-                        new ShopList(),
+                        new ShopList(plugin),
                         new ShopListAdmin(),
                         new AddPlayer(plugin),
                         new RemovePlayer(plugin),
