@@ -336,7 +336,7 @@ public class Shop {
 
     public static List<Shop> getShops(UUID ownerId) {
         List<Shop> shops = new ArrayList<>();
-        for (Shop shop : SHOPS) {
+        for (Shop shop : getShops()) {
             if (shop.getOwnerId().equals(ownerId)) {
                 shops.add(shop);
             }
@@ -349,7 +349,7 @@ public class Shop {
     }
 
     public static Shop getShop(UUID ownerId, String name) {
-        for (Shop shop : SHOPS) {
+        for (Shop shop : getShops()) {
             if (shop.getOwnerId().equals(ownerId) && shop.getName().equalsIgnoreCase(name)) {
                 return shop;
             }
@@ -358,7 +358,7 @@ public class Shop {
     }
 
     public static Shop getShop(Location location) {
-        for (Shop shop : SHOPS) {
+        for (Shop shop : getShops()) {
             Location shopLoc = shop.getChestLocation();
             if (!shopLoc.getWorld().isChunkLoaded(shopLoc.getBlockX() >> 4, shopLoc.getBlockZ() >> 4))
                 continue;
