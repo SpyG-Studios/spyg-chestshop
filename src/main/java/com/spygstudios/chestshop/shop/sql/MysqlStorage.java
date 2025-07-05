@@ -21,6 +21,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.database.DatabaseHandler;
 import com.spygstudios.chestshop.enums.DatabaseType;
 import com.spygstudios.chestshop.interfaces.DataManager;
@@ -38,9 +39,9 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
     private final String username;
     private final String password;
 
-    public MysqlStorage(String host, int port, String database, String username, String password) {
-        this.databaseType = DatabaseType.MYSQL;
-
+    public MysqlStorage(ChestShop plugin, String host, int port, String database, String username, String password) {
+        super(plugin, DatabaseType.MYSQL);
+        this.databaseType = super.databaseType;
         this.host = host;
         this.port = port;
         this.database = database;

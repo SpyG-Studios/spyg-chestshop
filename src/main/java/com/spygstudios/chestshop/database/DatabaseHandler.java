@@ -1,6 +1,5 @@
 package com.spygstudios.chestshop.database;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -8,50 +7,49 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.enums.DatabaseType;
 
-import lombok.Getter;
-
 public abstract class DatabaseHandler {
 
-    protected ChestShop plugin;
-    @Getter
-    protected DatabaseType databaseType;
-    protected File databaseFile;
+    protected final ChestShop plugin;
+    protected final DatabaseType databaseType;
     protected Connection connection;
+
+    public DatabaseHandler(ChestShop plugin, DatabaseType databaseType) {
+        this.plugin = plugin;
+        this.databaseType = databaseType;
+        this.connection = null;
+    }
 
     public abstract void initialize(Consumer<Boolean> callback);
 
     public abstract void createTables() throws SQLException;
 
     public void executeAsync(String sql, Object[] params, Consumer<Boolean> callback) {
-        BukkitScheduler scheduler = Bukkit.getScheduler();
-        scheduler.runTaskAsynchronously(plugin, () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             executeSync(sql, params, success -> {
                 if (callback != null) {
-                    scheduler.runTask(plugin, () -> callback.accept(success));
+                    Bukkit.getScheduler().runTask(plugin, () -> callback.accept(success));
                 }
             });
         });
     }
 
     public void executeSync(String sql, Object[] params, Consumer<Boolean> callback) {
-        BukkitScheduler scheduler = Bukkit.getScheduler();
         try (PreparedStatement stmt = prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                 stmt.setObject(i + 1, params[i]);
             }
             stmt.executeUpdate();
             if (callback != null) {
-                scheduler.runTask(plugin, () -> callback.accept(true));
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
             }
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, "Error during executing SQL: " + sql, e);
             if (callback != null) {
-                scheduler.runTask(plugin, () -> callback.accept(false));
+                Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
             }
         }
     }
