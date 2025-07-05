@@ -211,21 +211,18 @@ public class YamlShopFile extends YamlManager {
         return new HashMap<>(SHOPS_FILES);
     }
 
-    public static void startSaveScheduler(ChestShop plugin) {
-        long interval = plugin.getConf().getInt("shops.save-interval", 60);
-        if (interval <= 0)
-            interval = 60;
-        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, YamlShopFile::saveShops, 0, 20L * interval);
+    public static void saveShopFiles() {
+        for (YamlShopFile shopFile : SHOPS_FILES.values()) {
+            saveShopFile(shopFile);
+        }
     }
 
-    public static void saveShops() {
-        for (YamlShopFile shopFile : SHOPS_FILES.values()) {
-            if (shopFile.isSaved) {
-                continue;
-            }
-            shopFile.saveConfig();
-            shopFile.isSaved = true;
+    public static void saveShopFile(YamlShopFile shopFile) {
+        if (shopFile.isSaved) {
+            return;
         }
+        shopFile.saveConfig();
+        shopFile.isSaved = true;
     }
 
     public static String getPath(String shopName, String key) {

@@ -645,4 +645,28 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
         loadShopPlayers(shops);
     }
 
+    @Override
+    public void startSaveScheduler() {
+        long interval = plugin.getConf().getInt("shops.save-interval", 60);
+        if (interval <= 0)
+            interval = 60;
+        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+            for (Shop shop : Shop.getShops()) {
+                if (shop.isSaved()) {
+                    continue;
+                }
+                try {
+                    saveShop(shop, success -> {
+                        if (success) {
+                            shop.setSaved(true);
+                        }
+                    });
+                } catch (Exception e) {
+                    plugin.getLogger().severe("Failed to save shop: " + shop.getName() + " for owner: " + shop.getOwnerId());
+                    plugin.getLogger().severe("Error: " + e.getMessage());
+                }
+            }
+        }, 0, 20L * interval);
+    }
+
 }

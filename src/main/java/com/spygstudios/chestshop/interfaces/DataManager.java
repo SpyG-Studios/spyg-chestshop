@@ -47,6 +47,8 @@ public interface DataManager {
 
     void saveShop(Shop shop, Consumer<Boolean> callback);
 
+    void startSaveScheduler();
+
     void close();
 
     default String getDateString() {

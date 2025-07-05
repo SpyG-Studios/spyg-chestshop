@@ -225,7 +225,6 @@ public class YamlStorage implements DataManager {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 YamlShopFile.loadShopFiles(plugin);
-                YamlShopFile.startSaveScheduler(plugin);
                 Bukkit.getScheduler().runTask(plugin, () -> callback.accept(true));
             } catch (Exception e) {
                 Bukkit.getScheduler().runTask(plugin, () -> callback.accept(false));
@@ -234,7 +233,7 @@ public class YamlStorage implements DataManager {
     }
 
     public void close() {
-        YamlShopFile.saveShops();
+        YamlShopFile.saveShopFiles();
     }
 
     @Override
@@ -242,8 +241,22 @@ public class YamlStorage implements DataManager {
         if (callback == null) {
             throw new IllegalArgumentException("Callback cannot be null");
         }
-        YamlShopFile.saveShops();
+        YamlShopFile shopFile = YamlShopFile.getShopFile(shop.getOwnerId());
+        if (shopFile == null) {
+            callback.accept(false);
+            return;
+        }
+
+        YamlShopFile.saveShopFile(shopFile);
         callback.accept(true);
+    }
+
+    @Override
+    public void startSaveScheduler() {
+        long interval = plugin.getConf().getInt("shops.save-interval", 60);
+        if (interval <= 0)
+            interval = 60;
+        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, YamlShopFile::saveShopFiles, 0, 20L * interval);
     }
 
 }
