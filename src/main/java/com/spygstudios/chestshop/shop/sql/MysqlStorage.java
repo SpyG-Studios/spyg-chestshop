@@ -514,17 +514,17 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                 Object[] params = null;
 
                 if (exists) {
-                    sql = "UPDATE shops SET price = ?, material = ?, location = ?, world = ?, x = ?, y = ?, z = ?, created_at = ?, do_notify = ? " +
+                    sql = "UPDATE shops SET price = ?, material = ?, world = ?, x = ?, y = ?, z = ?, created_at = ?, do_notify = ? " +
                             "WHERE owner_uuid = ? AND shop_name = ?";
-                    params = new Object[] { shop.getPrice(), shop.getMaterial() != null ? shop.getMaterial().name() : null, shop.getChestLocation().serialize().toString(),
+                    params = new Object[] { shop.getPrice(), shop.getMaterial() != null ? shop.getMaterial().name() : null,
                             shop.getChestLocation().getWorld().getName(), shop.getChestLocation().getBlockX(), shop.getChestLocation().getBlockY(), shop.getChestLocation().getBlockZ(),
                             shop.getCreatedAt(), shop.isNotify(), shop.getOwnerId().toString(), shop.getName()
                     };
                 } else {
-                    sql = "INSERT INTO shops (owner_uuid, shop_name, price, material, location, world, x, y, z, created_at, do_notify) " +
+                    sql = "INSERT INTO shops (owner_uuid, shop_name, price, material, world, x, y, z, created_at, do_notify) " +
                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     params = new Object[] { shop.getOwnerId().toString(), shop.getName(), shop.getPrice(), shop.getMaterial() != null ? shop.getMaterial().name() : null,
-                            shop.getChestLocation().serialize().toString(), shop.getChestLocation().getWorld().getName(), shop.getChestLocation().getBlockX(), shop.getChestLocation().getBlockY(),
+                            shop.getChestLocation().getWorld().getName(), shop.getChestLocation().getBlockX(), shop.getChestLocation().getBlockY(),
                             shop.getChestLocation().getBlockZ(), shop.getCreatedAt(), shop.isNotify()
                     };
                 }
