@@ -17,11 +17,7 @@ public class ChunkLoadListener implements Listener {
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
-        plugin.getDataManager().loadShopsInChunk(event.getChunk()).thenAccept(shops -> {
-            if (shops != null && !shops.isEmpty()) {
-                plugin.getLogger().info("Loaded " + shops.size() + " shops in chunk: " + event.getChunk().getX() + ", " + event.getChunk().getZ());
-            }
-        });
+        plugin.getDataManager().loadShopsInChunk(event.getChunk());
     }
 
 }
