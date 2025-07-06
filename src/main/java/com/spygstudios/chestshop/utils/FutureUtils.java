@@ -33,7 +33,7 @@ public class FutureUtils {
         return future;
     }
 
-    public static <T> CompletableFuture<T> runTaskAsyncWithCompletion(Plugin plugin, Supplier<T> task) {
+    public static <T> CompletableFuture<T> runTaskAsync(Plugin plugin, Supplier<T> task) {
         CompletableFuture<T> future = new CompletableFuture<>();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
