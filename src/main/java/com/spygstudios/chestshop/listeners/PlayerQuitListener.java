@@ -1,8 +1,8 @@
 package com.spygstudios.chestshop.listeners;
 
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.spygstudios.chestshop.ChestShop;
 
@@ -16,13 +16,11 @@ public class PlayerQuitListener implements Listener {
     }
 
     @EventHandler
-    public void onQuit(org.bukkit.event.player.PlayerQuitEvent event) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            plugin.getDataManager().unloadPlayerShops(event.getPlayer().getUniqueId()).thenAccept(success -> {
-                if (success) {
-                    plugin.getLogger().info("Successful unload check for player: " + event.getPlayer().getName());
-                }
-            });
+    public void onQuit(PlayerQuitEvent event) {
+        plugin.getDataManager().unloadPlayerShops(event.getPlayer().getUniqueId()).thenAccept(success -> {
+            if (success) {
+                plugin.getLogger().info("Successful unload check for player: " + event.getPlayer().getName());
+            }
         });
     }
 

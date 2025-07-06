@@ -1,11 +1,13 @@
 package com.spygstudios.chestshop.listeners;
 
+import java.util.List;
+
+import org.bukkit.Chunk;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.shop.Shop;
 
 public class ChunkUnloadListener implements Listener {
@@ -19,29 +21,25 @@ public class ChunkUnloadListener implements Listener {
 
     @EventHandler
     public void onChunkUnload(ChunkUnloadEvent event) {
-        plugin.getLogger().info(Shop.getShops().size() + " shops in total");
-        DataManager dManager = plugin.getDataManager();
-        dManager.getShopsInChunk(event.getChunk()).thenAccept(shops -> {
-            for (Shop shop : shops) {
-                shop.unload();
+        Chunk chunk = event.getChunk();
+        List<Shop> shops = Shop.getShops();
+        if (shops == null || shops.isEmpty()) {
+            return;
+        }
+        for (Shop shop : shops) {
+            if (!chunk.getWorld().equals(shop.getChestLocation().getWorld())) {
+                continue;
             }
-            // if (shops == null || shops.isEmpty()) {
-            // return;
-            // }
-            // for (Shop shop : shops) {
-            // if (!event.getChunk().equals(shop.getChestLocation().getChunk()) ||
-            // shop.getChestLocation().isChunkLoaded()) {
-            // continue;
-            // }
-            // dManager.saveShop(shop).thenAccept(success -> {
-            // if (success) {
-            // shop.setSaved(true);
-            // }
-            // shop.unload();
-            // plugin.getLogger().info("Unloaded shop: " + shop.getName() + " for owner: " +
-            // shop.getOwnerId());
-            // });
-            // }
-        });
+            int x = shop.getChestLocation().getBlockX() >> 4;
+            int z = shop.getChestLocation().getBlockZ() >> 4;
+            if (x != chunk.getX() || z != chunk.getZ()) {
+                continue;
+            }
+            if (shop.isSaved()) {
+                shop.unload();
+            } else {
+                plugin.getDataManager().saveShop(shop);
+            }
+        }
     }
 }

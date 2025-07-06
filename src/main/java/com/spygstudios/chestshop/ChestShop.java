@@ -30,6 +30,7 @@ import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.listeners.BreakListener;
 import com.spygstudios.chestshop.listeners.BuildListener;
 import com.spygstudios.chestshop.listeners.ChatListener;
+import com.spygstudios.chestshop.listeners.ChunkLoadListener;
 import com.spygstudios.chestshop.listeners.ChunkUnloadListener;
 import com.spygstudios.chestshop.listeners.ExplosionListener;
 import com.spygstudios.chestshop.listeners.HopperListener;
@@ -96,6 +97,7 @@ public class ChestShop extends JavaPlugin {
         new PlayerQuitListener(this);
         new PlayerJoinListener(this);
         new ChunkUnloadListener(this);
+        new ChunkLoadListener(this);
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             Entry<String, Boolean> versionInfo = VersionChecker.isLatestVersion(API_URL, getPluginMeta().getVersion());
             this.currentVersion = versionInfo.getKey();
@@ -110,7 +112,7 @@ public class ChestShop extends JavaPlugin {
         } catch (Exception e) {
         }
 
-        getLogger().info("Loading economy plugin...");
+        getLogger().info("Looking for economy plugin...");
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
             getLogger().severe("Vault or economy plugin (e.g. Essentials) not found! Disabling plugin...");
@@ -118,7 +120,7 @@ public class ChestShop extends JavaPlugin {
             return;
         }
         economy = rsp.getProvider();
-        getLogger().info("Loaded economy plugin: " + economy.getName());
+        getLogger().info("Found economy plugin: " + economy.getName());
 
         String storageType = conf.getString("storage-type");
         switch (storageType) {
