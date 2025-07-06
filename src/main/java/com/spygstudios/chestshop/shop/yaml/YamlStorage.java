@@ -1,6 +1,5 @@
 package com.spygstudios.chestshop.shop.yaml;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -52,15 +51,7 @@ public class YamlStorage implements DataManager {
 
     @Override
     public CompletableFuture<List<Shop>> loadShopsInChunk(Chunk chunk) {
-        List<Shop> shops = new ArrayList<>();
-        for (Shop shop : Shop.getShops()) {
-            if (shop.getChestLocation().getWorld() != null && shop.getChestLocation().getWorld().equals(chunk.getWorld())) {
-                if (shop.getChestLocation().getChunk().equals(chunk)) {
-                    shops.add(shop);
-                }
-            }
-        }
-        return CompletableFuture.completedFuture(shops);
+        return CompletableFuture.completedFuture(List.of());
     }
 
     @Override
