@@ -65,10 +65,13 @@ public class Shop {
     }
 
     public Shop(UUID ownerId, String shopName, double price, Material material, Location chestLocation, String createdAt, boolean isNotify, List<UUID> addedPlayers) {
-        this.ownerId = ownerId;
-        if (Shop.getShop(ownerId, shopName) != null) {
-            return;
+        synchronized (SHOPS) {
+            if (Shop.getShop(ownerId, shopName) != null) {
+                return;
+            }
+            SHOPS.add(this);
         }
+        this.ownerId = ownerId;
         this.name = shopName;
         this.price = ShopUtils.parsePrice(price);
         this.material = material;
@@ -77,7 +80,6 @@ public class Shop {
         this.isNotify = isNotify;
         this.addedPlayers = addedPlayers;
         this.hologram = new ShopHologram(this, plugin);
-        SHOPS.add(this);
     }
 
     public String getMaterialString() {
@@ -345,7 +347,7 @@ public class Shop {
         return new ArrayList<>(SHOPS);
     }
 
-    public static synchronized Shop getShop(UUID ownerId, String name) {
+    public static Shop getShop(UUID ownerId, String name) {
         for (Shop shop : getShops()) {
             if (shop.getOwnerId().equals(ownerId) && shop.getName().equalsIgnoreCase(name)) {
                 return shop;
