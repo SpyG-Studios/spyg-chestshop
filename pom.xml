@@ -92,46 +92,49 @@
         </resources>
         <plugins>
             <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-shade-plugin</artifactId>
-            <version>3.6.0</version>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>shade</goal>
-                    </goals>
-                    <configuration>
-                        <relocations>
-                            <relocation>
-                                <pattern>org.bstats</pattern>
-                                <shadedPattern>com.spygstudios.bstats</shadedPattern>
-                            </relocation>
-                        </relocations>
-                        <filters>
-                            <filter>
-                                <artifact>*:*</artifact>
-                                <excludes>
-                                    <exclude>META-INF/*</exclude>
-                                </excludes>
-                            </filter>
-                        </filters>
-                        <createDependencyReducedPom>true</createDependencyReducedPom>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.bstats</pattern>
+                                    <shadedPattern>com.spygstudios.bstats</shadedPattern>
+                                </relocation>
+                            </relocations>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>3.14.0</version>
                 <configuration>
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
+                    <useIncrementalCompilation>
+                        false
+                    </useIncrementalCompilation>
                 </configuration>
             </plugin>
+
 
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
