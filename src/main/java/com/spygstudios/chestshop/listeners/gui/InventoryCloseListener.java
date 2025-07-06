@@ -35,7 +35,7 @@ public class InventoryCloseListener implements Listener {
             Location invLocation = inventory.getLocation();
             Shop shop = Shop.getShop(invLocation);
             if (plugin.getConf().getBoolean("shops.barrier-when-empty")) {
-                if (shop == null || !invLocation.getWorld().getChunkAt(invLocation).isLoaded()) {
+                if (shop == null || !invLocation.getWorld().isChunkLoaded(invLocation.getBlockX() >> 4, invLocation.getBlockZ() >> 4)) {
                     return;
                 }
                 try {
