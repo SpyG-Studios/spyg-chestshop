@@ -84,7 +84,7 @@ public class Shop {
         if (material == null) {
             return plugin.getConf().getString("shops.unknown-material");
         }
-        String materialString = material.toString();
+        String materialString = material.name();
         return materialString.length() > 14 ? materialString.substring(0, 14) : materialString;
     }
 
