@@ -34,7 +34,7 @@ public class CommandHandler {
                 .commands(
                         new Reload(plugin),
                         new ShopList(plugin),
-                        new ShopListAdmin(),
+                        new ShopListAdmin(plugin),
                         new AddPlayer(plugin),
                         new RemovePlayer(plugin),
                         new Create(plugin),

@@ -6,10 +6,11 @@ import java.util.Map;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.PageUtil;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.shop.Shop;
-import com.spygstudios.chestshop.shop.yaml.YamlShopFile;
 import com.spygstudios.spyglib.components.ComponentUtils;
 
 import dev.rollczi.litecommands.annotations.argument.Arg;
@@ -25,6 +26,12 @@ import net.kyori.adventure.text.event.HoverEvent;
 @Command(name = "spygchestshop admin list", aliases = { "spcs admin list", "chestshop admin list", "scs admin list" })
 public class ShopListAdmin {
 
+    private final ChestShop plugin;
+
+    public ShopListAdmin(ChestShop plugin) {
+        this.plugin = plugin;
+    }
+
     @Execute
     @Permission("spygchestshop.admin.list")
     @Permission("spygchestshop.*")
@@ -33,26 +40,29 @@ public class ShopListAdmin {
         if (page == null) {
             page = 1;
         }
+        final int currentPage = page;
+        DataManager dataManager = plugin.getDataManager();
+        dataManager.getPlayerShops(target.getUniqueId()).thenAccept(shops -> {
+            if (shops == null || shops.isEmpty()) {
+                Message.SHOP_NO_SHOPS.send(player);
+                return;
+            }
 
-        YamlShopFile file = YamlShopFile.getShopFile(target.getUniqueId());
-        if (file == null || file.getPlayerShops().isEmpty()) {
-            Message.ADMIN_NO_SHOPS.send(player, Map.of("%player-name%", target.getName()));
-            return;
-        }
+            Message.ADMIN_SHOP_LIST_HEAD.send(player, Map.of("%player-name%", target.getName()));
+            List<Shop> filteredShops = shops.stream().sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).skip((currentPage - 1) * 10L).limit(10).toList();
+            for (Shop shop : filteredShops) {
+                Component hoverMessage = ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS_HOVER.get(), Map.of(
+                        "%shop-name%", shop.getName(),
+                        "%material%", shop.getMaterialString(),
+                        "%price%", shop.getPrice() + "",
+                        "%items-left%", shop.getItemsLeft() + "",
+                        "%location%", shop.getChestLocationString(),
+                        "%created%", shop.getCreatedAt()));
+                player.sendMessage(ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS.get(), "%shop-name%", shop.getName()).hoverEvent(HoverEvent.showText(hoverMessage)));
+            }
 
-        Message.ADMIN_SHOP_LIST_HEAD.send(player, Map.of("%player-name%", target.getName()));
-        List<Shop> shops = Shop.getShops(target.getUniqueId()).stream().sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).skip((page - 1) * 10L).limit(10).toList();
-        for (Shop shop : shops) {
-            Component hoverMessage = ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS_HOVER.get(), Map.of(
-                    "%shop-name%", shop.getName(),
-                    "%material%", shop.getMaterialString(),
-                    "%price%", shop.getPrice() + "",
-                    "%items-left%", shop.getItemsLeft() + "",
-                    "%location%", shop.getChestLocationString(),
-                    "%created%", shop.getCreatedAt()));
-            player.sendMessage(ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS.get(), "%shop-name%", shop.getName()).hoverEvent(HoverEvent.showText(hoverMessage)));
-        }
+            player.sendMessage(PageUtil.getPages(currentPage, shops.size(), 10, "/spygchestshop list"));
+        });
 
-        player.sendMessage(PageUtil.getPages(page, file.getPlayerShops().size(), 10, "/spygchestshop list"));
     }
 }
