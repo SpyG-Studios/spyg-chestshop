@@ -50,8 +50,15 @@ public class YamlStorage implements DataManager {
     }
 
     @Override
-    public CompletableFuture<List<Shop>> loadShopsInChunk(Chunk chunk) {
-        return CompletableFuture.completedFuture(List.of());
+    public void loadShopsInChunk(Chunk chunk) {
+        // This method is not used in YamlStorage, as shops are loaded on
+        // initialization.
+    }
+
+    @Override
+    public void unloadShopsInChunk(Chunk chunk) {
+        // This method is not used in YamlStorage, as shops are loaded on
+        // initialization.
     }
 
     @Override

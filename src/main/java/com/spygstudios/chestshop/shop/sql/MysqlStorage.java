@@ -141,12 +141,12 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
     }
 
     @Override
-    public CompletableFuture<List<Shop>> loadShopsInChunk(Chunk chunk) {
+    public void loadShopsInChunk(Chunk chunk) {
         if (!chunk.isLoaded()) {
-            return CompletableFuture.failedFuture(new IllegalArgumentException("Chunk must be loaded to get shops"));
+            throw new IllegalArgumentException("Chunk must be loaded to get shops");
         }
 
-        return FutureUtils.runTaskAsyncWithCompletion(plugin, () -> {
+        FutureUtils.runTaskAsyncWithCompletion(plugin, () -> {
             String sql = "SELECT * FROM shops WHERE world = ? AND x >= ? AND x < ? AND z >= ? AND z < ?";
 
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -164,10 +164,10 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                 }
                 loadShopPlayers(shops);
 
-                return new ArrayList<>(shops.values());
+                return null;
             } catch (SQLException e) {
                 plugin.getLogger().severe("Failed to get shops in chunk: " + e.getMessage());
-                return List.of();
+                return null;
             }
         });
     }
