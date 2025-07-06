@@ -19,7 +19,6 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.enums.ShopRemoveCause;
 import com.spygstudios.chestshop.events.ShopRemoveEvent;
-import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.spyglib.hologram.HologramItemRow;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
 
@@ -50,7 +49,6 @@ public class Shop {
     private int soldItems;
     @Getter
     private ShopHologram hologram;
-    private DataManager dataManager;
     @Getter
     @Setter
     private boolean isSaved = false;
@@ -78,7 +76,6 @@ public class Shop {
         this.createdAt = createdAt;
         this.isNotify = isNotify;
         this.addedPlayers = addedPlayers;
-        this.dataManager = plugin.getDataManager();
         this.hologram = new ShopHologram(this, plugin);
         SHOPS.add(this);
     }
@@ -92,7 +89,7 @@ public class Shop {
     }
 
     public void setSoldItems(int soldItems) {
-        dataManager.updateSoldItems(ownerId, name, soldItems).thenAccept(success -> {
+        plugin.getDataManager().updateSoldItems(ownerId, name, soldItems).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop stats for " + name);
                 return;
@@ -104,7 +101,7 @@ public class Shop {
     }
 
     public void setMoneyEarned(double moneyEarned) {
-        dataManager.updateMoneyEarned(ownerId, name, moneyEarned).thenAccept(success -> {
+        plugin.getDataManager().updateMoneyEarned(ownerId, name, moneyEarned).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop stats for " + name);
                 return;
@@ -120,7 +117,7 @@ public class Shop {
     }
 
     public void setMaterial(Material material) {
-        dataManager.updateShopMaterial(ownerId, name, material).thenAccept(success -> {
+        plugin.getDataManager().updateShopMaterial(ownerId, name, material).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop material for " + name);
                 return;
@@ -134,7 +131,7 @@ public class Shop {
     }
 
     public void setName(String newName) {
-        dataManager.renameShop(ownerId, name, newName).thenAccept(success -> {
+        plugin.getDataManager().renameShop(ownerId, name, newName).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to rename shop " + name + " to " + newName);
                 return;
@@ -151,7 +148,7 @@ public class Shop {
 
     public void setPrice(double price) {
         double parsedPrice = ShopUtils.parsePrice(price);
-        dataManager.updateShopPrice(ownerId, name, parsedPrice).thenAccept(success -> {
+        plugin.getDataManager().updateShopPrice(ownerId, name, parsedPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop price for " + name);
                 return;
@@ -163,7 +160,7 @@ public class Shop {
     }
 
     public void setNotify(boolean notify) {
-        dataManager.updateShopNotify(ownerId, name, notify).thenAccept(success -> {
+        plugin.getDataManager().updateShopNotify(ownerId, name, notify).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop notify setting for " + name);
                 return;
@@ -182,7 +179,7 @@ public class Shop {
             Message.PLAYER_ALREADY_ADDED.send(Bukkit.getPlayer(ownerId), Map.of("%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
             return;
         }
-        dataManager.addPlayerToShop(ownerId, name, uuid).thenAccept(success -> {
+        plugin.getDataManager().addPlayerToShop(ownerId, name, uuid).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to add player " + uuid + " to shop " + name);
                 return;
@@ -202,7 +199,7 @@ public class Shop {
             Message.PLAYER_NOT_ADDED.send(Bukkit.getPlayer(ownerId), Map.of("%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
             return;
         }
-        dataManager.removePlayerFromShop(ownerId, name, uuid).thenAccept(success -> {
+        plugin.getDataManager().removePlayerFromShop(ownerId, name, uuid).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to remove player " + uuid + " from shop " + name);
                 return;
@@ -219,7 +216,7 @@ public class Shop {
         if (shopRemoveEvent.isCancelled()) {
             return;
         }
-        dataManager.deleteShop(ownerId, name).thenAccept(success -> {
+        plugin.getDataManager().deleteShop(ownerId, name).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to remove shop " + name);
                 return;
@@ -268,7 +265,7 @@ public class Shop {
                 "%items-left%", String.valueOf(itemsLeft),
                 "%items-bought%", String.valueOf(itemCount)));
 
-        dataManager.updateShopStats(ownerId, name, itemCount, itemsPrice).thenAccept(success -> {
+        plugin.getDataManager().updateShopStats(ownerId, name, itemCount, itemsPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop stats for " + name + " owned by " + ownerId);
                 return;
