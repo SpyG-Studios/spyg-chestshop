@@ -37,7 +37,7 @@ public class SqliteStorage extends DatabaseHandler implements DataManager {
     }
 
     @Override
-    public CompletableFuture<List<Shop>> getShopsInChunk(Chunk chunk) {
+    public CompletableFuture<List<Shop>> loadShopsInChunk(Chunk chunk) {
         return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
     }
 
@@ -102,11 +102,6 @@ public class SqliteStorage extends DatabaseHandler implements DataManager {
     }
 
     @Override
-    public CompletableFuture<Boolean> saveShop(Shop shop) {
-        return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
-    }
-
-    @Override
     public void createTables() throws SQLException {
         throw new UnsupportedOperationException("SQLite storage not implemented");
     }
@@ -124,6 +119,12 @@ public class SqliteStorage extends DatabaseHandler implements DataManager {
     @Override
     public CompletableFuture<Boolean> unloadPlayerShops(UUID ownerId) {
         return CompletableFuture.failedFuture(new UnsupportedOperationException("SQLite storage not implemented"));
+    }
+
+    @Override
+    public CompletableFuture<Boolean> saveShop(Shop shop) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'saveShop'");
     }
 
 }
