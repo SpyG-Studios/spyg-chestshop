@@ -173,6 +173,29 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
     }
 
     @Override
+    public void unloadShopsInChunk(Chunk chunk) {
+        List<Shop> shops = Shop.getShops();
+        if (shops == null || shops.isEmpty()) {
+            return;
+        }
+        for (Shop shop : shops) {
+            if (!chunk.getWorld().equals(shop.getChestLocation().getWorld())) {
+                continue;
+            }
+            int x = shop.getChestLocation().getBlockX() >> 4;
+            int z = shop.getChestLocation().getBlockZ() >> 4;
+            if (x != chunk.getX() || z != chunk.getZ()) {
+                continue;
+            }
+            if (shop.isSaved()) {
+                shop.unload();
+            } else {
+                plugin.getDataManager().saveShop(shop);
+            }
+        }
+    }
+
+    @Override
     public CompletableFuture<Shop> getShop(UUID ownerId, String shopName) {
         return FutureUtils.runTaskAsyncWithCompletion(plugin, () -> {
             Shop existingShop = Shop.getShop(ownerId, shopName);

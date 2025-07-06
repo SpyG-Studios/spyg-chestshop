@@ -25,6 +25,8 @@ public interface DataManager {
 
     CompletableFuture<List<Shop>> loadShopsInChunk(Chunk chunk);
 
+    void unloadShopsInChunk(Chunk chunk);
+
     CompletableFuture<Shop> getShop(UUID ownerId, String shopName);
 
     CompletableFuture<Boolean> updateShopPrice(UUID ownerId, String shopName, double price);
