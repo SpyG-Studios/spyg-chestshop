@@ -345,7 +345,7 @@ public class Shop {
         return new ArrayList<>(SHOPS);
     }
 
-    public static Shop getShop(UUID ownerId, String name) {
+    public static synchronized Shop getShop(UUID ownerId, String name) {
         for (Shop shop : getShops()) {
             if (shop.getOwnerId().equals(ownerId) && shop.getName().equalsIgnoreCase(name)) {
                 return shop;
