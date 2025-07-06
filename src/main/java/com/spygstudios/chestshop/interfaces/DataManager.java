@@ -23,7 +23,7 @@ public interface DataManager {
 
     CompletableFuture<List<Shop>> getPlayerShops(UUID ownerId);
 
-    CompletableFuture<List<Shop>> getShopsInChunk(Chunk chunk);
+    CompletableFuture<List<Shop>> loadShopsInChunk(Chunk chunk);
 
     CompletableFuture<Shop> getShop(UUID ownerId, String shopName);
 
