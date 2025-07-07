@@ -3,7 +3,6 @@ package com.spygstudios.chestshop.database;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import com.spygstudios.chestshop.ChestShop;
