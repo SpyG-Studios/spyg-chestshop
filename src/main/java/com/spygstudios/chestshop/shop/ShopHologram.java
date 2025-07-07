@@ -21,7 +21,8 @@ public class ShopHologram {
         this.plugin = plugin;
         this.shop = shop;
         int hologramRange = plugin.getConf().getInt("shops.holograms.range");
-        this.hologram = plugin.getHologramManager().createHologram(shop.getChestLocation().clone().add(0.5, 0.7, 0.5), hologramRange);
+        boolean hideBehindBlock = plugin.getConf().getBoolean("shops.holograms.hide-behind-block");
+        this.hologram = plugin.getHologramManager().createHologram(shop.getChestLocation().clone().add(0.5, 0.7, 0.5), hologramRange, hideBehindBlock);
         updateHologramRows();
     }
 
@@ -29,6 +30,10 @@ public class ShopHologram {
         while (!hologram.getRows().isEmpty()) {
             hologram.removeRow(0);
         }
+        int hologramRange = plugin.getConf().getInt("shops.holograms.range");
+        boolean hideBehindBlock = plugin.getConf().getBoolean("shops.holograms.hide-behind-block");
+        hologram.setHideBehindBlocks(hideBehindBlock);
+        hologram.setViewDistance(hologramRange);
         String owner = Bukkit.getOfflinePlayer(shop.getOwnerId()).getName();
         plugin.getConf().getStringList("shops.lines").forEach(line -> hologram.addRow(TranslateColor.translate(line
                 .replace("%owner%", owner == null ? "Unknown" : owner)
