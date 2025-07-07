@@ -1,4 +1,4 @@
-package com.spygstudios.chestshop.shop.sqlite;
+package com.spygstudios.chestshop.database.sqlite;
 
 import java.sql.SQLException;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.spygstudios.chestshop.shop.yaml;
+package com.spygstudios.chestshop.database.yaml;
 
 import java.io.File;
 import java.time.LocalDateTime;

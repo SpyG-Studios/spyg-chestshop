@@ -1,4 +1,4 @@
-package com.spygstudios.chestshop.shop.yaml;
+package com.spygstudios.chestshop.database.yaml;
 
 import java.util.List;
 import java.util.UUID;

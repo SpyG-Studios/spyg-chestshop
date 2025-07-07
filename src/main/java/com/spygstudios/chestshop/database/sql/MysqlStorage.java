@@ -1,4 +1,4 @@
-package com.spygstudios.chestshop.shop.sql;
+package com.spygstudios.chestshop.database.sql;
 
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;

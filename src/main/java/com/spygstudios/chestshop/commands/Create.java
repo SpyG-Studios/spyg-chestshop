@@ -14,11 +14,11 @@ import org.bukkit.inventory.ItemStack;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.chestshop.database.yaml.YamlShopFile;
 import com.spygstudios.chestshop.events.ShopCreatedEvent;
 import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.shop.ShopUtils;
-import com.spygstudios.chestshop.shop.yaml.YamlShopFile;
 
 import dev.rollczi.litecommands.annotations.argument.Arg;
 import dev.rollczi.litecommands.annotations.command.Command;
