@@ -1,9 +1,11 @@
 name: SpygChestShop
 main: com.spygstudios.chestshop.ChestShop
+paper-plugin-loader: com.spygstudios.chestshop.utils.DependencyLoader
 version: ${project.version}
 api-version: 1.20
 authors: [ikoli, Ris]
 depend: [Vault]
 
-libraries:
+
+sona-libraries:
   - com.spygstudios:spyglib:${spyglib.version}
