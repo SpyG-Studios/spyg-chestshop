@@ -14,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.Message;
-import com.spygstudios.chestshop.database.yaml.YamlShopFile;
 import com.spygstudios.chestshop.events.ShopCreatedEvent;
 import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.shop.Shop;
@@ -57,10 +56,8 @@ public class Create {
             return;
         }
 
-        YamlShopFile file = YamlShopFile.getShopFile(player);
-        if (file == null) {
-            file = new YamlShopFile(ChestShop.getInstance(), player);
-        } else if (file.getPlayerShops().contains(name)) {
+        DataManager dataManager = plugin.getDataManager();
+        if (Shop.getShop(player.getUniqueId(), name) != null) {
             Message.SHOP_ALREADY_EXISTS.send(player, Map.of("%shop-name%", name));
             return;
         }
@@ -71,7 +68,7 @@ public class Create {
         }
 
         int maxShops = ShopUtils.getMaxShops(player);
-        if (maxShops != -1 && file.getPlayerShops().size() >= maxShops) {
+        if (maxShops != -1 && dataManager.getPlayerShops(player.getUniqueId()).join().size() >= maxShops) {
             Message.SHOP_LIMIT_REACHED.send(player, Map.of("%shop-limit%", String.valueOf(maxShops)));
             return;
         }
