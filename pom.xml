@@ -69,14 +69,14 @@
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.50.2.0</version>
+            <version>${sqlite.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <version>9.3.0</version>
+            <version>${mysql.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -129,9 +129,7 @@
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
-                    <useIncrementalCompilation>
-                        false
-                    </useIncrementalCompilation>
+                    <useIncrementalCompilation>false</useIncrementalCompilation>
                 </configuration>
             </plugin>
 
@@ -144,15 +142,6 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.0.2</version>
             </plugin>
-            <!-- <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-sunfire-plugin</artifactId>
-                <version>2.22.1</version>
-                <configuration>
-                    <paralell>classes</paralell>
-                    <threadCount>8</threadCount>
-                </configuration>
-            </plugin> -->
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.2.0</version>
@@ -161,18 +150,6 @@
                 <artifactId>maven-install-plugin</artifactId>
                 <version>2.5.2</version>
             </plugin>
-            <!-- <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.junit.jupiter</groupId>
-                        <artifactId>junit-jupiter-engine</artifactId>
-                        <version>5.9.1</version>
-                    </dependency>
-                </dependencies>
-            </plugin> -->
         </plugins>
     </build>
 </project>
