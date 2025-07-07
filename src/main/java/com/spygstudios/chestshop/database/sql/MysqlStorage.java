@@ -228,9 +228,9 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
         if (shop != null) {
             return CompletableFuture.completedFuture(true);
         }
+
         String sql = "UPDATE shops SET price = ? WHERE owner_uuid = ? AND shop_name = ?";
-        execute(sql, price, ownerId.toString(), shopName);
-        return CompletableFuture.completedFuture(true);
+        return execute(sql, price, ownerId.toString(), shopName);
     }
 
     @Override
@@ -251,7 +251,8 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
             return CompletableFuture.completedFuture(true);
         }
 
-        return execute(shopName, ownerId.toString(), notify);
+        String sql = "UPDATE shops SET do_notify = ? WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, ownerId.toString(), notify);
     }
 
     @Override
@@ -261,21 +262,8 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
             return CompletableFuture.completedFuture(true);
         }
 
-        return FutureUtils.runTaskAsync(plugin, () -> {
-            String sql = "UPDATE shops SET sold_items = ?, money_earned = ? WHERE owner_uuid = ? AND shop_name = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setInt(1, soldItems);
-                stmt.setDouble(2, moneyEarned);
-                stmt.setString(3, ownerId.toString());
-                stmt.setString(4, shopName);
-                int rowsAffected = stmt.executeUpdate();
-                boolean success = rowsAffected > 0;
-                return success;
-            } catch (SQLException e) {
-                plugin.getLogger().severe("Failed to update shop stats: " + e.getMessage());
-                return false;
-            }
-        });
+        String sql = "UPDATE shops SET sold_items = ?, money_earned = ? WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, soldItems, moneyEarned, ownerId.toString(), shopName);
     }
 
     @Override
@@ -286,37 +274,14 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
             return CompletableFuture.completedFuture(true);
         }
 
-        return FutureUtils.runTaskAsync(plugin, () -> {
-            String sql = "UPDATE shops SET shop_name = ? WHERE owner_uuid = ? AND shop_name = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setString(1, newName);
-                stmt.setString(2, ownerId.toString());
-                stmt.setString(3, oldName);
-                int rowsAffected = stmt.executeUpdate();
-                boolean success = rowsAffected > 0;
-                return success;
-            } catch (SQLException e) {
-                plugin.getLogger().severe("Failed to rename shop: " + e.getMessage());
-                return false;
-            }
-        });
+        String sql = "UPDATE shops SET shop_name = ? WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, newName, ownerId.toString(), oldName);
     }
 
     @Override
     public CompletableFuture<Boolean> deleteShop(UUID ownerId, String shopName) {
-        return FutureUtils.runTaskAsync(plugin, () -> {
-            String sql = "DELETE FROM shops WHERE owner_uuid = ? AND shop_name = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setString(1, ownerId.toString());
-                stmt.setString(2, shopName);
-                int rowsAffected = stmt.executeUpdate();
-                boolean success = rowsAffected > 0;
-                return success;
-            } catch (SQLException e) {
-                plugin.getLogger().severe("Failed to delete shop: " + e.getMessage());
-                return false;
-            }
-        });
+        String sql = "DELETE FROM shops WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, ownerId.toString(), shopName);
     }
 
     @Override
@@ -355,20 +320,8 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
             plugin.getLogger().info("Player added to shop in memory for owner: " + ownerId + ", shopName: " + shopName);
             return CompletableFuture.completedFuture(true);
         }
-        return FutureUtils.runTaskAsync(plugin, () -> {
-            String sql = "INSERT INTO shop_players (shop_id, player_uuid) VALUES ((SELECT id FROM shops WHERE owner_uuid = ? AND shop_name = ?), ?)";
-            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setString(1, ownerId.toString());
-                stmt.setString(2, shopName);
-                stmt.setString(3, toAdd.toString());
-                int rowsAffected = stmt.executeUpdate();
-                boolean success = rowsAffected > 0;
-                return success;
-            } catch (SQLException e) {
-                plugin.getLogger().severe("Failed to add player to shop: " + e.getMessage());
-                return false;
-            }
-        });
+        String sql = "INSERT INTO shop_players (shop_id, player_uuid) VALUES ((SELECT id FROM shops WHERE owner_uuid = ? AND shop_name = ?), ?)";
+        return execute(sql, ownerId.toString(), shopName, toAdd.toString());
     }
 
     @Override
@@ -383,20 +336,8 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
             return CompletableFuture.completedFuture(true);
         }
 
-        return FutureUtils.runTaskAsync(plugin, () -> {
-            String sql = "DELETE FROM shop_players WHERE shop_id = (SELECT id FROM shops WHERE owner_uuid = ? AND shop_name = ?) AND player_uuid = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setString(1, ownerId.toString());
-                stmt.setString(2, shopName);
-                stmt.setString(3, toRemove.toString());
-                int rowsAffected = stmt.executeUpdate();
-                boolean success = rowsAffected > 0;
-                return success;
-            } catch (SQLException e) {
-                plugin.getLogger().severe("Failed to remove player from shop: " + e.getMessage());
-                return false;
-            }
-        });
+        String sql = "DELETE FROM shop_players WHERE shop_id = (SELECT id FROM shops WHERE owner_uuid = ? AND shop_name = ?) AND player_uuid = ?";
+        return execute(sql, ownerId.toString(), shopName, toRemove.toString());
     }
 
     @Override
@@ -408,20 +349,8 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
             return CompletableFuture.completedFuture(true);
         }
 
-        return FutureUtils.runTaskAsync(plugin, () -> {
-            String sql = "UPDATE shops SET sold_items = sold_items + ? WHERE owner_uuid = ? AND shop_name = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setInt(1, soldItems);
-                stmt.setString(2, ownerId.toString());
-                stmt.setString(3, shopName);
-                int rowsAffected = stmt.executeUpdate();
-                boolean success = rowsAffected > 0;
-                return success;
-            } catch (SQLException e) {
-                plugin.getLogger().severe("Failed to update sold items: " + e.getMessage());
-                return false;
-            }
-        });
+        String sql = "UPDATE shops SET sold_items = sold_items + ? WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, soldItems, ownerId.toString(), shopName);
     }
 
     @Override
@@ -433,20 +362,8 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
             return CompletableFuture.completedFuture(true);
         }
 
-        return FutureUtils.runTaskAsync(plugin, () -> {
-            String sql = "UPDATE shops SET money_earned = money_earned + ? WHERE owner_uuid = ? AND shop_name = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setDouble(1, moneyEarned);
-                stmt.setString(2, ownerId.toString());
-                stmt.setString(3, shopName);
-                int rowsAffected = stmt.executeUpdate();
-                boolean success = rowsAffected > 0;
-                return success;
-            } catch (SQLException e) {
-                plugin.getLogger().severe("Failed to update money earned: " + e.getMessage());
-                return false;
-            }
-        });
+        String sql = "UPDATE shops SET money_earned = money_earned + ? WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, moneyEarned, ownerId.toString(), shopName);
     }
 
     @Override
