@@ -40,21 +40,21 @@ public class BuildListener implements Listener {
         Block block = event.getBlock();
         Block adjacentBlock = null;
         switch (chest.getFacing()) {
-        case NORTH:
-            adjacentBlock = block.getRelative(type == Type.LEFT ? BlockFace.EAST : BlockFace.WEST);
-            break;
-        case EAST:
-            adjacentBlock = block.getRelative(type == Type.LEFT ? BlockFace.SOUTH : BlockFace.NORTH);
-            break;
-        case SOUTH:
-            adjacentBlock = block.getRelative(type == Type.LEFT ? BlockFace.WEST : BlockFace.EAST);
-            break;
-        case WEST:
-            adjacentBlock = block.getRelative(type == Type.LEFT ? BlockFace.NORTH : BlockFace.SOUTH);
-            break;
-        default:
-            event.setCancelled(true);
-            return;
+            case NORTH:
+                adjacentBlock = block.getRelative(type == Type.LEFT ? BlockFace.EAST : BlockFace.WEST);
+                break;
+            case EAST:
+                adjacentBlock = block.getRelative(type == Type.LEFT ? BlockFace.SOUTH : BlockFace.NORTH);
+                break;
+            case SOUTH:
+                adjacentBlock = block.getRelative(type == Type.LEFT ? BlockFace.WEST : BlockFace.EAST);
+                break;
+            case WEST:
+                adjacentBlock = block.getRelative(type == Type.LEFT ? BlockFace.NORTH : BlockFace.SOUTH);
+                break;
+            default:
+                event.setCancelled(true);
+                return;
         }
         Shop shop = Shop.getShop(adjacentBlock.getLocation());
         if (shop == null) {

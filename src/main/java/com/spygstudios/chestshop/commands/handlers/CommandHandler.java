@@ -31,7 +31,15 @@ public class CommandHandler {
     public CommandHandler(ChestShop plugin) {
         commands = LiteBukkitFactory.builder("spygchestshop", plugin)
 
-                .commands(new Reload(plugin), new ShopList(), new ShopListAdmin(), new AddPlayer(plugin), new RemovePlayer(plugin), new Create(), new Rename(plugin), new CustomerMode())
+                .commands(
+                        new Reload(plugin),
+                        new ShopList(),
+                        new ShopListAdmin(),
+                        new AddPlayer(plugin),
+                        new RemovePlayer(plugin),
+                        new Create(),
+                        new Rename(plugin),
+                        new CustomerMode())
 
                 .message(LiteBukkitMessages.PLAYER_ONLY, Message.PLAYER_ONLY.get())
 

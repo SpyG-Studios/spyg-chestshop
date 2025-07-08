@@ -41,8 +41,13 @@ public class ShopListAdmin {
         Message.ADMIN_SHOP_LIST_HEAD.send(player, Map.of("%player-name%", target.getName()));
         List<Shop> shops = Shop.getShops(target.getUniqueId()).stream().sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).skip((page - 1) * 10L).limit(10).toList();
         for (Shop shop : shops) {
-            Component hoverMessage = ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS_HOVER.get(), Map.of("%shop-name%", shop.getName(), "%material%", shop.getMaterialString(), "%price%",
-                    shop.getPrice() + "", "%items-left%", shop.getItemsLeft() + "", "%location%", shop.getChestLocationString(), "%created%", shop.getCreatedAt()));
+            Component hoverMessage = ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS_HOVER.get(), Map.of(
+                    "%shop-name%", shop.getName(),
+                    "%material%", shop.getMaterialString(),
+                    "%price%", shop.getPrice() + "",
+                    "%items-left%", shop.getItemsLeft() + "",
+                    "%location%", shop.getChestLocationString(),
+                    "%created%", shop.getCreatedAt()));
             player.sendMessage(ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS.get(), "%shop-name%", shop.getName()).hoverEvent(HoverEvent.showText(hoverMessage)));
         }
 

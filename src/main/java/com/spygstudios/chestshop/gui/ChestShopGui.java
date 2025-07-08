@@ -33,14 +33,17 @@ public class ChestShopGui {
     public static void open(ChestShop plugin, Player player, Shop shop) {
         config = plugin.getGuiConfig();
         Inventory inventory = player.getServer().createInventory(new ChestShopHolder(player, shop), 27,
-                TranslateColor.translate(config.getString("chestshop.title").replace("%shop-name%", shop.getName()).replace("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName())));
+                TranslateColor.translate(config.getString("chestshop.title")
+                        .replace("%shop-name%", shop.getName())
+                        .replace("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName())));
         setShopItems(plugin, shop, inventory);
         PageUtil.setFillItems(inventory, "chestshop");
         player.openInventory(inventory);
     }
 
     private static void setShopItems(ChestShop plugin, Shop shop, Inventory inventory) {
-        ItemStack shopMaterial = shop.getMaterial() != null ? new ItemStack(shop.getMaterial())
+        ItemStack shopMaterial = shop.getMaterial() != null
+                ? new ItemStack(shop.getMaterial())
                 : ItemUtils.create(Material.BARRIER, config.getString("chestshop.material.title"), config.getStringList("chestshop.material.lore"));
         inventory.setItem(13, shopMaterial);
         PersistentData materialData = new PersistentData(plugin, inventory.getItem(13));
@@ -50,10 +53,14 @@ public class ChestShopGui {
         // info item
         Material infoMaterial = Material.getMaterial(config.getString("chestshop.info.material", "WRITABLE_BOOK"));
         ItemStack infoItem = ItemUtils.create(infoMaterial, config.getString("chestshop.info.title"),
-                ParseListPlaceholder.parse(config.getStringList("chestshop.info.lore"),
-                        Map.of("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName(), "%material%", shop.getMaterial() == null ? "AIR" : shop.getMaterial().name(), "%price%",
-                                String.valueOf(shop.getPrice()), "%created%", shop.getCreatedAt(), "%location%", shop.getChestLocationString(), "%sold-items%", String.valueOf(shop.getSoldItems()),
-                                "%money-earned%", String.valueOf(shop.getMoneyEarned()))));
+                ParseListPlaceholder.parse(config.getStringList("chestshop.info.lore"), Map.of(
+                        "%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName(),
+                        "%material%", shop.getMaterial() == null ? "AIR" : shop.getMaterial().name(),
+                        "%price%", String.valueOf(shop.getPrice()),
+                        "%created%", shop.getCreatedAt(),
+                        "%location%", shop.getChestLocationString(),
+                        "%sold-items%", String.valueOf(shop.getSoldItems()),
+                        "%money-earned%", String.valueOf(shop.getMoneyEarned()))));
         inventory.setItem(8, infoItem);
 
         // notify item

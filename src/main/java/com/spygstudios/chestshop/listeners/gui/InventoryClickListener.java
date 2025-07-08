@@ -60,48 +60,48 @@ public class InventoryClickListener implements Listener {
         GuiAction guiAction = GuiAction.valueOf(action);
         ShopGuiHolder holder = (ShopGuiHolder) event.getInventory().getHolder();
         switch (guiAction) {
-        case SET_ITEM_AMOUNT:
-            if (System.currentTimeMillis() - getLastAmountClick(event.getWhoClicked()) < 100) {
-                return;
-            }
-            ItemStack item = event.getInventory().getItem(13);
-            lastAmountClick.put(event.getWhoClicked().getUniqueId(), System.currentTimeMillis());
-            int itemsLeft = holder.getShop().getItemsLeft();
-            int max = item.getMaxStackSize() > itemsLeft ? itemsLeft : item.getMaxStackSize();
-            int min = 1;
-            int modifier = data.getInt("amount");
-            int currentAmount = item.getAmount();
-            if (currentAmount + modifier >= max) {
-                currentAmount = max;
-            } else if (currentAmount + modifier <= min) {
-                currentAmount = min;
-            } else {
-                currentAmount = currentAmount + modifier;
-            }
-            item.setAmount(currentAmount);
-            ItemMeta shopMeta = item.getItemMeta();
-            final int finalCurrentAmount = currentAmount;
-            List<Component> translatedLore = plugin.getGuiConfig().getStringList("shop.item-to-buy.lore").stream()
-                    .map(line -> TranslateColor.translate(line.replace("%price%", String.valueOf(holder.getShop().getPrice() * finalCurrentAmount)))).toList();
-            shopMeta.lore(translatedLore);
-            item.setItemMeta(shopMeta);
-            break;
+            case SET_ITEM_AMOUNT:
+                if (System.currentTimeMillis() - getLastAmountClick(event.getWhoClicked()) < 100) {
+                    return;
+                }
+                ItemStack item = event.getInventory().getItem(13);
+                lastAmountClick.put(event.getWhoClicked().getUniqueId(), System.currentTimeMillis());
+                int itemsLeft = holder.getShop().getItemsLeft();
+                int max = item.getMaxStackSize() > itemsLeft ? itemsLeft : item.getMaxStackSize();
+                int min = 1;
+                int modifier = data.getInt("amount");
+                int currentAmount = item.getAmount();
+                if (currentAmount + modifier >= max) {
+                    currentAmount = max;
+                } else if (currentAmount + modifier <= min) {
+                    currentAmount = min;
+                } else {
+                    currentAmount = currentAmount + modifier;
+                }
+                item.setAmount(currentAmount);
+                ItemMeta shopMeta = item.getItemMeta();
+                final int finalCurrentAmount = currentAmount;
+                List<Component> translatedLore = plugin.getGuiConfig().getStringList("shop.item-to-buy.lore").stream()
+                        .map(line -> TranslateColor.translate(line.replace("%price%", String.valueOf(holder.getShop().getPrice() * finalCurrentAmount)))).toList();
+                shopMeta.lore(translatedLore);
+                item.setItemMeta(shopMeta);
+                break;
 
-        case BUY:
-            ItemStack shopItem = event.getInventory().getItem(13);
-            int amount = shopItem.getAmount();
-            holder.getShop().getShopTransactions().sell(holder.getPlayer(), amount);
-            if (holder.getShop().getItemsLeft() == 0) {
-                holder.getShop().getHologram().updateHologramRows();
-                holder.getPlayer().closeInventory();
-                Message.SHOP_EMPTY.send(holder.getPlayer());
-            }
-            break;
-        case OPEN_SHOP_INVENTORY:
-            holder.getShop().openShopInventory(holder.getPlayer());
-            break;
-        default:
-            break;
+            case BUY:
+                ItemStack shopItem = event.getInventory().getItem(13);
+                int amount = shopItem.getAmount();
+                holder.getShop().getShopTransactions().sell(holder.getPlayer(), amount);
+                if (holder.getShop().getItemsLeft() == 0) {
+                    holder.getShop().getHologram().updateHologramRows();
+                    holder.getPlayer().closeInventory();
+                    Message.SHOP_EMPTY.send(holder.getPlayer());
+                }
+                break;
+            case OPEN_SHOP_INVENTORY:
+                holder.getShop().openShopInventory(holder.getPlayer());
+                break;
+            default:
+                break;
         }
     }
 
@@ -123,23 +123,23 @@ public class InventoryClickListener implements Listener {
         PlayersHolder holder = (PlayersHolder) event.getInventory().getHolder();
         GuiAction guiAction = GuiAction.valueOf(action);
         switch (guiAction) {
-        case REMOVE_PLAYER:
-            Shop shop = holder.getShop();
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(data.getString("uuid")));
-            shop.removePlayer(offlinePlayer.getUniqueId());
-            PlayersGui.reloadGui(plugin, event.getInventory());
-            break;
+            case REMOVE_PLAYER:
+                Shop shop = holder.getShop();
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(data.getString("uuid")));
+                shop.removePlayer(offlinePlayer.getUniqueId());
+                PlayersGui.reloadGui(plugin, event.getInventory());
+                break;
 
-        case NEXT:
-            holder.setPage(holder.getPage() + 1);
-            PlayersGui.reloadGui(plugin, event.getInventory());
-            break;
-        case BACK:
-            holder.setPage(holder.getPage() - 1);
-            PlayersGui.reloadGui(plugin, event.getInventory());
-            break;
-        default:
-            break;
+            case NEXT:
+                holder.setPage(holder.getPage() + 1);
+                PlayersGui.reloadGui(plugin, event.getInventory());
+                break;
+            case BACK:
+                holder.setPage(holder.getPage() - 1);
+                PlayersGui.reloadGui(plugin, event.getInventory());
+                break;
+            default:
+                break;
         }
     }
 
@@ -179,36 +179,38 @@ public class InventoryClickListener implements Listener {
         Shop shop = holder.getShop();
         GuiAction guiAction = GuiAction.valueOf(action);
         switch (guiAction) {
-        case SET_MATERIAL:
-            changeShopMaterial(event);
-            break;
-        case TOGGLE_NOTIFY:
-            shop.setNotify(!shop.isNotify());
-            ItemStack notifyItem = clickedItem;
-            ItemMeta notifyMeta = notifyItem.getItemMeta();
-            notifyMeta
-                    .lore(Arrays.asList(TranslateColor.translate(shop.isNotify() ? plugin.getGuiConfig().getString("chestshop.notify.on") : plugin.getGuiConfig().getString("chestshop.notify.off"))));
-            notifyItem.setItemMeta(notifyMeta);
-            player.updateInventory();
-            break;
-        case SET_ITEM_PRICE:
-            if (AmountHandler.getPendingAmount(player) != null) {
-                AmountHandler.getPendingAmount(player).cancel();
-            }
-            new AmountHandler(player, shop, guiAction);
-            event.getInventory().close();
-            break;
-        case OPEN_PLAYERS:
-            PlayersGui.open(plugin, player, shop);
-            break;
-        case OPEN_SHOP_INVENTORY:
-            shop.openShopInventory(player);
-            break;
-        case CLOSE:
-            player.closeInventory();
-            break;
-        default:
-            break;
+            case SET_MATERIAL:
+                changeShopMaterial(event);
+                break;
+            case TOGGLE_NOTIFY:
+                shop.setNotify(!shop.isNotify());
+                ItemStack notifyItem = clickedItem;
+                ItemMeta notifyMeta = notifyItem.getItemMeta();
+                notifyMeta
+                        .lore(Arrays.asList(TranslateColor.translate(shop.isNotify()
+                                ? plugin.getGuiConfig().getString("chestshop.notify.on")
+                                : plugin.getGuiConfig().getString("chestshop.notify.off"))));
+                notifyItem.setItemMeta(notifyMeta);
+                player.updateInventory();
+                break;
+            case SET_ITEM_PRICE:
+                if (AmountHandler.getPendingAmount(player) != null) {
+                    AmountHandler.getPendingAmount(player).cancel();
+                }
+                new AmountHandler(player, shop, guiAction);
+                event.getInventory().close();
+                break;
+            case OPEN_PLAYERS:
+                PlayersGui.open(plugin, player, shop);
+                break;
+            case OPEN_SHOP_INVENTORY:
+                shop.openShopInventory(player);
+                break;
+            case CLOSE:
+                player.closeInventory();
+                break;
+            default:
+                break;
         }
     }
 

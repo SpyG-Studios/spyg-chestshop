@@ -33,8 +33,9 @@ public class PlayerJoinListener implements Listener {
             return;
         }
         if (!isLatestVersion && event.getPlayer().hasPermission("spygchestshop.admin.updates")) {
-            Component message = ComponentUtils.replaceComponent(Message.NEW_VERSION.get().clickEvent(ClickEvent.clickEvent(Action.OPEN_URL, "https://modrinth.com/plugin/spyg-chestshop")),
-                    Map.of("%old-version%", plugin.getPluginMeta().getVersion(), "%new-version%", currentVersion));
+            Component message = ComponentUtils.replaceComponent(Message.NEW_VERSION.get().clickEvent(ClickEvent.clickEvent(Action.OPEN_URL, "https://modrinth.com/plugin/spyg-chestshop")), Map.of(
+                    "%old-version%", plugin.getPluginMeta().getVersion(),
+                    "%new-version%", currentVersion));
             event.getPlayer().sendMessage(message);
         }
     }
