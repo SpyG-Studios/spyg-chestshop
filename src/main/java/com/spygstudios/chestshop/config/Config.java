@@ -31,6 +31,7 @@ public class Config extends YamlManager {
         set("shops.max-players", 18, Arrays.asList("The maximum amount of players that can be added to a shop. Set to 0 for unlimited."));
         set("shops.save-interval", 60, Arrays.asList("The interval in seconds to save the shops data."));
         set("shops.holograms.range", 16, Arrays.asList("The view range of the holograms. Restart required to apply changes."));
+        set("shops.holograms.see-through-walls", false, Arrays.asList("If the holograms should be visible through walls."));
 
         set("shops.anti-explosion", true, Arrays.asList("Prevent shops from being destroyed by explosions."));
         set("shops.hopper-protection", true,

@@ -18,10 +18,11 @@ public class ShopHologram {
     private final ChestShop plugin;
 
     public ShopHologram(Shop shop, ChestShop plugin) {
+        int hologramRange = plugin.getConf().getInt("shops.holograms.range");
+        boolean seeTroughWalls = plugin.getConf().getBoolean("shops.holograms.see-through-walls");
         this.plugin = plugin;
         this.shop = shop;
-        int hologramRange = plugin.getConf().getInt("shops.holograms.range");
-        this.hologram = plugin.getHologramManager().createHologram(shop.getChestLocation().clone().add(0.5, 0.7, 0.5), hologramRange);
+        this.hologram = plugin.getHologramManager().createHologram(shop.getChestLocation().clone().add(0.5, 0.7, 0.5), seeTroughWalls, hologramRange);
         updateHologramRows();
     }
 
@@ -29,8 +30,8 @@ public class ShopHologram {
         while (!hologram.getRows().isEmpty()) {
             hologram.removeRow(0);
         }
-        int hologramRange = plugin.getConf().getInt("shops.holograms.range");
-        hologram.setViewDistance(hologramRange);
+        hologram.setViewDistance(plugin.getConf().getInt("shops.holograms.range"));
+        hologram.setSeeTrough(plugin.getConf().getBoolean("shops.holograms.see-through-walls"));
         String owner = Bukkit.getOfflinePlayer(shop.getOwnerId()).getName();
         plugin.getConf().getStringList("shops.lines").forEach(line -> hologram.addRow(TranslateColor.translate(line
                 .replace("%owner%", owner == null ? "Unknown" : owner)
