@@ -18,6 +18,7 @@ public class Config extends YamlManager {
         set("colors.command.label", "&7");
         set("colors.command.args", "&f");
 
+        set("shops.price", 0.0, Arrays.asList("Shop creation price. Set to 0 for free shops."));
         set("shops.decimals.enabled", false, Arrays.asList("Enable cents in the shops. This will allow prices to have decimal values (e.g. 1.99)."));
         set("shops.decimals.max", 2, Arrays.asList("The maximum amount of decimal places allowed in the price."));
         set("shops.barrier-when-empty", false, Arrays.asList("Displays a barrier instead of the shop's item above the shop when it is out of stock."));
@@ -27,7 +28,7 @@ public class Config extends YamlManager {
         set("shops.disabled-worlds", Arrays.asList("disabled_world"));
         set("shops.unknown-material", "-", Arrays.asList("The material text to use when the material is unknown."));
         set("shops.max-shops.default", -1, Arrays.asList(
-                "The maximum amount of shops a player can have (spygchestshop.max.<group>). Set to -1 for unlimited. If a player has more than one permission, the highest amount will be used."));
+                "The maximum amount of shops a player can have (spygchestshop.max.<shop_group_name>). Set to -1 for unlimited. If a player has more than one permission, the highest amount will be used."));
         set("shops.max-players", 18, Arrays.asList("The maximum amount of players that can be added to a shop. Set to 0 for unlimited."));
         set("shops.save-interval", 60, Arrays.asList("The interval in seconds to save the shops data."));
         set("shops.holograms.range", 16, Arrays.asList("The view range of the holograms. Restart required to apply changes."));

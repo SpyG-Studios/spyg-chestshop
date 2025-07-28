@@ -25,7 +25,9 @@ shop:
   bought: '%prefix% &aSikeresen vásároltál &7x%items-bought% &f%material% &f$%price%
     &aért! &7(&8%items-left%&7)'
   chest-already-shop: '%prefix% &cEz a láda már jelenleg is bolt!'
-  created: '%prefix% &aSikeresen létrehoztad a(z) &f%shop-name% &aboltot!'
+  created:
+    with-price: '%prefix% &aBolt &f%shop-name% &a&f$%price%&a-ért létrehozva!'
+    basic: '%prefix% &aBolt &f%shop-name% &alétrehozva!'
   disabled-world: '%prefix% &cEbben a világban nem hozhatsz létre boltot!'
   invalid-page: '%prefix% &cÉrvénytelen oldal! &7(&8%page%&7)'
   limit-reached: '%prefix% &cElérted a maximum boltok számát! (&e%shop-limit%&c)'
