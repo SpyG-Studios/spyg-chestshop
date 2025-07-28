@@ -90,7 +90,7 @@ public class Create {
         Shop shop = new Shop(player, name, targetBlock.getLocation(), file);
         ShopCreateEvent shopCreateEvent = new ShopCreateEvent(shop);
         Bukkit.getPluginManager().callEvent(shopCreateEvent);
-        System.out.println(shopPrice);
+
         if (shopPrice > 0) {
             economy.withdrawPlayer(player, shopPrice);
             Message.SHOP_CREATED_PRICE.send(player, Map.of("%shop-name%", name, "%price%", String.valueOf(shopPrice)));
