@@ -1,6 +1,8 @@
 package com.spygstudios.chestshop.gui;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -56,7 +58,7 @@ public class ChestShopGui {
                 ParseListPlaceholder.parse(config.getStringList("chestshop.info.lore"), Map.of(
                         "%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName(),
                         "%material%", shop.getMaterial() == null ? "AIR" : shop.getMaterial().name(),
-                        "%price%", String.valueOf(shop.getPrice()),
+                        "%price%", String.format("Customer Purchase: $%.2f / Customer Sale: $%.2f", shop.getCustomerPurchasePrice(), shop.getCustomerSalePrice()),
                         "%created%", shop.getCreatedAt(),
                         "%location%", shop.getChestLocationString(),
                         "%sold-items%", String.valueOf(shop.getSoldItems()),
@@ -74,7 +76,11 @@ public class ChestShopGui {
 
         // money item
         Material moneyMaterial = Material.getMaterial(config.getString("chestshop.money.material", "GOLD_INGOT"));
-        ItemStack moneyItem = ItemUtils.create(moneyMaterial, config.getString("chestshop.money.title"), config.getStringList("chestshop.money.lore"));
+        List<String> moneyLore = new ArrayList<>();
+        moneyLore.add(config.getString("chestshop.money.sell.line", "&7Customer Purchase Price: &a$%sell-price%").replace("%sell-price%", String.valueOf(shop.getCustomerPurchasePrice())));
+        moneyLore.add(config.getString("chestshop.money.buy.line", "&7Customer Sale Price: &c$%buy-price%").replace("%buy-price%", String.valueOf(shop.getCustomerSalePrice())));
+        moneyLore.addAll(config.getStringList("chestshop.money.lore"));
+        ItemStack moneyItem = ItemUtils.create(moneyMaterial, config.getString("chestshop.money.title"), moneyLore);
         PersistentData moneyData = new PersistentData(plugin, moneyItem);
         moneyData.set("action", GuiAction.SET_ITEM_PRICE.name());
         moneyData.save();
@@ -88,6 +94,20 @@ public class ChestShopGui {
         inventoryData.save();
         inventory.setItem(18, inventoryItem);
 
+        // buy/sell toggle item
+        Material buySellMaterial = Material.getMaterial(config.getString("chestshop.buysell.material", "COMPARATOR"));
+        List<String> buySellLore = new ArrayList<>();
+        String sellStatus = shop.acceptsCustomerPurchases() ? config.getString("chestshop.buysell.sell.enabled", "&aEnabled") : config.getString("chestshop.buysell.sell.disabled", "&cDisabled");
+        String buyStatus = shop.acceptsCustomerSales() ? config.getString("chestshop.buysell.buy.enabled", "&aEnabled") : config.getString("chestshop.buysell.buy.disabled", "&cDisabled");
+        buySellLore.add(config.getString("chestshop.buysell.sell.line", "&7Selling: %status%").replace("%status%", sellStatus));
+        buySellLore.add(config.getString("chestshop.buysell.buy.line", "&7Buying: %status%").replace("%status%", buyStatus));
+        buySellLore.addAll(config.getStringList("chestshop.buysell.lore"));
+        ItemStack buySellItem = ItemUtils.create(buySellMaterial, config.getString("chestshop.buysell.title"), buySellLore);
+        PersistentData buySellData = new PersistentData(plugin, buySellItem);
+        buySellData.set("action", GuiAction.TOGGLE_SELLING.name());
+        buySellData.save();
+        inventory.setItem(15, buySellItem);
+
         // player item
         OfflinePlayer owner = Bukkit.getOfflinePlayer(shop.getOwnerId());
         ItemStack playrItem = owner.isOnline() ? PlayerHeads.getOnlinePlayerHead(owner.getUniqueId()) : PlayerHeads.getOfflinePlayerHead(owner.getUniqueId());
@@ -98,7 +118,6 @@ public class ChestShopGui {
         PersistentData playerData = new PersistentData(plugin, playrItem);
         playerData.set("action", GuiAction.OPEN_PLAYERS.name());
         playerData.save();
-
         inventory.setItem(26, playrItem);
     }
 

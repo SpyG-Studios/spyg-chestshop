@@ -15,9 +15,11 @@ public class GuiConfig extends YamlManager {
         set("chestshop.material.title", "&cMaterial");
         set("chestshop.material.lore", Arrays.asList("&7Put here the material you", "&7want to sell"));
 
-        set("chestshop.money.title", "&6Price");
+        set("chestshop.money.title", "&6&lPrice Settings");
         set("chestshop.money.material", "GOLD_INGOT");
-        set("chestshop.money.lore", Arrays.asList("&7Edit the price you want to", "&7sell the material for"));
+        set("chestshop.money.sell.line", "&7Sell Price: &a$%sell-price%");
+        set("chestshop.money.buy.line", "&7Buy Price: &c$%buy-price%");
+        set("chestshop.money.lore", Arrays.asList("&7Left click: Set sell price", "&7Right click: Set buy price"));
 
         set("chestshop.inventory.title", "&cShopInventory");
         set("chestshop.inventory.material", "CHEST");
@@ -35,6 +37,17 @@ public class GuiConfig extends YamlManager {
         set("chestshop.notify.material", "BELL");
         set("chestshop.notify.on", "&2ON");
         set("chestshop.notify.off", "&4OFF");
+        
+        set("chestshop.buysell.title", "&6&lBuy/Sell Toggle");
+        set("chestshop.buysell.material", "LEVER");
+        set("chestshop.buysell.sell.line", "&7Selling: %status%");
+        set("chestshop.buysell.buy.line", "&7Buying: %status%");
+        set("chestshop.buysell.sell.enabled", "&a&lENABLED");
+        set("chestshop.buysell.sell.disabled", "&c&lDISABLED");
+        set("chestshop.buysell.buy.enabled", "&a&lENABLED");
+        set("chestshop.buysell.buy.disabled", "&c&lDISABLED");
+        set("chestshop.buysell.lore", Arrays.asList("&7Left click: Toggle selling", "&7Right click: Toggle buying"));
+        
         set("chestshop.fill-items.filler1.material", "GRAY_STAINED_GLASS_PANE");
         set("chestshop.fill-items.filler1.slots", Arrays.asList());
 
@@ -52,6 +65,14 @@ public class GuiConfig extends YamlManager {
         set("shop.title", "&c%shop-name%");
         set("shop.item-to-buy.title", "&6&lBuy &7%material%");
         set("shop.item-to-buy.lore", Arrays.asList("&7Buy item for &6$&e%price%"));
+        set("shop.item-to-sell.title", "&6&lSell &7%material%");
+        set("shop.item-to-sell.lore", Arrays.asList("&7Sell item for &6$&e%price%"));
+        set("shop.mode.buying.title", "&a&lBuying Mode");
+        set("shop.mode.buying.material", "EMERALD");
+        set("shop.mode.buying.lore", Arrays.asList("&7Click to switch to selling mode"));
+        set("shop.mode.selling.title", "&c&lSelling Mode");
+        set("shop.mode.selling.material", "REDSTONE");
+        set("shop.mode.selling.lore", Arrays.asList("&7Click to switch to buying mode"));
         set("shop.fill-items.filler1.material", "GRAY_STAINED_GLASS_PANE");
         set("shop.fill-items.filler1.slots", Arrays.asList());
 

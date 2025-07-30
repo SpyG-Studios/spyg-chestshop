@@ -26,7 +26,8 @@ import lombok.Getter;
 public class Shop {
     @Getter
     private UUID ownerId;
-    private double price;
+    private double sellPrice;
+    private double buyPrice;
     @Getter
     private Material material;
     @Getter
@@ -37,6 +38,10 @@ public class Shop {
     private String name;
     @Getter
     private boolean isNotify;
+    @Getter
+    private boolean canSell; // Shop can sell items TO customers (customers can purchase)
+    @Getter
+    private boolean canBuy;  // Shop can buy items FROM customers (customers can sell)
     @Getter
     private List<UUID> addedPlayers;
     @Getter
@@ -50,18 +55,21 @@ public class Shop {
     private static ChestShop plugin = ChestShop.getInstance();
 
     public Shop(Player owner, String shopName, Location chestLocation, ShopFile shopFile) {
-        this(owner.getUniqueId(), shopName, 0, null, chestLocation, ShopFile.getDateString(), false, new ArrayList<>(), shopFile);
+        this(owner.getUniqueId(), shopName, 0, 0, null, chestLocation, ShopFile.getDateString(), false, true, false, new ArrayList<>(), shopFile);
         shopFile.addShop(this);
     }
 
-    public Shop(UUID ownerId, String shopName, double price, Material material, Location chestLocation, String createdAt, boolean isNotify, List<UUID> addedPlayers, ShopFile shopFile) {
+    public Shop(UUID ownerId, String shopName, double sellPrice, double buyPrice, Material material, Location chestLocation, String createdAt, boolean isNotify, boolean canSell, boolean canBuy, List<UUID> addedPlayers, ShopFile shopFile) {
         this.ownerId = ownerId;
         this.name = shopName;
-        this.price = ShopUtils.parsePrice(price);
+        this.sellPrice = ShopUtils.parsePrice(sellPrice);
+        this.buyPrice = ShopUtils.parsePrice(buyPrice);
         this.material = material;
         this.chestLocation = chestLocation;
         this.createdAt = createdAt;
         this.isNotify = isNotify;
+        this.canSell = canSell;
+        this.canBuy = canBuy;
         this.addedPlayers = addedPlayers;
         this.shopFile = shopFile;
         this.shopTransactions = new ShopTransactions(this, shopFile);
@@ -104,20 +112,65 @@ public class Shop {
         hologram.updateHologramRows();
     }
 
-    public double getPrice() {
-        return ShopUtils.parsePrice(this.price);
+    public double getSellPrice() {
+        return ShopUtils.parsePrice(this.sellPrice);
     }
 
-    public void setPrice(double price) {
-        this.price = ShopUtils.parsePrice(price);
-        ShopFile.getShopFile(ownerId).setPrice(name, this.price);
+    public double getBuyPrice() {
+        return ShopUtils.parsePrice(this.buyPrice);
+    }
+
+    // Clearer method names for the shop's capabilities in the context of customer interactions
+    // For example, isCanSell() and isCanBuy() are confusing, so we use more descriptive names
+    // I.E From the shop perspective: what the shop can do with customers
+    public boolean acceptsCustomerPurchases() {
+        return isCanSell();
+    }
+
+    public boolean acceptsCustomerSales() {
+        return isCanBuy();
+    }
+
+    public double getCustomerPurchasePrice() {
+        return getSellPrice();
+    }
+
+    public double getCustomerSalePrice() {
+        return getBuyPrice();
+    }
+
+
+    public void setSellPrice(double sellPrice) {
+        this.sellPrice = ShopUtils.parsePrice(sellPrice);
+        ShopFile.getShopFile(ownerId).setSellPrice(name, this.sellPrice);
         hologram.updateHologramRows();
     }
+
+    public void setBuyPrice(double buyPrice) {
+        this.buyPrice = ShopUtils.parsePrice(buyPrice);
+        ShopFile.getShopFile(ownerId).setBuyPrice(name, this.buyPrice);
+        hologram.updateHologramRows();
+    }
+
 
     public void setNotify(boolean notify) {
         isNotify = notify;
         shopFile.overwriteSet("shops." + name + ".do-notify", notify);
         shopFile.save();
+    }
+
+    public void setCanSell(boolean canSell) {
+        this.canSell = canSell;
+        shopFile.overwriteSet("shops." + name + ".can-sell", canSell);
+        shopFile.save();
+        hologram.updateHologramRows();
+    }
+
+    public void setCanBuy(boolean canBuy) {
+        this.canBuy = canBuy;
+        shopFile.overwriteSet("shops." + name + ".can-buy", canBuy);
+        shopFile.save();
+        hologram.updateHologramRows();
     }
 
     public void addPlayer(OfflinePlayer player) {
