@@ -55,18 +55,27 @@ public class InteractListener implements Listener {
             return;
         }
 
-        // Buyer
+        // Customer interaction
         if (shop.getMaterial() == null) {
             Message.SHOP_SETUP_NEEDED.send(player);
             event.setCancelled(true);
             return;
         }
 
-        if (shop.getItemsLeft() == 0 && !shop.getAddedPlayers().contains(player.getUniqueId())) {
+        // If shop doesn't accept any customer interactions, cancel the event
+        if (!shop.acceptsCustomerSales() && !shop.acceptsCustomerPurchases()) {
+            Message.SHOP_SETUP_NEEDED.send(player);
+            event.setCancelled(true);
+            return;
+        }
+
+        // If shop is empty and doesn't accept customer sales (only allows customer purchases), block access
+        if (shop.getItemsLeft() == 0 && !shop.acceptsCustomerSales() && !shop.getAddedPlayers().contains(player.getUniqueId())) {
             Message.SHOP_EMPTY.send(player);
             event.setCancelled(true);
             return;
         }
+
         ShopGui.open(plugin, player, shop);
         event.setCancelled(true);
     }

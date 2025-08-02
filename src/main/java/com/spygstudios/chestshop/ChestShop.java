@@ -33,6 +33,7 @@ import com.spygstudios.chestshop.listeners.ExplosionListener;
 import com.spygstudios.chestshop.listeners.HopperListener;
 import com.spygstudios.chestshop.listeners.InteractListener;
 import com.spygstudios.chestshop.listeners.PlayerJoinListener;
+import com.spygstudios.chestshop.listeners.PlayerQuitListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
 import com.spygstudios.chestshop.shop.ShopFile;
@@ -82,6 +83,7 @@ public class ChestShop extends JavaPlugin {
         new ExplosionListener(instance);
         new ChatListener(instance);
         new HopperListener(instance);
+        new PlayerQuitListener(instance);
         Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
             Entry<String, Boolean> versionInfo = VersionChecker.isLatestVersion(API_URL, getPluginMeta().getVersion());
             new PlayerJoinListener(instance, versionInfo.getKey(), versionInfo.getValue());

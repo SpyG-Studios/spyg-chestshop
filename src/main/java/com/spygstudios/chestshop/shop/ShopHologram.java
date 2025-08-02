@@ -33,11 +33,26 @@ public class ShopHologram {
         hologram.setViewDistance(plugin.getConf().getInt("shops.holograms.range"));
         hologram.setSeeTrough(plugin.getConf().getBoolean("shops.holograms.see-through-walls"));
         String owner = Bukkit.getOfflinePlayer(shop.getOwnerId()).getName();
-        plugin.getConf().getStringList("shops.lines").forEach(line -> hologram.addRow(TranslateColor.translate(line
+        plugin.getConf().getStringList("shops.lines").forEach(line -> {
+            String priceDisplay;
+            if (shop.acceptsCustomerPurchases() && shop.acceptsCustomerSales()) {
+                priceDisplay = String.valueOf(shop.getCustomerPurchasePrice()) + " / " + String.valueOf(shop.getCustomerSalePrice());
+            } else if (shop.acceptsCustomerPurchases()) {
+                priceDisplay = String.valueOf(shop.getCustomerPurchasePrice());
+            } else if (shop.acceptsCustomerSales()) {
+                priceDisplay = String.valueOf(shop.getCustomerSalePrice());
+            } else {
+                priceDisplay = "N/A";
+            }
+            
+            hologram.addRow(TranslateColor.translate(line
                 .replace("%owner%", owner == null ? "Unknown" : owner)
                 .replace("%shop-name%", shop.getName())
-                .replace("%price%", String.valueOf(shop.getPrice()))
-                .replace("%material%", shop.getMaterialString()))));
+                .replace("%price%", priceDisplay)
+                .replace("%sell-price%", String.valueOf(shop.getCustomerPurchasePrice()))
+                .replace("%buy-price%", String.valueOf(shop.getCustomerSalePrice()))
+                .replace("%material%", shop.getMaterialString())));
+        });
         hologram.addRow(new ItemStack(
                 shop.getMaterial() == null || (shop.getItemsLeft() == 0 && ChestShop.getInstance().getConf().getBoolean("shops.barrier-when-empty")) ? Material.BARRIER : shop.getMaterial()));
     }
