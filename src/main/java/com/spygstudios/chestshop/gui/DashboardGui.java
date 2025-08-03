@@ -86,7 +86,9 @@ public class DashboardGui {
         // notify item
         Material notifyMaterial = Material.getMaterial(guiConfig.getString("chestshop.notify.material", "BELL"));
         ItemStack notifyItem = ItemUtils.create(notifyMaterial, guiConfig.getString("chestshop.notify.title"),
-                Arrays.asList(shop.isNotify() ? guiConfig.getString("chestshop.notify.on") : guiConfig.getString("chestshop.notify.off")));
+                Arrays.asList(shop.isNotify()
+                        ? guiConfig.getString("chestshop.notify.on")
+                        : guiConfig.getString("chestshop.notify.off")));
         PersistentData notifyData = new PersistentData(plugin, notifyItem);
         notifyData.set("action", GuiAction.TOGGLE_NOTIFY.name());
         notifyData.save();
@@ -100,7 +102,7 @@ public class DashboardGui {
         moneyLore.addAll(guiConfig.getStringList("chestshop.money.lore"));
         ItemStack moneyItem = ItemUtils.create(moneyMaterial, guiConfig.getString("chestshop.money.title"), moneyLore);
         PersistentData moneyData = new PersistentData(plugin, moneyItem);
-        moneyData.set("action", GuiAction.SET_ITEM_PRICE.name());
+        moneyData.set("action", GuiAction.SET_SHOP_BUY_PRICE.name());
         moneyData.save();
         inventory.setItem(11, moneyItem);
 
@@ -115,8 +117,12 @@ public class DashboardGui {
         // buy/sell toggle item
         Material buySellMaterial = Material.getMaterial(guiConfig.getString("chestshop.buysell.material", "COMPARATOR"));
         List<String> buySellLore = new ArrayList<>();
-        String sellStatus = shop.acceptsCustomerPurchases() ? guiConfig.getString("chestshop.buysell.sell.enabled", "&aEnabled") : guiConfig.getString("chestshop.buysell.sell.disabled", "&cDisabled");
-        String buyStatus = shop.acceptsCustomerSales() ? guiConfig.getString("chestshop.buysell.buy.enabled", "&aEnabled") : guiConfig.getString("chestshop.buysell.buy.disabled", "&cDisabled");
+        String sellStatus = shop.acceptsCustomerPurchases()
+                ? guiConfig.getString("chestshop.buysell.sell.enabled", "&aEnabled")
+                : guiConfig.getString("chestshop.buysell.sell.disabled", "&cDisabled");
+        String buyStatus = shop.acceptsCustomerSales()
+                ? guiConfig.getString("chestshop.buysell.buy.enabled", "&aEnabled")
+                : guiConfig.getString("chestshop.buysell.buy.disabled", "&cDisabled");
         buySellLore.add(guiConfig.getString("chestshop.buysell.sell.line", "&7Selling: %status%").replace("%status%", sellStatus));
         buySellLore.add(guiConfig.getString("chestshop.buysell.buy.line", "&7Buying: %status%").replace("%status%", buyStatus));
         buySellLore.addAll(guiConfig.getStringList("chestshop.buysell.lore"));

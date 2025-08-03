@@ -39,9 +39,9 @@ public class Shop {
     @Getter
     private boolean isNotify;
     @Getter
-    private boolean canSell;
+    private boolean canSellToPlayers;
     @Getter
-    private boolean canBuy;
+    private boolean canBuyFromPlayers;
     @Getter
     private List<UUID> addedPlayers;
     @Getter
@@ -69,8 +69,8 @@ public class Shop {
         this.chestLocation = chestLocation;
         this.createdAt = createdAt;
         this.isNotify = isNotify;
-        this.canSell = canSell;
-        this.canBuy = canBuy;
+        this.canSellToPlayers = canSell;
+        this.canBuyFromPlayers = canBuy;
         this.addedPlayers = addedPlayers;
         this.shopFile = shopFile;
         this.shopTransactions = new ShopTransactions(this, shopFile);
@@ -122,11 +122,11 @@ public class Shop {
     }
 
     public boolean acceptsCustomerPurchases() {
-        return isCanSell();
+        return isCanSellToPlayers();
     }
 
     public boolean acceptsCustomerSales() {
-        return isCanBuy();
+        return isCanBuyFromPlayers();
     }
 
     public double getCustomerPurchasePrice() {
@@ -155,22 +155,18 @@ public class Shop {
         shopFile.save();
     }
 
-    public void setCanSell(boolean canSell) {
-        this.canSell = canSell;
-        shopFile.overwriteSet("shops." + name + ".can-sell", canSell);
+    public void setCanSellToPlayers(boolean canSellToPlayers) {
+        this.canSellToPlayers = canSellToPlayers;
+        shopFile.overwriteSet("shops." + name + ".can-sell", canSellToPlayers);
         shopFile.save();
         hologram.updateHologramRows();
     }
 
-    public void setCanBuy(boolean canBuy) {
-        this.canBuy = canBuy;
-        shopFile.overwriteSet("shops." + name + ".can-buy", canBuy);
+    public void setCanBuyFromPlayers(boolean canBuyFromPlayers) {
+        this.canBuyFromPlayers = canBuyFromPlayers;
+        shopFile.overwriteSet("shops." + name + ".can-buy", canBuyFromPlayers);
         shopFile.save();
         hologram.updateHologramRows();
-    }
-
-    public void addPlayer(OfflinePlayer player) {
-        addPlayer(player.getUniqueId());
     }
 
     public void addPlayer(UUID uuid) {

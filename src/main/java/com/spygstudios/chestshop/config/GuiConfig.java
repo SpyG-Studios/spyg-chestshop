@@ -38,7 +38,7 @@ public class GuiConfig extends YamlManager {
         set("chestshop.notify.on", "&2ON");
         set("chestshop.notify.off", "&4OFF");
 
-        set("chestshop.buysell.title", "&6&lBuy/Sell Toggle");
+        set("chestshop.buysell.title", "&6&lSell mode Toggle");
         set("chestshop.buysell.material", "LEVER");
         set("chestshop.buysell.sell.line", "&7Selling: %status%");
         set("chestshop.buysell.buy.line", "&7Buying: %status%");
@@ -46,7 +46,7 @@ public class GuiConfig extends YamlManager {
         set("chestshop.buysell.sell.disabled", "&c&lDISABLED");
         set("chestshop.buysell.buy.enabled", "&a&lENABLED");
         set("chestshop.buysell.buy.disabled", "&c&lDISABLED");
-        set("chestshop.buysell.lore", Arrays.asList("&7Left click: Toggle selling", "&7Right click: Toggle buying"));
+        set("chestshop.buysell.lore", Arrays.asList("", "&7Click to toggle sell mode"));
 
         set("chestshop.fill-items.filler1.material", "GRAY_STAINED_GLASS_PANE");
         set("chestshop.fill-items.filler1.slots", Arrays.asList());

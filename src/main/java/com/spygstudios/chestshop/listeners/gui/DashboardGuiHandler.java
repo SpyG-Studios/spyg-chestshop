@@ -1,6 +1,8 @@
 package com.spygstudios.chestshop.listeners.gui;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,8 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.enums.GuiAction;
-import com.spygstudios.chestshop.gui.DashboardGui;
 import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
 import com.spygstudios.chestshop.gui.PlayersGui;
 import com.spygstudios.chestshop.shop.AmountHandler;
@@ -82,16 +84,14 @@ public class DashboardGuiHandler implements Listener {
                 shop.setNotify(!shop.isNotify());
                 ItemStack notifyItem = clickedItem;
                 ItemMeta notifyMeta = notifyItem.getItemMeta();
-                notifyMeta
-                        .lore(Arrays.asList(TranslateColor.translate(shop.isNotify()
-                                ? plugin.getGuiConfig().getString("chestshop.notify.on")
-                                : plugin.getGuiConfig().getString("chestshop.notify.off"))));
+                notifyMeta.lore(Arrays.asList(TranslateColor.translate(shop.isNotify()
+                        ? plugin.getGuiConfig().getString("chestshop.notify.on")
+                        : plugin.getGuiConfig().getString("chestshop.notify.off"))));
                 notifyItem.setItemMeta(notifyMeta);
                 player.updateInventory();
                 break;
-            case SET_ITEM_PRICE:
-            case SET_SELL_PRICE:
-            case SET_BUY_PRICE:
+            case SET_SHOP_SELL_PRICE:
+            case SET_SHOP_BUY_PRICE:
                 if (AmountHandler.getPendingAmount(player) != null) {
                     AmountHandler.getPendingAmount(player).cancel();
                 }
@@ -130,9 +130,9 @@ public class DashboardGuiHandler implements Listener {
         Shop shop = holder.getShop();
         Player player = holder.getPlayer();
 
-        GuiAction action = GuiAction.SET_SELL_PRICE;
+        GuiAction action = GuiAction.SET_SHOP_SELL_PRICE;
         if (event.getClick().isRightClick()) {
-            action = GuiAction.SET_BUY_PRICE;
+            action = GuiAction.SET_SHOP_BUY_PRICE;
         }
 
         if (AmountHandler.getPendingAmount(player) != null) {
@@ -146,14 +146,39 @@ public class DashboardGuiHandler implements Listener {
         DashboardHolder holder = (DashboardHolder) event.getInventory().getHolder();
         Shop shop = holder.getShop();
         Player player = holder.getPlayer();
+        GuiConfig guiConfig = plugin.getGuiConfig();
 
-        if (event.getClick().isLeftClick()) {
-            shop.setCanSell(!shop.acceptsCustomerPurchases());
-        } else if (event.getClick().isRightClick()) {
-            shop.setCanBuy(!shop.acceptsCustomerSales());
+        if (!shop.acceptsCustomerPurchases() && !shop.acceptsCustomerSales()) {
+            shop.setCanSellToPlayers(true);
+            shop.setCanBuyFromPlayers(true);
+        } else if (!shop.acceptsCustomerPurchases() && shop.acceptsCustomerSales()) {
+            shop.setCanSellToPlayers(false);
+            shop.setCanBuyFromPlayers(false);
+        } else if (shop.acceptsCustomerPurchases() && shop.acceptsCustomerSales()) {
+            shop.setCanSellToPlayers(true);
+            shop.setCanBuyFromPlayers(false);
+        } else {
+            shop.setCanSellToPlayers(false);
+            shop.setCanBuyFromPlayers(true);
         }
 
-        DashboardGui.open(plugin, player, shop);
+        List<String> buySellLore = new ArrayList<>();
+        String sellStatus = shop.acceptsCustomerPurchases()
+                ? guiConfig.getString("chestshop.buysell.sell.enabled", "&aEnabled")
+                : guiConfig.getString("chestshop.buysell.sell.disabled", "&cDisabled");
+        String buyStatus = shop.acceptsCustomerSales()
+                ? guiConfig.getString("chestshop.buysell.buy.enabled", "&aEnabled")
+                : guiConfig.getString("chestshop.buysell.buy.disabled", "&cDisabled");
+        buySellLore.add(guiConfig.getString("chestshop.buysell.sell.line", "&7Selling: %status%").replace("%status%", sellStatus));
+        buySellLore.add(guiConfig.getString("chestshop.buysell.buy.line", "&7Buying: %status%").replace("%status%", buyStatus));
+        buySellLore.addAll(guiConfig.getStringList("chestshop.buysell.lore"));
+
+        ItemStack item = event.getClickedInventory().getItem(event.getSlot());
+        ItemMeta meta = item.getItemMeta();
+        meta.lore(TranslateColor.translate(buySellLore));
+        item.setItemMeta(meta);
+
+        player.updateInventory();
     }
 
 }

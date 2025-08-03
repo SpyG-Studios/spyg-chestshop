@@ -32,32 +32,29 @@ public class AmountHandler {
         this.player = player;
         this.type = type;
         this.shop = shop;
-        
+
         // Send appropriate message based on the action type
         String cancelWord = ChestShop.getInstance().getConf().getString("cancel");
         switch (type) {
-            case SET_SELL_PRICE:
+            case SET_SHOP_SELL_PRICE:
                 Message.ENTER_SELL_PRICE.send(player, Map.of("%cancel%", cancelWord));
                 break;
-            case SET_BUY_PRICE:
+            case SET_SHOP_BUY_PRICE:
                 Message.ENTER_BUY_PRICE.send(player, Map.of("%cancel%", cancelWord));
                 break;
             default:
                 Message.ENTER_AMOUNT.send(player, Map.of("%cancel%", cancelWord));
                 break;
         }
-        
+
         pendingAmount.add(this);
     }
 
     public void create(double amount) {
-        if (type.equals(GuiAction.SET_ITEM_PRICE)) {
-            shop.setBuyPrice(amount);
-            Message.ENTER_AMOUNT_SUCCESS.send(player);
-        } else if (type.equals(GuiAction.SET_SELL_PRICE)) {
+        if (type.equals(GuiAction.SET_SHOP_SELL_PRICE)) {
             shop.setSellPrice(amount);
             Message.ENTER_SELL_PRICE_SUCCESS.send(player);
-        } else if (type.equals(GuiAction.SET_BUY_PRICE)) {
+        } else if (type.equals(GuiAction.SET_SHOP_BUY_PRICE)) {
             shop.setBuyPrice(amount);
             Message.ENTER_BUY_PRICE_SUCCESS.send(player);
         } else {

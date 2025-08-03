@@ -2,9 +2,8 @@ package com.spygstudios.chestshop.enums;
 
 public enum GuiAction {
     SET_ITEM_AMOUNT,
-    SET_ITEM_PRICE,
-    SET_SELL_PRICE,
-    SET_BUY_PRICE,
+    SET_SHOP_SELL_PRICE,
+    SET_SHOP_BUY_PRICE,
     TOGGLE_NOTIFY,
     TOGGLE_SELLING,
     TOGGLE_BUYING,
