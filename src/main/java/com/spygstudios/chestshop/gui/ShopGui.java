@@ -16,6 +16,7 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.PageUtil;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.enums.GuiAction;
+import com.spygstudios.chestshop.enums.ShopMode;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.item.ItemUtils;
@@ -117,13 +118,6 @@ public class ShopGui {
         data.set("amount", amount);
         data.save();
         inventory.setItem(slot, item);
-    }
-
-    public enum ShopMode {
-        /** Customer purchasing items from the shop (shop sells TO customer) */
-        CUSTOMER_PURCHASING,
-        /** Customer selling items to the shop (shop buys FROM customer) */
-        CUSTOMER_SELLING
     }
 
     private static ShopMode getPlayerMode(Player player, Shop shop) {
