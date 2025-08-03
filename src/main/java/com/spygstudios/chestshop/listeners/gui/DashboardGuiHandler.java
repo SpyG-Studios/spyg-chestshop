@@ -13,7 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.gui.DashboardGui;
-import com.spygstudios.chestshop.gui.DashboardGui.ChestShopHolder;
+import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
 import com.spygstudios.chestshop.gui.PlayersGui;
 import com.spygstudios.chestshop.shop.AmountHandler;
 import com.spygstudios.chestshop.shop.Shop;
@@ -31,7 +31,7 @@ public class DashboardGuiHandler implements Listener {
 
     @EventHandler
     public void onShopGuiClick(InventoryClickEvent event) {
-        if (!(event.getInventory().getHolder() instanceof ChestShopHolder)) {
+        if (!(event.getInventory().getHolder() instanceof DashboardHolder)) {
             return;
         }
         if (event.getClickedInventory() == null || event.getClickedInventory().getType().equals(InventoryType.PLAYER)) {
@@ -70,7 +70,7 @@ public class DashboardGuiHandler implements Listener {
         if (action == null) {
             return;
         }
-        ChestShopHolder holder = (ChestShopHolder) event.getInventory().getHolder();
+        DashboardHolder holder = (DashboardHolder) event.getInventory().getHolder();
         Player player = holder.getPlayer();
         Shop shop = holder.getShop();
         GuiAction guiAction = GuiAction.valueOf(action);
@@ -126,7 +126,7 @@ public class DashboardGuiHandler implements Listener {
         if (!event.getClick().isLeftClick() && !event.getClick().isRightClick()) {
             return;
         }
-        ChestShopHolder holder = (ChestShopHolder) event.getInventory().getHolder();
+        DashboardHolder holder = (DashboardHolder) event.getInventory().getHolder();
         Shop shop = holder.getShop();
         Player player = holder.getPlayer();
 
@@ -143,7 +143,7 @@ public class DashboardGuiHandler implements Listener {
     }
 
     private void handleBuySellToggle(InventoryClickEvent event) {
-        ChestShopHolder holder = (ChestShopHolder) event.getInventory().getHolder();
+        DashboardHolder holder = (DashboardHolder) event.getInventory().getHolder();
         Shop shop = holder.getShop();
         Player player = holder.getPlayer();
 

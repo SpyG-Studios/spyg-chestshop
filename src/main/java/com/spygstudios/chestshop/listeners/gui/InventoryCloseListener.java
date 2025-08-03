@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.gui.DashboardGui;
-import com.spygstudios.chestshop.gui.DashboardGui.ChestShopHolder;
+import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
 import com.spygstudios.chestshop.shop.Shop;
@@ -31,7 +31,7 @@ public class InventoryCloseListener implements Listener {
         Inventory inventory = event.getInventory();
         InventoryHolder invHolder = inventory.getHolder();
 
-        if (!(invHolder instanceof ChestShopHolder || invHolder instanceof ShopGuiHolder || invHolder instanceof PlayersHolder) && inventory.getLocation() != null) {
+        if (!(invHolder instanceof DashboardHolder || invHolder instanceof ShopGuiHolder || invHolder instanceof PlayersHolder) && inventory.getLocation() != null) {
             Location invLocation = inventory.getLocation();
             Shop shop = Shop.getShop(invLocation);
             if (plugin.getConf().getBoolean("shops.barrier-when-empty")) {
@@ -52,12 +52,12 @@ public class InventoryCloseListener implements Listener {
             }
         }
 
-        if (invHolder instanceof ChestShopHolder holder) {
+        if (invHolder instanceof DashboardHolder holder) {
             itemAdding(event, holder);
         }
     }
 
-    private void itemAdding(InventoryCloseEvent event, ChestShopHolder holdder) {
+    private void itemAdding(InventoryCloseEvent event, DashboardHolder holdder) {
         ItemStack item = event.getInventory().getItem(13);
         Shop shop = holdder.getShop();
         if (item == null || item.getType().equals(shop.getMaterial())) {

@@ -35,7 +35,7 @@ public class DashboardGui {
 
     public static void open(ChestShop plugin, Player player, Shop shop) {
         guiConfig = plugin.getGuiConfig();
-        Inventory inventory = player.getServer().createInventory(new ChestShopHolder(player, shop), 27,
+        Inventory inventory = player.getServer().createInventory(new DashboardHolder(player, shop), 27,
                 TranslateColor.translate(guiConfig.getString("chestshop.title")
                         .replace("%shop-name%", shop.getName())
                         .replace("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName())));
@@ -139,7 +139,7 @@ public class DashboardGui {
         inventory.setItem(26, playrItem);
     }
 
-    public static class ChestShopHolder implements InventoryHolder {
+    public static class DashboardHolder implements InventoryHolder {
 
         @Getter
         private final Player player;
@@ -150,7 +150,7 @@ public class DashboardGui {
         @Getter
         private final Shop shop;
 
-        public ChestShopHolder(Player player, Shop shop) {
+        public DashboardHolder(Player player, Shop shop) {
             this.player = player;
             this.material = shop.getMaterial() == null ? Material.AIR : shop.getMaterial();
             this.shop = shop;

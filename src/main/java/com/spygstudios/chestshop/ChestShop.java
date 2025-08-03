@@ -23,7 +23,7 @@ import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.config.MessageConfig;
-import com.spygstudios.chestshop.gui.DashboardGui.ChestShopHolder;
+import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
 import com.spygstudios.chestshop.listeners.BreakListener;
@@ -125,7 +125,7 @@ public class ChestShop extends JavaPlugin {
         }
         ShopFile.saveShops();
 
-        List<Object> guis = Arrays.asList(ChestShopHolder.class, PlayersHolder.class, ShopGuiHolder.class);
+        List<Object> guis = Arrays.asList(DashboardHolder.class, PlayersHolder.class, ShopGuiHolder.class);
         for (Player player : Bukkit.getOnlinePlayers()) {
             InventoryHolder holder = player.getOpenInventory().getTopInventory().getHolder();
             if (guis.contains(holder.getClass())) {
