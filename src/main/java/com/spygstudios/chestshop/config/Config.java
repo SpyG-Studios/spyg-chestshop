@@ -19,6 +19,9 @@ public class Config extends YamlManager {
         set("colors.command.args", "&f");
 
         set("shops.price", 0.0, Arrays.asList("Shop creation price. Set to 0 for free shops."));
+        set("shops.price-format.sell", "&4$&c%price%", Arrays.asList("The format to use for the sell price in the shop hologram. (%sell-price%)"));
+        set("shops.price-format.buy", "&2$&a%price%", Arrays.asList("The format to use for the buy price in the shop hologram. (%buy-price%)"));
+        set("shops.price-format.combined", "%buy-price% - %sell-price%", Arrays.asList("The format to use for the combined price in the shop hologram. (%price%)"));
         set("shops.decimals.enabled", false, Arrays.asList("Enable cents in the shops. This will allow prices to have decimal values (e.g. 1.99)."));
         set("shops.decimals.max", 2, Arrays.asList("The maximum amount of decimal places allowed in the price."));
         set("shops.barrier-when-empty", false, Arrays.asList("Displays a barrier instead of the shop's item above the shop when it is out of stock."));
@@ -27,6 +30,8 @@ public class Config extends YamlManager {
         set("shops.blacklisted-names", Arrays.asList("stupid"));
         set("shops.disabled-worlds", Arrays.asList("disabled_world"));
         set("shops.unknown.material", "-", Arrays.asList("The material text to use when the material is unknown."));
+        set("shops.unknown.mode", "&cOffline", Arrays.asList("The text to use when the shop mode is not set."));
+        set("shops.unknown.owner", "Unknown Owner", Arrays.asList("The text to use when the shop owner is unknown."));
         set("shops.max-shops.default", -1, Arrays.asList(
                 "The maximum amount of shops a player can have (spygchestshop.max.<shop_group_name>). Set to -1 for unlimited. If a player has more than one permission, the highest amount will be used."));
         set("shops.max-players", 18, Arrays.asList("The maximum amount of players that can be added to a shop. Set to 0 for unlimited."));
@@ -37,7 +42,7 @@ public class Config extends YamlManager {
         set("shops.anti-explosion", true, Arrays.asList("Prevent shops from being destroyed by explosions."));
         set("shops.hopper-protection", true,
                 Arrays.asList("Prevent hoppers from taking items from shops. !!!YOU MUST TURN OFF \"hopper.disable-move-event\" IN PAPER CONFIG IN ORDER TO PROTECT THE HOPPERS!!!"));
-        set("shops.lines", Arrays.asList("%shop-name%", "&#dddddd%owner%", "&2$&a%price%"), Arrays.asList("The lines of the shop."));
+        set("shops.lines", Arrays.asList("%shop-name%", "&#dddddd%owner%", "&a%price%"), Arrays.asList("The lines of the shop."));
         saveConfig();
     }
 
