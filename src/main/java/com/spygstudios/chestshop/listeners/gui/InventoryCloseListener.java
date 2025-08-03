@@ -38,18 +38,13 @@ public class InventoryCloseListener implements Listener {
                 if (shop == null || !invLocation.getWorld().getChunkAt(invLocation).isLoaded()) {
                     return;
                 }
-                try {
-                    shop.getHologram().updateHologramRows();
-                } catch (IllegalStateException e) {
-                }
+                shop.getHologram().updateHologramRows();
             }
         }
 
-        if (invHolder instanceof PlayersHolder holder) {
-            if (event.getPlayer().getOpenInventory() == null || !(event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof PlayersHolder)) {
-                Bukkit.getScheduler().runTaskLater(plugin, () -> DashboardGui.open(plugin, (Player) event.getPlayer(), holder.getShop()), 1);
-                return;
-            }
+        if (event.getPlayer().getOpenInventory() != null && event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof PlayersHolder holder) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> DashboardGui.open(plugin, (Player) event.getPlayer(), holder.getShop()), 1);
+            return;
         }
 
         if (invHolder instanceof DashboardHolder holder) {
