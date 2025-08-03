@@ -48,7 +48,7 @@ public enum Message {
     SHOP_BOUGHT_FROM("shop.bought-from", "%prefix% &aYou bought &7x%items-bought% &f%material% &afor &f$%price%&a from &f%player-name%&a!"),
     SHOP_CHEST_ALREADY_SHOP("shop.chest-already-shop", "%prefix% &cThis chest is already a shop!"),
     SHOP_CHEST_FULL("shop.chest-full", "%prefix% &cThe shop chest is full!"),
-    SHOP_CHEST_FULL_OWNER("shop.chest-full-owner", "%prefix% &c%player-name% &ctried to sell &7x%amount% &f%material% &cbut your shop chest is full!"),
+    SHOP_CHEST_FULL_OWNER("shop.chest-full-owner", "%prefix% &c%player-name% &ctried to sell &7x%amount% &f%material% &cbut %shop-name%'s chest is full!"),
     SHOP_CREATED("shop.created.basic", "%prefix% &aShop &f%shop-name% &acreated!"),
     SHOP_CREATED_PRICE("shop.created.with-price", "%prefix% &aShop &f%shop-name% &acreated for &f$%price%&a!"),
     SHOP_DISABLED_WORLD("shop.disabled-world", "%prefix% &cShops are disabled in this world!"),

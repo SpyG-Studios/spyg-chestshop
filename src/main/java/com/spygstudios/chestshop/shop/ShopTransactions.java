@@ -33,7 +33,7 @@ public class ShopTransactions {
         if (!shop.acceptsCustomerPurchases()) {
             return;
         }
-        
+
         int itemsLeft = shop.getItemsLeft();
         int itemCount = itemsLeft < amount ? itemsLeft : amount;
         if (!InventoryUtils.hasFreeSlot(buyer)) {
@@ -102,16 +102,16 @@ public class ShopTransactions {
         if (!shop.acceptsCustomerSales()) {
             return;
         }
-        
+
         Material material = shop.getMaterial();
-        
+
         // Check if player has the items to sell
         int playerItemCount = InventoryUtils.countItems(seller.getInventory(), material);
         if (playerItemCount < amount) {
             Message.NOT_ENOUGH_ITEMS.send(seller, Map.of("%material%", material.name(), "%amount%", String.valueOf(amount)));
             return;
         }
-        
+
         // Check if shop chest has space
         Chest chest = (Chest) shop.getChestLocation().getBlock().getState();
         if (!hasChestSpace(chest, material, amount)) {
@@ -120,15 +120,19 @@ public class ShopTransactions {
             if (shop.isNotify()) {
                 Player owner = Bukkit.getPlayer(shop.getOwnerId());
                 if (owner != null) {
-                    Message.SHOP_CHEST_FULL_OWNER.send(owner, Map.of("%player-name%", seller.getName(), "%material%", material.name(), "%amount%", String.valueOf(amount)));
+                    Message.SHOP_CHEST_FULL_OWNER.send(owner, Map.of(
+                            "%player-name%", seller.getName(),
+                            "%material%", material.name(),
+                            "%amount%", String.valueOf(amount),
+                            "%shop-name%", shop.getName()));
                 }
             }
             return;
         }
-        
+
         double itemsPrice = amount * shop.getCustomerSalePrice();
         Economy economy = plugin.getEconomy();
-        
+
         // Check if shop owner has enough money
         if (economy.getBalance(Bukkit.getOfflinePlayer(shop.getOwnerId())) < itemsPrice) {
             Message.SHOP_OWNER_NO_MONEY.send(seller);
@@ -141,86 +145,90 @@ public class ShopTransactions {
             }
             return;
         }
-        
+
         // Remove items from player inventory
         int removedItems = removeItemsFromPlayer(seller, material, amount);
-        
+
         // Add items to chest
         addItemsToChest(chest, material, removedItems);
-        
+
         // Handle money transaction
         EconomyResponse withdrawResponse = economy.withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwnerId()), itemsPrice);
         if (withdrawResponse.transactionSuccess()) {
             economy.depositPlayer(seller, itemsPrice);
         }
-        
+
         // Update statistics
         shopFile.overwriteSet("shops." + shop.getName() + ".bought-items", shopFile.getInt("shops." + shop.getName() + ".bought-items") + removedItems);
         shopFile.save();
-        
+
         // Send messages
         Message.SHOP_SOLD_TO.send(seller, Map.of("%price%", String.valueOf(itemsPrice), "%material%", material.name(), "%items-sold%", String.valueOf(removedItems)));
-        
+
         Player owner = Bukkit.getPlayer(shop.getOwnerId());
         if (shop.isNotify() && owner != null) {
-            Message.SHOP_BOUGHT_FROM.send(owner, Map.of("%price%", String.valueOf(itemsPrice), "%material%", material.name(), "%player-name%", seller.getName(), "%items-bought%", String.valueOf(removedItems)));
+            Message.SHOP_BOUGHT_FROM.send(owner,
+                    Map.of("%price%", String.valueOf(itemsPrice), "%material%", material.name(), "%player-name%", seller.getName(), "%items-bought%", String.valueOf(removedItems)));
         }
     }
-    
+
     private boolean hasChestSpace(Chest chest, Material material, int amount) {
         int maxStackSize = material.getMaxStackSize();
         int remainingAmount = amount;
-        
+
         for (ItemStack item : chest.getInventory().getContents()) {
-            if (remainingAmount <= 0) break;
-            
+            if (remainingAmount <= 0)
+                break;
+
             if (item == null) {
                 remainingAmount -= maxStackSize;
             } else if (item.getType() == material && item.getAmount() < maxStackSize) {
                 remainingAmount -= (maxStackSize - item.getAmount());
             }
         }
-        
+
         return remainingAmount <= 0;
     }
-    
+
     private int removeItemsFromPlayer(Player player, Material material, int amount) {
         int remainingToRemove = amount;
-        
+
         for (ItemStack item : player.getInventory().getContents()) {
-            if (remainingToRemove <= 0) break;
-            
+            if (remainingToRemove <= 0)
+                break;
+
             if (item != null && item.getType() == material) {
                 int itemAmount = item.getAmount();
                 int removeAmount = Math.min(remainingToRemove, itemAmount);
-                
+
                 item.setAmount(itemAmount - removeAmount);
                 remainingToRemove -= removeAmount;
             }
         }
-        
+
         return amount - remainingToRemove;
     }
-    
+
     private void addItemsToChest(Chest chest, Material material, int amount) {
         int remainingToAdd = amount;
         int maxStackSize = material.getMaxStackSize();
-        
+
         // First, try to add to existing stacks
         for (ItemStack item : chest.getInventory().getContents()) {
-            if (remainingToAdd <= 0) break;
-            
+            if (remainingToAdd <= 0)
+                break;
+
             if (item != null && item.getType() == material && item.getAmount() < maxStackSize) {
                 int canAdd = Math.min(remainingToAdd, maxStackSize - item.getAmount());
                 item.setAmount(item.getAmount() + canAdd);
                 remainingToAdd -= canAdd;
             }
         }
-        
+
         // Then, add to empty slots
         for (int i = 0; i < chest.getInventory().getSize() && remainingToAdd > 0; i++) {
             ItemStack slot = chest.getInventory().getItem(i);
-            
+
             if (slot == null) {
                 int addAmount = Math.min(remainingToAdd, maxStackSize);
                 chest.getInventory().setItem(i, new ItemStack(material, addAmount));
