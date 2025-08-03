@@ -11,8 +11,8 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.gui.ChestShopGui;
-import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
+import com.spygstudios.chestshop.gui.DashboardGui;
+import com.spygstudios.chestshop.gui.DashboardGui.ChestShopHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
 import com.spygstudios.chestshop.shop.Shop;
@@ -47,7 +47,7 @@ public class InventoryCloseListener implements Listener {
 
         if (invHolder instanceof PlayersHolder holder) {
             if (event.getPlayer().getOpenInventory() == null || !(event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof PlayersHolder)) {
-                Bukkit.getScheduler().runTaskLater(plugin, () -> ChestShopGui.open(plugin, (Player) event.getPlayer(), holder.getShop()), 1);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> DashboardGui.open(plugin, (Player) event.getPlayer(), holder.getShop()), 1);
                 return;
             }
         }

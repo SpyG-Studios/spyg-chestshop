@@ -12,8 +12,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.enums.GuiAction;
-import com.spygstudios.chestshop.gui.ChestShopGui;
-import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
+import com.spygstudios.chestshop.gui.DashboardGui;
+import com.spygstudios.chestshop.gui.DashboardGui.ChestShopHolder;
 import com.spygstudios.chestshop.gui.PlayersGui;
 import com.spygstudios.chestshop.shop.AmountHandler;
 import com.spygstudios.chestshop.shop.Shop;
@@ -153,7 +153,7 @@ public class DashboardGuiHandler implements Listener {
             shop.setCanBuy(!shop.acceptsCustomerSales());
         }
 
-        ChestShopGui.open(plugin, player, shop);
+        DashboardGui.open(plugin, player, shop);
     }
 
 }

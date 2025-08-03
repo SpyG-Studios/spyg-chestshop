@@ -30,7 +30,7 @@ import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class ChestShopGui {
+public class DashboardGui {
     private static GuiConfig guiConfig;
 
     public static void open(ChestShop plugin, Player player, Shop shop) {
