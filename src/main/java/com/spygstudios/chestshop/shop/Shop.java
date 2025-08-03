@@ -39,9 +39,9 @@ public class Shop {
     @Getter
     private boolean isNotify;
     @Getter
-    private boolean canSell; // Shop can sell items TO customers (customers can purchase)
+    private boolean canSell;
     @Getter
-    private boolean canBuy;  // Shop can buy items FROM customers (customers can sell)
+    private boolean canBuy;
     @Getter
     private List<UUID> addedPlayers;
     @Getter
@@ -59,7 +59,8 @@ public class Shop {
         shopFile.addShop(this);
     }
 
-    public Shop(UUID ownerId, String shopName, double sellPrice, double buyPrice, Material material, Location chestLocation, String createdAt, boolean isNotify, boolean canSell, boolean canBuy, List<UUID> addedPlayers, ShopFile shopFile) {
+    public Shop(UUID ownerId, String shopName, double sellPrice, double buyPrice, Material material, Location chestLocation, String createdAt, boolean isNotify, boolean canSell, boolean canBuy,
+            List<UUID> addedPlayers, ShopFile shopFile) {
         this.ownerId = ownerId;
         this.name = shopName;
         this.sellPrice = ShopUtils.parsePrice(sellPrice);
@@ -120,9 +121,6 @@ public class Shop {
         return ShopUtils.parsePrice(this.buyPrice);
     }
 
-    // Clearer method names for the shop's capabilities in the context of customer interactions
-    // For example, isCanSell() and isCanBuy() are confusing, so we use more descriptive names
-    // I.E From the shop perspective: what the shop can do with customers
     public boolean acceptsCustomerPurchases() {
         return isCanSell();
     }
@@ -139,7 +137,6 @@ public class Shop {
         return getBuyPrice();
     }
 
-
     public void setSellPrice(double sellPrice) {
         this.sellPrice = ShopUtils.parsePrice(sellPrice);
         ShopFile.getShopFile(ownerId).setSellPrice(name, this.sellPrice);
@@ -151,7 +148,6 @@ public class Shop {
         ShopFile.getShopFile(ownerId).setBuyPrice(name, this.buyPrice);
         hologram.updateHologramRows();
     }
-
 
     public void setNotify(boolean notify) {
         isNotify = notify;
