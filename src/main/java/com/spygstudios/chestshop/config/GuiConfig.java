@@ -17,9 +17,7 @@ public class GuiConfig extends YamlManager {
 
         set("chestshop.money.title", "&6&lPrice Settings");
         set("chestshop.money.material", "GOLD_INGOT");
-        set("chestshop.money.sell.line", "&7Sell Price: &a$%sell-price%");
-        set("chestshop.money.buy.line", "&7Buy Price: &c$%buy-price%");
-        set("chestshop.money.lore", Arrays.asList("", "&7Left click: Set sell price", "&7Right click: Set buy price"));
+        set("chestshop.money.lore", Arrays.asList("&7Sell Price: &a$%sell-price%", "&7Buy Price: &c$%buy-price%", "", "&7Left click: Set sell price", "&7Right click: Set buy price"));
 
         set("chestshop.inventory.title", "&cShopInventory");
         set("chestshop.inventory.material", "CHEST");

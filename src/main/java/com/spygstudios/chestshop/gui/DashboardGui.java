@@ -97,9 +97,12 @@ public class DashboardGui {
         // money item
         Material moneyMaterial = Material.getMaterial(guiConfig.getString("chestshop.money.material", "GOLD_INGOT"));
         List<String> moneyLore = new ArrayList<>();
-        moneyLore.add(guiConfig.getString("chestshop.money.sell.line", "&7Customer Purchase Price: &a$%sell-price%").replace("%sell-price%", String.valueOf(shop.getCustomerPurchasePrice())));
-        moneyLore.add(guiConfig.getString("chestshop.money.buy.line", "&7Customer Sale Price: &c$%buy-price%").replace("%buy-price%", String.valueOf(shop.getCustomerSalePrice())));
-        moneyLore.addAll(guiConfig.getStringList("chestshop.money.lore"));
+        for (String string : guiConfig.getStringList("chestshop.money.lore")) {
+            moneyLore.add(string
+                    .replace("%sell-price%", String.valueOf(shop.getCustomerPurchasePrice()))
+                    .replace("%buy-price%", String.valueOf(shop.getCustomerSalePrice())));
+        }
+
         ItemStack moneyItem = ItemUtils.create(moneyMaterial, guiConfig.getString("chestshop.money.title"), moneyLore);
         PersistentData moneyData = new PersistentData(plugin, moneyItem);
         moneyData.set("action", GuiAction.SET_SHOP_BUY_PRICE.name());
