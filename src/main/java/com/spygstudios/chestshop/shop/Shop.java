@@ -19,7 +19,6 @@ import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.enums.ShopRemoveCause;
 import com.spygstudios.chestshop.events.ShopRemoveEvent;
 import com.spygstudios.spyglib.hologram.HologramItemRow;
-import com.spygstudios.spyglib.inventory.InventoryUtils;
 
 import lombok.Getter;
 
@@ -201,7 +200,8 @@ public class Shop {
 
     public int getItemsLeft() {
         Chest chest = (Chest) chestLocation.getBlock().getState();
-        return InventoryUtils.countItems(chest.getInventory(), material);
+        return ShopUtils.countDurableItemsInInventory(chest.getInventory(), material);
+
     }
 
     public void openShopInventory(Player player) {

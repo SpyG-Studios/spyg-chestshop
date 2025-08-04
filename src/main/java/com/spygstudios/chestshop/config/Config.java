@@ -19,6 +19,7 @@ public class Config extends YamlManager {
         set("colors.command.args", "&f");
 
         set("shops.price", 0.0, Arrays.asList("Shop creation price. Set to 0 for free shops."));
+        set("shops.minimum-durability", 100, Arrays.asList("The minimum durability of the item to be used in a shop. (in percentage)"));
         set("shops.price-format.sell", "&4$&c%price%", Arrays.asList("The format to use for the sell price in the shop hologram. (%sell-price%)"));
         set("shops.price-format.buy", "&2$&a%price%", Arrays.asList("The format to use for the buy price in the shop hologram. (%buy-price%)"));
         set("shops.price-format.combined", "%buy-price% - %sell-price%", Arrays.asList("The format to use for the combined price in the shop hologram. (%price%)"));

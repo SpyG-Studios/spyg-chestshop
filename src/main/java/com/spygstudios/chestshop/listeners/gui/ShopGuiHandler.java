@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -18,8 +19,8 @@ import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.enums.ShopMode;
 import com.spygstudios.chestshop.gui.ShopGui;
 import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
+import com.spygstudios.chestshop.shop.ShopUtils;
 import com.spygstudios.spyglib.color.TranslateColor;
-import com.spygstudios.spyglib.inventory.InventoryUtils;
 import com.spygstudios.spyglib.persistentdata.PersistentData;
 
 import net.kyori.adventure.text.Component;
@@ -52,8 +53,8 @@ public class ShopGuiHandler implements Listener {
         }
         GuiAction guiAction = GuiAction.valueOf(action);
         ShopGuiHolder holder = (ShopGuiHolder) event.getInventory().getHolder();
-        ShopMode currentMode = ShopGui.getPlayerMode(holder.getPlayer());
-
+        Player player = holder.getPlayer();
+        ShopMode currentMode = ShopGui.getPlayerMode(player);
         switch (guiAction) {
             case SET_ITEM_AMOUNT:
                 if (System.currentTimeMillis() - getLastClick(event.getWhoClicked()) < 100) {
@@ -68,7 +69,7 @@ public class ShopGuiHandler implements Listener {
                     int itemsLeft = holder.getShop().getItemsLeft();
                     max = Math.min(item.getMaxStackSize(), itemsLeft);
                 } else {
-                    int playerItems = InventoryUtils.countItems(holder.getPlayer().getInventory(), holder.getShop().getMaterial());
+                    int playerItems = ShopUtils.countDurableItemsInInventory(player.getInventory(), holder.getShop().getMaterial());
                     max = Math.min(item.getMaxStackSize(), playerItems);
                 }
                 int min = 1;
@@ -91,21 +92,20 @@ public class ShopGuiHandler implements Listener {
                 shopMeta.lore(translatedLore);
                 item.setItemMeta(shopMeta);
                 break;
-
             case BUY:
                 ItemStack shopItem = event.getInventory().getItem(13);
                 int amount = shopItem.getAmount();
-                holder.getShop().getShopTransactions().sell(holder.getPlayer(), amount);
+                holder.getShop().getShopTransactions().sell(player, amount);
                 if (holder.getShop().getItemsLeft() == 0) {
                     holder.getShop().getHologram().updateHologramRows();
-                    holder.getPlayer().closeInventory();
-                    Message.SHOP_EMPTY.send(holder.getPlayer());
+                    player.closeInventory();
+                    Message.SHOP_EMPTY.send(player);
                 }
                 break;
             case SELL:
                 ItemStack sellItem = event.getInventory().getItem(13);
                 int sellAmount = sellItem.getAmount();
-                holder.getShop().getShopTransactions().buy(holder.getPlayer(), sellAmount);
+                holder.getShop().getShopTransactions().buy(player, sellAmount);
                 holder.getShop().getHologram().updateHologramRows();
                 break;
             case TOGGLE_MODE:
@@ -114,11 +114,11 @@ public class ShopGuiHandler implements Listener {
                         (newMode == ShopMode.CUSTOMER_SELLING && !holder.getShop().acceptsCustomerSales())) {
                     return;
                 }
-                ShopGui.setPlayerMode(holder.getPlayer(), newMode);
-                ShopGui.open(plugin, holder.getPlayer(), holder.getShop(), newMode);
+                ShopGui.setPlayerMode(player, newMode);
+                ShopGui.open(plugin, player, holder.getShop(), newMode);
                 break;
             case OPEN_SHOP_INVENTORY:
-                holder.getShop().openShopInventory(holder.getPlayer());
+                holder.getShop().openShopInventory(player);
                 break;
             default:
                 break;
