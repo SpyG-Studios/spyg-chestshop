@@ -47,25 +47,23 @@ public class InteractListener implements Listener {
             return;
         }
 
+        event.setCancelled(true);
         // Owner
         boolean isAdmin = (player.hasPermission("spygchestshop.admin") || player.hasPermission("spygchestshop.admin.edit")) && player.isSneaking();
         if ((shop.getOwnerId().equals(player.getUniqueId()) || isAdmin) && !CustomerMode.getCustomerMode().contains(player.getUniqueId())) {
             DashboardGui.open(plugin, player, shop);
-            event.setCancelled(true);
             return;
         }
 
         // Customer interaction
         if (shop.getMaterial() == null) {
             Message.SHOP_SETUP_NEEDED.send(player);
-            event.setCancelled(true);
             return;
         }
 
         // If shop doesn't accept any customer interactions, cancel the event
         if (!shop.acceptsCustomerSales() && !shop.acceptsCustomerPurchases()) {
             Message.SHOP_SETUP_NEEDED.send(player);
-            event.setCancelled(true);
             return;
         }
 
@@ -73,12 +71,10 @@ public class InteractListener implements Listener {
         // purchases), block access
         if (shop.getItemsLeft() == 0 && !shop.acceptsCustomerSales() && !shop.getAddedPlayers().contains(player.getUniqueId())) {
             Message.SHOP_EMPTY.send(player);
-            event.setCancelled(true);
             return;
         }
 
         ShopGui.open(plugin, player, shop);
-        event.setCancelled(true);
     }
 
 }
