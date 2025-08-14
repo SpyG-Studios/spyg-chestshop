@@ -117,9 +117,9 @@ public class ShopTransactions {
         }
 
         shopFile.overwriteSet("shops." + shop.getName() + ".bought-items", shopFile.getInt("shops." + shop.getName() + ".bought-items") + soldItems);
+        shopFile.overwriteSet("shops." + shop.getName() + ".money-spent", shopFile.getDouble("shops." + shop.getName() + ".money-spent") + itemsPrice);
         shopFile.save();
 
-        shopFile.overwriteSet("shops." + shop.getName() + ".money-earned", shopFile.getDouble("shops." + shop.getName() + ".money-spent") + itemsPrice);
         Message.SHOP_SOLD_TO.send(seller, Map.of("%price%", String.valueOf(itemsPrice), "%material%", material.name(), "%items-sold%", String.valueOf(soldItems)));
 
         Player owner = Bukkit.getPlayer(shop.getOwnerId());
