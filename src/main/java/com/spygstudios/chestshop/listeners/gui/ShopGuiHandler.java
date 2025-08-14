@@ -106,7 +106,6 @@ public class ShopGuiHandler implements Listener {
                 ItemStack sellItem = event.getInventory().getItem(13);
                 int sellAmount = sellItem.getAmount();
                 holder.getShop().getShopTransactions().buy(player, sellAmount);
-                holder.getShop().getHologram().updateHologramRows();
                 break;
             case TOGGLE_MODE:
                 ShopMode newMode = currentMode == ShopMode.CUSTOMER_PURCHASING ? ShopMode.CUSTOMER_SELLING : ShopMode.CUSTOMER_PURCHASING;
