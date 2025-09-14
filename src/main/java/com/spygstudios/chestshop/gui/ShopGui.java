@@ -92,10 +92,10 @@ public class ShopGui {
         }
 
         ConfigurationSection amountSection = config.getConfigurationSection("shop.amount.items");
-        amountSection.getConfigurationSection("items").getKeys(false).forEach(key -> {
+        amountSection.getKeys(false).forEach(key -> {
             int slot = amountSection.getInt(key + ".slot");
             int amount = amountSection.getInt(key + ".amount");
-            String title = amountSection.getString(key + ".title").replace("%amount%", String.valueOf(amount));
+            String title = amountSection.getString(key + ".title").replace("%amount%", String.valueOf(amount).replace("-", ""));
             List<String> lore = amountSection.getStringList(key + ".lore");
             Material material = Material.getMaterial(amountSection.getString(key + ".material", "GRAY_STAINED_GLASS_PANE"));
             List<Float> modelFloats = amountSection.getFloatList(key + ".model-data.floats");
@@ -110,7 +110,7 @@ public class ShopGui {
 
     private void addItemToInventory(ChestShop plugin, Inventory inventory, int slot, Material material, String title, List<String> lore, List<Float> modelFloats, List<String> modelStrings,
             int amount) {
-        ItemStack item = ItemUtils.create(material, title, lore, modelFloats, modelStrings, amount);
+        ItemStack item = ItemUtils.create(material, title, lore, modelFloats, modelStrings, Math.abs(amount));
         PersistentData data = new PersistentData(plugin, item);
         data.set("action", GuiAction.SET_ITEM_AMOUNT.name());
         data.set("amount", amount);
