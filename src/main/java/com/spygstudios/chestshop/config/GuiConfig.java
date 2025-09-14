@@ -36,10 +36,18 @@ public class GuiConfig extends YamlManager {
         set("chestshop.info.slot", 8);
         set("chestshop.info.material", "WRITABLE_BOOK");
         set("chestshop.info.lore",
-                Arrays.asList("&7owner: &e%player-name%", "&7material: &e%material%", "&7price: &e%price%", "&7money earned: &6$&e%money-earned%", "&7sold items: &e%sold-items%",
-                        "&7location: &e%location%", "&7created: &e%created%"));
+                Arrays.asList(
+                        "&7owner: &e%player-name%",
+                        "&7material: &e%material%",
+                        "&7price: &e%price%",
+                        "&7sold items: &e%sold-items%",
+                        "&7money earned: &6$&e%money-earned%",
+                        "&7bought items: &e%bought-items%",
+                        "&7money spent: &6$&e%money-spent%",
+                        "&7location: &e%location%",
+                        "&7created: &e%created%"));
 
-        set("chestshop.notify.title", "&e&lBuy Notifications");
+        set("chestshop.notify.title", "&eBuy/Sell Notifications");
         set("chestshop.notify.material", "BELL");
         set("chestshop.notify.on", "&2ON");
         set("chestshop.notify.off", "&4OFF");
