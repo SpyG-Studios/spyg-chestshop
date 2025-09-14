@@ -11,10 +11,10 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.gui.ChestShopGui;
-import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
+import com.spygstudios.chestshop.gui.DashboardGui;
+import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
-import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
+import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.shop.Shop;
 
 public class InventoryCloseListener implements Listener {
@@ -31,33 +31,28 @@ public class InventoryCloseListener implements Listener {
         Inventory inventory = event.getInventory();
         InventoryHolder invHolder = inventory.getHolder();
 
-        if (!(invHolder instanceof ChestShopHolder || invHolder instanceof ShopGuiHolder || invHolder instanceof PlayersHolder) && inventory.getLocation() != null) {
+        if (!(invHolder instanceof DashboardHolder || invHolder instanceof ShopHolder || invHolder instanceof PlayersHolder) && inventory.getLocation() != null) {
             Location invLocation = inventory.getLocation();
             Shop shop = Shop.getShop(invLocation);
             if (plugin.getConf().getBoolean("shops.barrier-when-empty")) {
                 if (shop == null || !invLocation.getWorld().getChunkAt(invLocation).isLoaded()) {
                     return;
                 }
-                try {
-                    shop.getHologram().updateHologramRows();
-                } catch (IllegalStateException e) {
-                }
+                shop.getHologram().updateHologramRows();
             }
         }
 
-        if (invHolder instanceof PlayersHolder holder) {
-            if (event.getPlayer().getOpenInventory() == null || !(event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof PlayersHolder)) {
-                Bukkit.getScheduler().runTaskLater(plugin, () -> ChestShopGui.open(plugin, (Player) event.getPlayer(), holder.getShop()), 1);
-                return;
-            }
+        if (event.getPlayer().getOpenInventory() != null && event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof PlayersHolder holder) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> DashboardGui.open(plugin, (Player) event.getPlayer(), holder.getShop()), 1);
+            return;
         }
 
-        if (invHolder instanceof ChestShopHolder holder) {
+        if (invHolder instanceof DashboardHolder holder) {
             itemAdding(event, holder);
         }
     }
 
-    private void itemAdding(InventoryCloseEvent event, ChestShopHolder holdder) {
+    private void itemAdding(InventoryCloseEvent event, DashboardHolder holdder) {
         ItemStack item = event.getInventory().getItem(13);
         Shop shop = holdder.getShop();
         if (item == null || item.getType().equals(shop.getMaterial())) {

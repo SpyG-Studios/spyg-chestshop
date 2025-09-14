@@ -13,6 +13,7 @@ usage: '%prefix% &7%usage%'
 config-reloaded: '%prefix% &aKonfiguráció sikeresen újratöltve!'
 no-permission: '%prefix% &cEhhez nincs jogod!'
 not-enough-money: '%prefix% &cNincs elég pénzed! ($%price%)'
+not-enough-items: '%prefix% &cNincs elég &f%material% &c(&e%amount%&c szükséges)!'
 player:
   only-players: '%prefix% &cCsak játékosok használhatják ezt a parancsot!'
   already-added: '%prefix% &f%player-name% &cmár hozzá lett adva a boltodhoz!'
@@ -60,7 +61,15 @@ shop:
   setup-needed: '%prefix% &cEz a bolt nincs megfelelően beállítva!'
   sold: '%prefix% &aSikeresen eladtál &7x%items-bought% &f%material% &2$&a%price% &aértékben &f%player-name%
     &ajátékosnak! &7(&8%items-left%&7)'
+  sold-to: '%prefix% &aSikeresen eladtad &7x%items-sold% &f%material% &2$&a%price% &ajátékosnak! &7(&8%items-left%&7)'
+  bought-from: '%prefix% &aSikeresen vásároltál &7x%items-bought% &f%material% &aforintért &f$%price%&a-tól &f%player-name%&a-tól!'
   renamed: '%prefix% &f%old-name% &aúj neve: &f%new-name%!'
+  chest-full: '%prefix% &cA bolt ládája tele van!'
+  chest-full-owner: '%prefix% &c%player-name% &cpróbálta eladni &7x%amount% &f%material% &cde a %shop-name% ládája tele van!'
+  owner-no-money: '%prefix% &cA bolt tulajdonosának nincs elég pénze, hogy megvegye a tárgyaidat!'
+  owner-no-money-owner: '%prefix% &c%player-name% &cpróbálta eladni &f%material% &cért &f$%price% &cde nincs elég pénzed!'
+  not-enough-money: '%prefix% &cNincs elég pénzed, hogy megvásárold ezt a tárgyat! (&e%price%&c)'
+  not-enough-money-owner: '%prefix% &c%player-name% &cpróbálta megvásárolni &f%material% &cért &f$%price% &cde nincs elég pénzed!'
 admin:
   shop:
     list:

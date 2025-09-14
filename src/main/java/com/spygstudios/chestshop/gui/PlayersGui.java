@@ -65,7 +65,6 @@ public class PlayersGui {
             PersistentData skullData = new PersistentData(plugin, skull);
             skullData.set("action", GuiAction.REMOVE_PLAYER.name());
             skullData.set("uuid", offlinePlayer.getUniqueId().toString());
-            skullData.save();
             inventory.setItem(i, skull);
 
             if (offlinePlayer.isOnline()) {
@@ -80,7 +79,6 @@ public class PlayersGui {
                     PersistentData headData = new PersistentData(plugin, head);
                     headData.set("action", GuiAction.REMOVE_PLAYER.name());
                     headData.set("uuid", offlinePlayer.getUniqueId().toString());
-                    headData.save();
                     inventory.setItem(index, head);
                 });
             });
@@ -100,7 +98,6 @@ public class PlayersGui {
         arrow.setItemMeta(arrowMeta);
         PersistentData nextData = new PersistentData(plugin, arrow);
         nextData.set("action", action.name());
-        nextData.save();
         return arrow;
     }
 

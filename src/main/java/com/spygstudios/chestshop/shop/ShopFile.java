@@ -84,7 +84,11 @@ public class ShopFile extends YamlManager {
         for (String shopName : shopFile.getPlayerShops()) {
             String shopPath = "shops." + shopName;
             shopFile.set(shopPath + ".price", 0);
+            shopFile.set(shopPath + ".sell-price", 0);
+            shopFile.set(shopPath + ".buy-price", 0);
             shopFile.set(shopPath + ".do-notify", false);
+            shopFile.set(shopPath + ".can-sell", true);
+            shopFile.set(shopPath + ".can-buy", false);
             shopFile.set(shopPath + ".sold-items", 0);
             shopFile.set(shopPath + ".money-earned", 0);
             shopFile.set(shopPath + ".created", getDateString());
@@ -95,9 +99,13 @@ public class ShopFile extends YamlManager {
     public void addShop(Shop shop) {
         String name = shop.getName();
         set("shops." + name + ".price", 0);
+        set("shops." + name + ".sell-price", 0);
+        set("shops." + name + ".buy-price", 0);
         set("shops." + name + ".material", null);
         set("shops." + name + ".location", LocationUtils.fromLocation(shop.getChestLocation(), true));
         set("shops." + name + ".do-notify", false);
+        set("shops." + name + ".can-sell", true);
+        set("shops." + name + ".can-buy", false);
         set("shops." + name + ".created", getDateString());
         set("shops." + name + ".added-players", new ArrayList<String>());
         isSaved = false;
@@ -105,11 +113,15 @@ public class ShopFile extends YamlManager {
 
     public void setName(String shopName, String name) {
         set("shops." + name + ".price", getDouble("shops." + shopName + ".price", 0));
+        set("shops." + name + ".sell-price", getDouble("shops." + shopName + ".sell-price", 0));
+        set("shops." + name + ".buy-price", getDouble("shops." + shopName + ".buy-price", 0));
         set("shops." + name + ".material", getString("shops." + shopName + ".material", null));
         set("shops." + name + ".location", getString("shops." + shopName + ".location"));
         set("shops." + name + ".do-notify", getBoolean("shops." + shopName + ".do-notify", false));
+        set("shops." + name + ".can-sell", getBoolean("shops." + shopName + ".can-sell", true));
+        set("shops." + name + ".can-buy", getBoolean("shops." + shopName + ".can-buy", false));
         set("shops." + name + ".created", getString("shops." + shopName + ".created", getDateString()));
-        set("shops." + name + ".added-players", getStringList("shops." + shopName + ".added-players", new ArrayList<>()));
+        set("shops." + name + ".added-players", getStringList("shops." + shopName + ".added-players"));
         overwriteSet("shops." + shopName, null);
         isSaved = false;
     }
@@ -121,6 +133,16 @@ public class ShopFile extends YamlManager {
 
     public void setPrice(String shopName, double price) {
         overwriteSet("shops." + shopName + ".price", price);
+        isSaved = false;
+    }
+
+    public void setSellPrice(String shopName, double sellPrice) {
+        overwriteSet("shops." + shopName + ".sell-price", sellPrice);
+        isSaved = false;
+    }
+
+    public void setBuyPrice(String shopName, double buyPrice) {
+        overwriteSet("shops." + shopName + ".buy-price", buyPrice);
         isSaved = false;
     }
 
@@ -182,11 +204,14 @@ public class ShopFile extends YamlManager {
             shopFile.removeShop(shopName);
             return;
         }
-        double price = shopFile.getDouble("shops." + shopName + ".price");
+        double sellPrice = shopFile.getDouble("shops." + shopName + ".sell-price", shopFile.getDouble("shops." + shopName + ".price", 0));
+        double buyPrice = shopFile.getDouble("shops." + shopName + ".buy-price", 0);
         Material material = Material.getMaterial(shopFile.getString("shops." + shopName + ".material"));
         String createdAt = shopFile.getString("shops." + shopName + ".created");
         boolean isNotify = shopFile.getBoolean("shops." + shopName + ".do-notify");
-        new Shop(shopFile.getOwnerId(), shopName, price, material, location, createdAt, isNotify, shopFile.getAddedUuids(shopName), shopFile);
+        boolean canSell = shopFile.getBoolean("shops." + shopName + ".can-sell", true);
+        boolean canBuy = shopFile.getBoolean("shops." + shopName + ".can-buy", false);
+        new Shop(shopFile.getOwnerId(), shopName, sellPrice, buyPrice, material, location, createdAt, isNotify, canSell, canBuy, shopFile.getAddedUuids(shopName), shopFile);
     }
 
     public static ShopFile getShopFile(UUID ownerId) {

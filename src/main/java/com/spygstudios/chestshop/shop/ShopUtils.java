@@ -1,5 +1,7 @@
 package com.spygstudios.chestshop.shop;
 
+import java.util.HashMap;
+
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -8,8 +10,12 @@ import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.block.data.type.Chest.Type;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.spyglib.inventory.InventoryUtils;
 
 public class ShopUtils {
 
@@ -106,5 +112,64 @@ public class ShopUtils {
             maxShops = Math.max(maxShops, value);
         }
         return maxShops;
+    }
+
+    public static int countDurableItemsInInventory(Inventory inventory, Material material) {
+        int itemCount = InventoryUtils.countItems(inventory, item -> {
+            if (!item.getType().equals(material)) {
+                return false;
+            }
+            return isDurabilitySufficient(item);
+        });
+
+        return itemCount;
+    }
+
+    private static boolean isDurabilitySufficient(ItemStack item) {
+        if (item.getItemMeta() instanceof Damageable damageable && damageable.hasDamage()) {
+            short maxDurability = item.getType().getMaxDurability();
+            int damageInPercent = (int) (Math.ceil((double) damageable.getDamage() / maxDurability * 100));
+            int durabilityInPercent = 100 - damageInPercent;
+            int minDurabilityPercent = plugin.getConfig().getInt("shops.minimum-durability");
+            if (minDurabilityPercent > durabilityInPercent) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static int extractItems(Inventory fromInventory, Inventory toInventory, Material material, int itemCount) {
+        int extractedItems = 0;
+        for (ItemStack chestItem : fromInventory.getContents()) {
+            if (itemCount <= 0)
+                break;
+
+            if (chestItem != null && chestItem.getType() == material) {
+                if (!isDurabilitySufficient(chestItem)) {
+                    continue;
+                }
+                int chestAmount = chestItem.getAmount();
+                int removeAmount = Math.min(itemCount, chestAmount);
+
+                ItemStack clone = chestItem.clone();
+                clone.setAmount(removeAmount);
+
+                HashMap<Integer, ItemStack> leftover = toInventory.addItem(clone);
+
+                if (leftover.isEmpty()) {
+                    chestItem.setAmount(chestAmount - removeAmount);
+                    itemCount -= removeAmount;
+                    extractedItems += removeAmount;
+                } else {
+                    int added = removeAmount - leftover.values().stream().mapToInt(ItemStack::getAmount).sum();
+                    chestItem.setAmount(chestAmount - added);
+                    itemCount -= added;
+                    extractedItems += added;
+                    break;
+                }
+            }
+        }
+
+        return extractedItems;
     }
 }

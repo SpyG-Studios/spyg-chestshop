@@ -11,6 +11,7 @@ usage: '%prefix% &7%usage%'  # Komunikat pokazujący poprawne użycie komendy, n
 config-reloaded: '%prefix% &aKonfiguracja została pomyślnie załadowana!'  # Wiadomość, gdy konfiguracja pluginu została pomyślnie załadowana.
 no-permission: '%prefix% &cNie masz do tego uprawnień!'  # Komunikat, gdy gracz nie ma uprawnień do wykonania danej akcji.
 not-enough-money: '%prefix% &cNie masz wystarczającej ilości pieniędzy! ($%price%)'  # Wiadomość, gdy gracz próbuje wykonać akcję bez wystarczających pieniędzy.
+not-enough-items: '%prefix% &cNie masz wystarczającej ilości &f%material% &c(&e%amount%&c wymagane)!'  # Wiadomość, gdy gracz nie ma wystarczającej ilości przedmiotów do wykonania akcji.
 player:
   only-players: '&cTylko gracze mogą używać tego polecenia!'  # Sprawdzanie, czy komenda jest używana przez gracza.
   already-added: '%prefix% &cGracz &f%player-name% &cjest już dodany do sklepu!'  # Wiadomość, gdy gracz już jest dodany do sklepu.
@@ -55,6 +56,12 @@ shop:
   setup-needed: '%prefix% &cTen sklep nie jest poprawnie skonfigurowany!'  # Wiadomość, gdy sklep nie jest poprawnie skonfigurowany.
   sold: '%prefix% &aSprzedałeś &7x%items-bought% &f%material% &a za &f$%price%&a, do &f%player-name%&a! &7(&8%items-left%&7)'  # Wiadomość po sprzedaży przedmiotu z jednego sklepu do drugiego gracza.
   renamed: '%prefix% &aSklep &f%old-name% &azmieniony na &f%new-name%'  # Wiadomość po zmianie nazwy sklepu.
+  sold-to: '%prefix% &aSprzedałeś &7x%items-sold% &f%material% &a za &f$%price%&a do gracza!'  # Wiadomość po sprzedaży przedmiotu do innego gracza.
+  bought-from: '%prefix% &aKupiłeś &7x%items-bought% &f%material% &a za &f$%price%&a od gracza &f%player-name%&a!'  # Wiadomość po zakupie przedmiotu od innego gracza.
+  chest-full: '%prefix% &cSkrzynia sklepu jest pełna!'  # Wiadomość, gdy skrzynia sklepu jest pełna.
+  chest-full-owner: '%prefix% &c%player-name% &cpróbował sprzedać &7x%amount% &f%material% &c, ale skrzynia sklepu %shop-name% jest pełna!'  # Wiadomość, gdy gracz próbuje sprzedać przedmiot, ale skrzynia sklepu jest pełna.
+  owner-no-money: '%prefix% &cWłaściciel sklepu nie ma wystarczającej ilości pieniędzy, aby kupić twoje przedmioty!'  # Wiadomość, gdy właściciel sklepu nie ma wystarczająco pieniędzy.
+  owner-no-money-owner: '%prefix% &c%player-name% &cpróbował kupić &f%material% &cza &f$%price% &c, ale nie masz wystarczającej ilości pieniędzy!'  # Wiadomość, gdy właściciel sklepu próbuje kupić przedmiot, ale nie ma wystarczająco pieniędzy.
 admin:
   shop:
     list:

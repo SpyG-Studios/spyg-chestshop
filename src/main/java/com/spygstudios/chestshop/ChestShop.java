@@ -23,9 +23,9 @@ import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.config.MessageConfig;
-import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
+import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
-import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
+import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.listeners.BreakListener;
 import com.spygstudios.chestshop.listeners.BuildListener;
 import com.spygstudios.chestshop.listeners.ChatListener;
@@ -33,8 +33,10 @@ import com.spygstudios.chestshop.listeners.ExplosionListener;
 import com.spygstudios.chestshop.listeners.HopperListener;
 import com.spygstudios.chestshop.listeners.InteractListener;
 import com.spygstudios.chestshop.listeners.PlayerJoinListener;
-import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
+import com.spygstudios.chestshop.listeners.gui.DashboardGuiHandler;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
+import com.spygstudios.chestshop.listeners.gui.PlayerGuiHandler;
+import com.spygstudios.chestshop.listeners.gui.ShopGuiHandler;
 import com.spygstudios.chestshop.shop.ShopFile;
 import com.spygstudios.spyglib.hologram.HologramManager;
 import com.spygstudios.spyglib.version.VersionChecker;
@@ -77,7 +79,9 @@ public class ChestShop extends JavaPlugin {
         new InteractListener(this);
         new BreakListener(this);
         new BuildListener(this);
-        new InventoryClickListener(instance);
+        new DashboardGuiHandler(instance);
+        new PlayerGuiHandler(instance);
+        new ShopGuiHandler(instance);
         new InventoryCloseListener(instance);
         new ExplosionListener(instance);
         new ChatListener(instance);
@@ -119,7 +123,7 @@ public class ChestShop extends JavaPlugin {
         }
         ShopFile.saveShops();
 
-        List<Object> guis = Arrays.asList(ChestShopHolder.class, PlayersHolder.class, ShopGuiHolder.class);
+        List<Object> guis = Arrays.asList(DashboardHolder.class, PlayersHolder.class, ShopHolder.class);
         for (Player player : Bukkit.getOnlinePlayers()) {
             InventoryHolder holder = player.getOpenInventory().getTopInventory().getHolder();
             if (guis.contains(holder.getClass())) {

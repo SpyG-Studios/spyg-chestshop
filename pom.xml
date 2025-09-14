@@ -6,14 +6,15 @@
 
     <groupId>com.spygstudios</groupId>
     <artifactId>spyg-chestshop</artifactId>
-    <version>1.7.1</version>
+    <version>1.8.0</version>
 
     <properties>
+        <java.version>21</java.version>
+        <maven.compiler.plugin.version>3.12.1</maven.compiler.plugin.version>
         <bstats.version>3.1.0</bstats.version>
-        <spyglib.version>1.3.5</spyglib.version>
+        <lombok.version>1.18.38</lombok.version>
+        <spyglib.version>1.3.9</spyglib.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
         <maven.test.skip>true</maven.test.skip>
     </properties>
 
@@ -53,7 +54,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.36</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -100,18 +101,24 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                  </annotationProcessorPaths>
                 </configuration>
             </plugin>
-
-
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>3.1.0</version>
@@ -125,7 +132,7 @@
                 <artifactId>maven-sunfire-plugin</artifactId>
                 <version>2.22.1</version>
                 <configuration>
-                    <paralell>classes</paralell>
+                    <parallel>classes</parallel>
                     <threadCount>8</threadCount>
                 </configuration>
             </plugin>

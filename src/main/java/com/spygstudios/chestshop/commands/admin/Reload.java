@@ -1,12 +1,16 @@
 package com.spygstudios.chestshop.commands.admin;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.config.MessageConfig;
+import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
+import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
+import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.shop.Shop;
 
 import dev.rollczi.litecommands.annotations.command.Command;
@@ -30,7 +34,7 @@ public class Reload {
 
     @Execute
     @Permission("spygchestshop.admin.reload")
-    public void onReload(@Context CommandSender player) {
+    public void onReload(@Context CommandSender sender) {
         config.reloadConfig();
         guiConfig.reloadConfig();
         plugin.getMessageConfig().reloadConfig();
@@ -41,6 +45,15 @@ public class Reload {
             plugin.setMessageConfig(new MessageConfig(plugin, config.getString("locale")));
             Message.init(plugin.getMessageConfig());
         }
-        Message.CONFIG_RELOADED.send(player);
+        for (Player player : plugin.getServer().getOnlinePlayers()) {
+            if (player.getOpenInventory() == null || player.getOpenInventory().getTopInventory() == null) {
+                continue;
+            }
+            if (player.getOpenInventory().getTopInventory().getHolder() instanceof DashboardHolder || player.getOpenInventory().getTopInventory().getHolder() instanceof ShopHolder
+                    || player.getOpenInventory().getTopInventory().getHolder() instanceof PlayersHolder) {
+                player.closeInventory();
+            }
+        }
+        Message.CONFIG_RELOADED.send(sender);
     }
 }

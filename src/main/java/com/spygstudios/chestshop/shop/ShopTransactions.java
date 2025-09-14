@@ -1,12 +1,12 @@
 package com.spygstudios.chestshop.shop;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
@@ -29,6 +29,10 @@ public class ShopTransactions {
     }
 
     public void sell(Player buyer, int amount) {
+        if (!shop.acceptsCustomerPurchases()) {
+            return;
+        }
+
         int itemsLeft = shop.getItemsLeft();
         int itemCount = itemsLeft < amount ? itemsLeft : amount;
         if (!InventoryUtils.hasFreeSlot(buyer)) {
@@ -36,7 +40,7 @@ public class ShopTransactions {
             return;
         }
 
-        double itemsPrice = itemCount * shop.getPrice();
+        double itemsPrice = itemCount * shop.getCustomerPurchasePrice();
         Economy economy = plugin.getEconomy();
         EconomyResponse response = economy.withdrawPlayer(buyer, itemsPrice);
 
@@ -46,12 +50,13 @@ public class ShopTransactions {
         }
 
         economy.depositPlayer(Bukkit.getOfflinePlayer(shop.getOwnerId()), itemsPrice);
-        extractItems(buyer, (Chest) shop.getChestLocation().getBlock().getState(), itemCount);
+        Inventory chestInventory = ((Chest) shop.getChestLocation().getBlock().getState()).getInventory();
+        int soldItems = ShopUtils.extractItems(chestInventory, buyer.getInventory(), shop.getMaterial(), itemCount);
         itemsLeft = itemsLeft - itemCount;
 
         Message.SHOP_BOUGHT.send(buyer,
-                Map.of("%price%", String.valueOf(itemsPrice), "%material%", shop.getMaterial().name(), "%items-left%", String.valueOf(itemsLeft), "%items-bought%", String.valueOf(itemCount)));
-        shopFile.overwriteSet("shops." + shop.getName() + ".sold-items", shopFile.getInt("shops." + shop.getName() + ".sold-items") + itemCount);
+                Map.of("%price%", String.valueOf(itemsPrice), "%material%", shop.getMaterial().name(), "%items-left%", String.valueOf(itemsLeft), "%items-bought%", String.valueOf(soldItems)));
+        shopFile.overwriteSet("shops." + shop.getName() + ".sold-items", shopFile.getInt("shops." + shop.getName() + ".sold-items") + soldItems);
         shopFile.overwriteSet("shops." + shop.getName() + ".money-earned", shopFile.getDouble("shops." + shop.getName() + ".money-earned") + itemsPrice);
         shopFile.save();
         Player owner = Bukkit.getPlayer(shop.getOwnerId());
@@ -61,35 +66,85 @@ public class ShopTransactions {
         }
     }
 
-    private int extractItems(Player buyer, Chest chest, int itemCount) {
+    public void buy(Player seller, int amount) {
+        if (!shop.acceptsCustomerSales()) {
+            return;
+        }
+
         Material material = shop.getMaterial();
+        int playerItemCount = ShopUtils.countDurableItemsInInventory(seller.getInventory(), material);
+        if (playerItemCount < amount) {
+            Message.NOT_ENOUGH_ITEMS.send(seller, Map.of("%material%", material.name(), "%amount%", String.valueOf(amount)));
+            seller.closeInventory();
+            return;
+        }
 
-        for (ItemStack chestItem : chest.getInventory().getContents()) {
-            if (itemCount <= 0)
-                break;
-
-            if (chestItem != null && chestItem.getType() == material) {
-                int chestAmount = chestItem.getAmount();
-                int removeAmount = Math.min(itemCount, chestAmount);
-
-                ItemStack clone = chestItem.clone();
-                clone.setAmount(removeAmount);
-
-                HashMap<Integer, ItemStack> leftover = buyer.getInventory().addItem(clone);
-
-                if (leftover.isEmpty()) {
-                    chestItem.setAmount(chestAmount - removeAmount);
-                    itemCount -= removeAmount;
-                } else {
-                    int added = removeAmount - leftover.values().stream().mapToInt(ItemStack::getAmount).sum();
-                    chestItem.setAmount(chestAmount - added);
-                    itemCount -= added;
-                    break;
-                }
+        Chest chest = (Chest) shop.getChestLocation().getBlock().getState();
+        if (!hasChestSpace(chest, material, amount)) {
+            Message.SHOP_CHEST_FULL.send(seller);
+            if (!shop.isNotify()) {
+                return;
+            }
+            Player owner = Bukkit.getPlayer(shop.getOwnerId());
+            if (owner != null) {
+                Message.SHOP_CHEST_FULL_OWNER.send(owner, Map.of(
+                        "%player-name%", seller.getName(),
+                        "%material%", material.name(),
+                        "%amount%", String.valueOf(amount),
+                        "%shop-name%", shop.getName()));
             }
         }
 
-        return itemCount;
+        double itemsPrice = amount * shop.getCustomerSalePrice();
+        Economy economy = plugin.getEconomy();
+
+        if (economy.getBalance(Bukkit.getOfflinePlayer(shop.getOwnerId())) < itemsPrice) {
+            Message.SHOP_OWNER_NO_MONEY.send(seller);
+            if (!shop.isNotify()) {
+                return;
+            }
+            Player owner = Bukkit.getPlayer(shop.getOwnerId());
+            if (owner != null) {
+                Message.SHOP_OWNER_NO_MONEY_OWNER.send(owner, Map.of("%player-name%", seller.getName(), "%material%", material.name(), "%price%", String.valueOf(itemsPrice)));
+            }
+        }
+        Inventory chestInventory = ((Chest) shop.getChestLocation().getBlock().getState()).getInventory();
+        int soldItems = ShopUtils.extractItems(seller.getInventory(), chestInventory, material, amount);
+
+        EconomyResponse withdrawResponse = economy.withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwnerId()), itemsPrice);
+        if (withdrawResponse.transactionSuccess()) {
+            economy.depositPlayer(seller, itemsPrice);
+        }
+
+        shopFile.overwriteSet("shops." + shop.getName() + ".bought-items", shopFile.getInt("shops." + shop.getName() + ".bought-items") + soldItems);
+        shopFile.overwriteSet("shops." + shop.getName() + ".money-spent", shopFile.getDouble("shops." + shop.getName() + ".money-spent") + itemsPrice);
+        shopFile.save();
+
+        Message.SHOP_SOLD_TO.send(seller, Map.of("%price%", String.valueOf(itemsPrice), "%material%", material.name(), "%items-sold%", String.valueOf(soldItems)));
+
+        Player owner = Bukkit.getPlayer(shop.getOwnerId());
+        if (shop.isNotify() && owner != null) {
+            Message.SHOP_BOUGHT_FROM.send(owner,
+                    Map.of("%price%", String.valueOf(itemsPrice), "%material%", material.name(), "%player-name%", seller.getName(), "%items-bought%", String.valueOf(soldItems)));
+        }
+    }
+
+    private boolean hasChestSpace(Chest chest, Material material, int amount) {
+        int maxStackSize = material.getMaxStackSize();
+        int remainingAmount = amount;
+
+        for (ItemStack item : chest.getInventory().getContents()) {
+            if (remainingAmount <= 0)
+                break;
+
+            if (item == null) {
+                remainingAmount -= maxStackSize;
+            } else if (item.getType() == material && item.getAmount() < maxStackSize) {
+                remainingAmount -= (maxStackSize - item.getAmount());
+            }
+        }
+
+        return remainingAmount <= 0;
     }
 
 }
