@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -90,14 +91,16 @@ public class ShopGui {
             inventory.setItem(18, inventoryItem);
         }
 
-        config.getConfigurationSection("shop.amount.items").getKeys(false).forEach(key -> {
-            int slot = config.getInt("shop.amount.items." + key + ".slot");
-            int amount = config.getInt("shop.amount.items." + key + ".amount");
-            String title = config.getString("shop.amount.items." + key + ".title")
-                    .replace("%amount%", String.valueOf(amount).replace("-", ""));
-            List<String> lore = config.getStringList("shop.amount.items." + key + ".lore");
-            Material material = Material.getMaterial(config.getString("shop.amount.items." + key + ".material", "GRAY_STAINED_GLASS_PANE"));
-            addItemToInventory(plugin, inventory, slot, material, title, lore, amount);
+        ConfigurationSection amountSection = config.getConfigurationSection("shop.amount.items");
+        amountSection.getConfigurationSection("items").getKeys(false).forEach(key -> {
+            int slot = amountSection.getInt(key + ".slot");
+            int amount = amountSection.getInt(key + ".amount");
+            String title = amountSection.getString(key + ".title").replace("%amount%", String.valueOf(amount));
+            List<String> lore = amountSection.getStringList(key + ".lore");
+            Material material = Material.getMaterial(amountSection.getString(key + ".material", "GRAY_STAINED_GLASS_PANE"));
+            List<Float> modelFloats = amountSection.getFloatList(key + ".model-data.floats");
+            List<String> modelStrings = amountSection.getStringList(key + ".model-data.strings");
+            addItemToInventory(plugin, inventory, slot, material, title, lore, modelFloats, modelStrings, amount);
         });
 
         PageUtil.setFillItems(inventory, "shop");
@@ -105,8 +108,9 @@ public class ShopGui {
 
     }
 
-    private void addItemToInventory(ChestShop plugin, Inventory inventory, int slot, Material material, String title, List<String> lore, int amount) {
-        ItemStack item = ItemUtils.create(material, title, lore, Math.abs(amount));
+    private void addItemToInventory(ChestShop plugin, Inventory inventory, int slot, Material material, String title, List<String> lore, List<Float> modelFloats, List<String> modelStrings,
+            int amount) {
+        ItemStack item = ItemUtils.create(material, title, lore, modelFloats, modelStrings, amount);
         PersistentData data = new PersistentData(plugin, item);
         data.set("action", GuiAction.SET_ITEM_AMOUNT.name());
         data.set("amount", amount);
