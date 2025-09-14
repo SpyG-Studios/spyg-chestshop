@@ -15,7 +15,7 @@ public class GuiConfig extends YamlManager {
         set("chestshop.material.title", "&cMaterial");
         set("chestshop.material.slot", 13);
         set("chestshop.material.lore", Arrays.asList("&7Put here the material you", "&7want to sell"));
-        set("chestshop.material.not-set.material", "BARRIER");
+        set("chestshop.material.not-set-material", "BARRIER");
 
         set("chestshop.money.title", "&6&lPrice Settings");
         set("chestshop.money.slot", 11);

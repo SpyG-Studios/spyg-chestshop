@@ -51,7 +51,7 @@ public class DashboardGui {
         ItemStack shopMaterial = shop.getMaterial() != null
                 ? new ItemStack(shop.getMaterial())
                 : ItemUtils.create(
-                        Material.getMaterial(guiMaterialSection.getString("not-set.material", "BARRIER")),
+                        Material.getMaterial(guiMaterialSection.getString("not-set-material", "BARRIER")),
                         guiMaterialSection.getString("title"),
                         guiMaterialSection.getStringList("lore"),
                         guiMaterialSection.getFloatList("model-data.floats"),
