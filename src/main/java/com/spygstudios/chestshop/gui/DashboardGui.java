@@ -49,10 +49,9 @@ public class DashboardGui {
         ItemStack shopMaterial = shop.getMaterial() != null
                 ? new ItemStack(shop.getMaterial())
                 : ItemUtils.create(Material.BARRIER, guiConfig.getString("chestshop.material.title"), guiConfig.getStringList("chestshop.material.lore"));
-        inventory.setItem(13, shopMaterial);
+                        Material.getMaterial(guiMaterialSection.getString("not-set.material", "BARRIER")),
         PersistentData materialData = new PersistentData(plugin, inventory.getItem(13));
         materialData.set("action", GuiAction.SET_MATERIAL.name());
-        materialData.save();
 
         // info item
         String buyPrice = config.getString("shops.price-format.buy")
@@ -81,7 +80,7 @@ public class DashboardGui {
                         "%location%", shop.getChestLocationString(),
                         "%sold-items%", String.valueOf(shop.getSoldItems()),
                         "%money-earned%", String.valueOf(shop.getMoneyEarned()))));
-        inventory.setItem(8, infoItem);
+                infoSection.getFloatList("model-data.floats"),
 
         // notify item
         Material notifyMaterial = Material.getMaterial(guiConfig.getString("chestshop.notify.material", "BELL"));
@@ -91,8 +90,7 @@ public class DashboardGui {
                         : guiConfig.getString("chestshop.notify.off")));
         PersistentData notifyData = new PersistentData(plugin, notifyItem);
         notifyData.set("action", GuiAction.TOGGLE_NOTIFY.name());
-        notifyData.save();
-        inventory.setItem(0, notifyItem);
+        inventory.setItem(notifySection.getInt("slot"), notifyItem);
 
         // money item
         Material moneyMaterial = Material.getMaterial(guiConfig.getString("chestshop.money.material", "GOLD_INGOT"));
@@ -106,16 +104,14 @@ public class DashboardGui {
         ItemStack moneyItem = ItemUtils.create(moneyMaterial, guiConfig.getString("chestshop.money.title"), moneyLore);
         PersistentData moneyData = new PersistentData(plugin, moneyItem);
         moneyData.set("action", GuiAction.SET_SHOP_BUY_PRICE.name());
-        moneyData.save();
-        inventory.setItem(11, moneyItem);
+        inventory.setItem(moneySection.getInt("slot"), moneyItem);
 
         // inventory item
         Material inventoryMaterial = Material.getMaterial(guiConfig.getString("chestshop.inventory.material", "CHEST"));
         ItemStack inventoryItem = ItemUtils.create(inventoryMaterial, guiConfig.getString("chestshop.inventory.title"), guiConfig.getStringList("chestshop.inventory.lore"));
         PersistentData inventoryData = new PersistentData(plugin, inventoryItem);
         inventoryData.set("action", GuiAction.OPEN_SHOP_INVENTORY.name());
-        inventoryData.save();
-        inventory.setItem(18, inventoryItem);
+        inventory.setItem(inventorySection.getInt("slot"), inventoryItem);
 
         // buy/sell toggle item
         Material buySellMaterial = Material.getMaterial(guiConfig.getString("chestshop.buysell.material", "COMPARATOR"));
@@ -132,8 +128,7 @@ public class DashboardGui {
         ItemStack buySellItem = ItemUtils.create(buySellMaterial, guiConfig.getString("chestshop.buysell.title"), buySellLore);
         PersistentData buySellData = new PersistentData(plugin, buySellItem);
         buySellData.set("action", GuiAction.TOGGLE_SELLING.name());
-        buySellData.save();
-        inventory.setItem(15, buySellItem);
+        inventory.setItem(buySellSection.getInt("slot"), buySellItem);
 
         // player item
         OfflinePlayer owner = Bukkit.getOfflinePlayer(shop.getOwnerId());
@@ -144,8 +139,7 @@ public class DashboardGui {
         playrItem.setItemMeta(playrMeta);
         PersistentData playerData = new PersistentData(plugin, playrItem);
         playerData.set("action", GuiAction.OPEN_PLAYERS.name());
-        playerData.save();
-        inventory.setItem(26, playrItem);
+        inventory.setItem(playerSection.getInt("slot"), playrItem);
     }
 
     public static class DashboardHolder implements InventoryHolder {

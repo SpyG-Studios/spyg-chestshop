@@ -151,20 +151,17 @@ public class Shop {
     public void setNotify(boolean notify) {
         isNotify = notify;
         shopFile.overwriteSet("shops." + name + ".do-notify", notify);
-        shopFile.save();
     }
 
     public void setCanSellToPlayers(boolean canSellToPlayers) {
         this.canSellToPlayers = canSellToPlayers;
         shopFile.overwriteSet("shops." + name + ".can-sell", canSellToPlayers);
-        shopFile.save();
         hologram.updateHologramRows();
     }
 
     public void setCanBuyFromPlayers(boolean canBuyFromPlayers) {
         this.canBuyFromPlayers = canBuyFromPlayers;
         shopFile.overwriteSet("shops." + name + ".can-buy", canBuyFromPlayers);
-        shopFile.save();
         hologram.updateHologramRows();
     }
 

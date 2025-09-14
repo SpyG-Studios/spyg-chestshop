@@ -121,7 +121,7 @@ public class ShopFile extends YamlManager {
         set("shops." + name + ".can-sell", getBoolean("shops." + shopName + ".can-sell", true));
         set("shops." + name + ".can-buy", getBoolean("shops." + shopName + ".can-buy", false));
         set("shops." + name + ".created", getString("shops." + shopName + ".created", getDateString()));
-        set("shops." + name + ".added-players", getStringList("shops." + shopName + ".added-players", new ArrayList<>()));
+        set("shops." + name + ".added-players", getStringList("shops." + shopName + ".added-players"));
         overwriteSet("shops." + shopName, null);
         isSaved = false;
     }

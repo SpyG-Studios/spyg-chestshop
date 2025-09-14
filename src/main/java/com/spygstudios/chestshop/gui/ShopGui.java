@@ -53,7 +53,6 @@ public class ShopGui {
             ItemStack modeItem = ItemUtils.create(modeMaterial, modeTitle, modeLore);
             PersistentData modeData = new PersistentData(plugin, modeItem);
             modeData.set("action", GuiAction.TOGGLE_MODE.name());
-            modeData.save();
             inventory.setItem(4, modeItem);
         }
 
@@ -81,7 +80,6 @@ public class ShopGui {
                 ? GuiAction.BUY.name()
                 : GuiAction.SELL.name());
         data.set("mode", mode.name());
-        data.save();
         inventory.setItem(13, shopItem);
 
         if (shop.getAddedPlayers().contains(player.getUniqueId())) {
@@ -89,7 +87,6 @@ public class ShopGui {
             ItemStack inventoryItem = ItemUtils.create(inventoryMaterial, config.getString("chestshop.inventory.title"), config.getStringList("chestshop.inventory.lore"));
             PersistentData inventoryData = new PersistentData(plugin, inventoryItem);
             inventoryData.set("action", GuiAction.OPEN_SHOP_INVENTORY.name());
-            inventoryData.save();
             inventory.setItem(18, inventoryItem);
         }
 
@@ -113,7 +110,6 @@ public class ShopGui {
         PersistentData data = new PersistentData(plugin, item);
         data.set("action", GuiAction.SET_ITEM_AMOUNT.name());
         data.set("amount", amount);
-        data.save();
         inventory.setItem(slot, item);
     }
 

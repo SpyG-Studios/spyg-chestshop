@@ -119,7 +119,6 @@ public class DashboardGuiHandler implements Listener {
         event.getInventory().setItem(13, new ItemStack(event.getCursor().getType()));
         PersistentData newData = new PersistentData(plugin, event.getInventory().getItem(13));
         newData.set("action", GuiAction.SET_MATERIAL.name());
-        newData.save();
     }
 
     private void handlePriceSetting(InventoryClickEvent event) {
