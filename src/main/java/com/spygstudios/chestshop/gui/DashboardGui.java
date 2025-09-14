@@ -90,7 +90,9 @@ public class DashboardGui {
                         "%created%", shop.getCreatedAt(),
                         "%location%", shop.getChestLocationString(),
                         "%sold-items%", String.valueOf(shop.getSoldItems()),
-                        "%money-earned%", String.valueOf(shop.getMoneyEarned()))),
+                        "%money-earned%", String.valueOf(shop.getMoneyEarned()),
+                        "%bought-items%", String.valueOf(shop.getBoughtItems()),
+                        "%money-spent%", String.valueOf(shop.getMoneySpent()))),
                 infoSection.getFloatList("model-data.floats"),
                 infoSection.getStringList("model-data.strings"));
 

@@ -94,6 +94,14 @@ public class Shop {
         return shopFile.getInt("shops." + name + ".money-earned");
     }
 
+    public int getBoughtItems() {
+        return shopFile.getInt("shops." + name + ".bought-items");
+    }
+
+    public int getMoneySpent() {
+        return shopFile.getInt("shops." + name + ".money-spent");
+    }
+
     public String getChestLocationString() {
         return chestLocation.getWorld().getName() + ", x: " + chestLocation.getBlockX() + " y: " + chestLocation.getBlockY() + " z: " + chestLocation.getBlockZ();
     }
