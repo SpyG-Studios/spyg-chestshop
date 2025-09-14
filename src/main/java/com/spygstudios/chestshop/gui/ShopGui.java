@@ -38,7 +38,7 @@ public class ShopGui {
 
     public static void open(ChestShop plugin, Player player, Shop shop, ShopMode mode) {
         GuiConfig config = plugin.getGuiConfig();
-        Inventory inventory = player.getServer().createInventory(new ShopGuiHolder(player, shop), 27, TranslateColor.translate(config.getString("shop.title").replace("%shop-name%", shop.getName())));
+        Inventory inventory = player.getServer().createInventory(new ShopHolder(player, shop), 27, TranslateColor.translate(config.getString("shop.title").replace("%shop-name%", shop.getName())));
 
         if (shop.acceptsCustomerPurchases() && shop.acceptsCustomerSales() && shop.getItemsLeft() > 0) {
             Material modeMaterial = mode == ShopMode.CUSTOMER_PURCHASING
@@ -153,7 +153,7 @@ public class ShopGui {
         PLAYER_MODES.remove(player.getUniqueId());
     }
 
-    public static class ShopGuiHolder implements InventoryHolder {
+    public static class ShopHolder implements InventoryHolder {
 
         @Getter
         private final Player player;
@@ -161,7 +161,7 @@ public class ShopGui {
         @Getter
         private final Shop shop;
 
-        public ShopGuiHolder(Player player, Shop shop) {
+        public ShopHolder(Player player, Shop shop) {
             this.player = player;
             this.shop = shop;
         }

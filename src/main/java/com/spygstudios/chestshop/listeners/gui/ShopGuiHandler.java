@@ -18,7 +18,7 @@ import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.enums.ShopMode;
 import com.spygstudios.chestshop.gui.ShopGui;
-import com.spygstudios.chestshop.gui.ShopGui.ShopGuiHolder;
+import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.shop.ShopUtils;
 import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.persistentdata.PersistentData;
@@ -38,7 +38,7 @@ public class ShopGuiHandler implements Listener {
 
     @EventHandler
     public void onShopClick(InventoryClickEvent event) {
-        if (!(event.getInventory().getHolder() instanceof ShopGuiHolder)) {
+        if (!(event.getInventory().getHolder() instanceof ShopHolder)) {
             return;
         }
         ItemStack clickedItem = event.getCurrentItem();
@@ -52,7 +52,7 @@ public class ShopGuiHandler implements Listener {
             return;
         }
         GuiAction guiAction = GuiAction.valueOf(action);
-        ShopGuiHolder holder = (ShopGuiHolder) event.getInventory().getHolder();
+        ShopHolder holder = (ShopHolder) event.getInventory().getHolder();
         Player player = holder.getPlayer();
         ShopMode currentMode = ShopGui.getPlayerMode(player);
         switch (guiAction) {
