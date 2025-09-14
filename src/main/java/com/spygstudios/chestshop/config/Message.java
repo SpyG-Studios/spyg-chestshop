@@ -58,7 +58,8 @@ public enum Message {
 
     SHOP_LIST_HEAD("shop.list.header", "%prefix% &aYour shops:"),
     SHOP_LIST_SHOPS("shop.list.shops", "&7- &f%shop-name%"),
-    SHOP_LIST_SHOPS_HOVER("shop.list.shops-hover", "&6&l%material%&r\n &8- &7price: &6$&e%price%\n &8- &7items left: &e%items-left%\n &8- &7location: &e%location%\n &8- &7created at: &e%created%"),
+    SHOP_LIST_SHOPS_HOVER("shop.list.shops-hover",
+            "&6&l%material%&r\n &8- &7price: &6$&a%sell-price%&e/&6$&c%buy-price%\n &8- &7items left: &e%items-left%\n &8- &7location: &e%location%\n &8- &7created at: &e%created%"),
 
     SHOP_LIST_CURRENT_PAGE("shop.list.current-page", "&7[&e&l%page%&r&7]"),
     SHOP_LIST_NEXT("shop.list.next", " &7[&eNext&7]"),
@@ -84,7 +85,7 @@ public enum Message {
     ADMIN_SHOP_LIST_HEAD("admin.shop.list.header", "%prefix% &e%player-name%&a's shops:"),
     ADMIN_SHOP_LIST_SHOPS("admin.shop.list.shops", "&7- &f%shop-name%"),
     ADMIN_SHOP_LIST_SHOPS_HOVER("admin.shop.list.shops-hover",
-            "&6&l%material%&r\n &8- &7price: &6$&e%price%\n &8- &7items left: &e%items-left%\n &8- &7location: &e%location%\n &8- &7created at: &e%created%"),
+            "&6&l%material%&r\n &8- &7price: &6$&a%sell-price%&e/&6$&c%buy-price%\n &8- &7items left: &e%items-left%\n &8- &7location: &e%location%\n &8- &7created at: &e%created%"),
     ADMIN_NO_SHOPS("admin.no-shops", "%prefix% &cPlayer &f%player-name% &chas no shops!"),
     ADMIN_CUSTOMER_MODE("admin.customer-mode.message", "%prefix% &aCustomer mode %state%!"),
     ADMIN_CUSTOMER_MODE_OTHER("admin.customer-mode.message-other", "%prefix% &aCustomer mode %state% for &f%player-name%&a!"),

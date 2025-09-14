@@ -44,7 +44,8 @@ public class ShopListAdmin {
             Component hoverMessage = ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS_HOVER.get(), Map.of(
                     "%shop-name%", shop.getName(),
                     "%material%", shop.getMaterialString(),
-                    "%price%", String.format("$%.2f / $%.2f", shop.getCustomerPurchasePrice(), shop.getCustomerSalePrice()),
+                    "%sell-price%", String.format("%.2f", shop.getCustomerPurchasePrice()),
+                    "%buy-price%", String.format("%.2f", shop.getCustomerSalePrice()),
                     "%items-left%", shop.getItemsLeft() + "",
                     "%location%", shop.getChestLocationString(),
                     "%created%", shop.getCreatedAt()));
