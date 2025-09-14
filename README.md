@@ -81,7 +81,7 @@ If the plugin supports it, add a `model-data` field to the relevant item section
     - '&7Click to open the shop inventory'
 ```
 
-- The `model-data` value must be an integer and should match the value used in your resource pack.
+- The `model-data` field can contain either `floats` (integers) or `strings`, or both.
 - Not all items need this field; only add it where you want a custom model.
 - If you don't see the custom model in-game, make sure your resource pack is loaded and the item type supports custom model data.
 
