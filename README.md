@@ -50,6 +50,43 @@ Edit `config.yml` to customize:
 
 Edit `guis.yml` to customize GUI titles, slots, and item appearances.
 
+### Adding Custom Model Data to GUI Items
+
+You can add custom model data ("model-data") to items in your GUIs for resource pack support and custom textures. This is useful for making GUI items appear unique or custom-skinned.
+
+**How to add model-data:**
+
+If the plugin supports it, add a `model-data` field to the relevant item section in your `guis.yml` (or equivalent GUI config). For example:
+
+```yaml
+  inventory:
+    title: '&cShopInventory'
+    slot: 18
+    material: CHEST
+    model-data: # You can define custom model as follows, it can be a list of integers/strings. You don't need to use both types, just one is enough.
+      floats: [123, 456]  # Add an integer (or float) identifier
+      strings: ['custom_chest', 'custom_chest_2']  # Add a string identifier
+    lore:
+    - '&7Click to open the shop inventory'
+```
+
+```yaml
+  inventory:
+    title: '&cShopInventory'
+    slot: 18
+    material: CHEST
+    model-data:
+      strings: ['custom_chest']  # Add a string identifier
+    lore:
+    - '&7Click to open the shop inventory'
+```
+
+- The `model-data` value must be an integer and should match the value used in your resource pack.
+- Not all items need this field; only add it where you want a custom model.
+- If you don't see the custom model in-game, make sure your resource pack is loaded and the item type supports custom model data.
+
+> **Note:** If you do not see the custom model, check that your plugin version supports the `model-data` field for GUI items. If not, you may need to update the plugin or request this feature from the developers.
+
 ### Localization
 Locale files are in `src/main/resources/locale/` (e.g., `en_US.yml`, `hu_HU.yml`, `pl_PL.yml`).
 Set your preferred language in `config.yml` with the `locale` option.
