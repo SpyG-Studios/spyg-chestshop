@@ -34,6 +34,7 @@ public class Reload {
 
     @Execute
     @Permission("spygchestshop.admin.reload")
+    @Permission("spygchestshop.admin.*")
     public void onReload(@Context CommandSender sender) {
         config.reloadConfig();
         guiConfig.reloadConfig();

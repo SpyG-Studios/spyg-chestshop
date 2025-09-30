@@ -25,6 +25,7 @@ public class CustomerMode {
 
     @Execute
     @Permission("spygchestshop.admin.customermode")
+    @Permission("spygchestshop.admin.*")
     public void onCustomerMode(@Context Player player, @Arg Optional<Player> target) {
         Player targetPlayer = target.orElse(player);
         String state = !customerMode.contains(targetPlayer.getUniqueId()) ? Message.ADMIN_CUSTOMER_MODE_STATE_ENABLED.getRaw() : Message.ADMIN_CUSTOMER_MODE_STATE_DISABLED.getRaw();
