@@ -2,6 +2,7 @@ package com.spygstudios.chestshop.config;
 
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -122,11 +123,21 @@ public enum Message {
     }
 
     public String getRaw() {
-        return config.getString(node);
+        String message = config.getString(node);
+        if (message == null) {
+            Bukkit.getLogger().warning("Message node " + node + " is missing from your language file! Using default message.");
+            message = defaultMessage;
+        }
+        return message;
     }
 
     public Component get() {
-        return TranslateColor.translate(config.getString(node).replace("%prefix%", config.getString("prefix")));
+        String message = config.getString(node);
+        if (message == null) {
+            Bukkit.getLogger().warning("Message node " + node + " is missing from your language file! Using default message.");
+            message = defaultMessage;
+        }
+        return TranslateColor.translate(message.replace("%prefix%", config.getString("prefix")));
     }
 
     public void setDefault() {
