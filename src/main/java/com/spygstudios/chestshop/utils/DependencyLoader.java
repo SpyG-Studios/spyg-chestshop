@@ -23,13 +23,13 @@ public class DependencyLoader implements PluginLoader {
                 resolver.addDependency(new Dependency(new DefaultArtifact(lib), null));
             });
         } catch (Exception e) {
-            resolver.addDependency(new Dependency(new DefaultArtifact("com.spygstudios:spyglib:1.2.3"), null));
+            resolver.addDependency(new Dependency(new DefaultArtifact("com.spygstudios:spyglib:1.3.9"), null));
             resolver.addDependency(new Dependency(new DefaultArtifact("org.xerial:sqlite-jdbc:3.50.2.0"), null));
             resolver.addDependency(new Dependency(new DefaultArtifact("com.mysql:mysql-connector-j:9.3.0"), null));
             e.printStackTrace();
         }
 
-        resolver.addRepository(new RemoteRepository.Builder("oss-central", "default", "https://oss.sonatype.org/content/groups/public/").build());
+        resolver.addRepository(new RemoteRepository.Builder("ikoli", "default", "https://repo.ikoli.hu/").build());
 
         classpathBuilder.addLibrary(resolver);
     }
