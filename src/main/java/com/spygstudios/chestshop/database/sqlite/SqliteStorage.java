@@ -12,10 +12,10 @@ import org.bukkit.Material;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.database.DatabaseHandler;
 import com.spygstudios.chestshop.enums.DatabaseType;
-import com.spygstudios.chestshop.interfaces.DataManager;
+import com.spygstudios.chestshop.interfaces.SqlDataManager;
 import com.spygstudios.chestshop.shop.Shop;
 
-public class SqliteStorage extends DatabaseHandler implements DataManager {
+public class SqliteStorage extends DatabaseHandler implements SqlDataManager {
 
     public SqliteStorage(ChestShop plugin) {
         super(plugin, DatabaseType.SQLITE);
@@ -88,7 +88,7 @@ public class SqliteStorage extends DatabaseHandler implements DataManager {
     }
 
     @Override
-    public CompletableFuture<Boolean> updateShopStats(UUID ownerId, String shopName, int soldItems, double moneyEarned) {
+    public CompletableFuture<Boolean> updateShopSellStats(UUID ownerId, String shopName, int soldItems, double moneyEarned) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'updateShopStats'");
     }
@@ -151,6 +151,42 @@ public class SqliteStorage extends DatabaseHandler implements DataManager {
     public void createTables() throws SQLException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'createTables'");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> updateShopBuyStats(UUID ownerId, String shopName, int boughtItems, double moneyEarned) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateShopBuyStats'");
+    }
+
+    @Override
+    public CompletableFuture<Integer> getBoughtItems(UUID ownerId, String shopName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getBoughtItems'");
+    }
+
+    @Override
+    public CompletableFuture<Integer> getSoldItems(UUID ownerId, String shopName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSoldItems'");
+    }
+
+    @Override
+    public CompletableFuture<Integer> getMoneySpent(UUID ownerId, String shopName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getMoneySpent'");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> setCanBuyFromPlayers(UUID ownerId, String shopName, boolean canBuy) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setCanBuyFromPlayers'");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> setCanSellToPlayers(UUID ownerId, String shopName, boolean canSell) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setCanSellToPlayers'");
     }
 
 }

@@ -193,7 +193,9 @@ public class YamlShopFile extends YamlManager {
         Material material = Material.getMaterial(shopFile.getString("shops." + shopName + ".material"));
         String createdAt = shopFile.getString("shops." + shopName + ".created");
         boolean isNotify = shopFile.getBoolean("shops." + shopName + ".do-notify");
-        return new Shop(shopFile.getOwnerId(), shopName, price, material, location, createdAt, isNotify, shopFile.getAddedUuids(shopName));
+        boolean canSell = shopFile.getBoolean("shops." + shopName + ".can-sell", true);
+        boolean canBuy = shopFile.getBoolean("shops." + shopName + ".can-buy", false);
+        return new Shop(shopFile.getOwnerId(), shopName, sellPrice, buyPrice, material, location, createdAt, isNotify, canSell, canBuy, shopFile.getAddedUuids(shopName));
     }
 
     public static YamlShopFile getShopFile(UUID ownerId) {

@@ -9,6 +9,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.chestshop.interfaces.SqlDataManager;
 import com.spygstudios.spyglib.components.ComponentUtils;
 
 import net.kyori.adventure.text.Component;
@@ -45,7 +46,10 @@ public class PlayerJoinListener implements Listener {
 
     @EventHandler
     public void loadShopsOnJoin(PlayerJoinEvent event) {
-        plugin.getDataManager().loadPlayerShops(event.getPlayer().getUniqueId());
+        if (!(plugin.getDataManager() instanceof SqlDataManager dataManager)) {
+            return;
+        }
+        dataManager.loadPlayerShops(event.getPlayer().getUniqueId());
     }
 
 }

@@ -1,7 +1,6 @@
 package com.spygstudios.chestshop.shop;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -23,52 +22,42 @@ import com.spygstudios.spyglib.hologram.HologramItemRow;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.economy.EconomyResponse;
 
+@Getter
 public class Shop {
-    @Getter
     private UUID ownerId;
     private double sellPrice;
     private double buyPrice;
-    @Getter
     private Material material;
-    @Getter
     private Location chestLocation;
-    @Getter
     private String createdAt;
-    @Getter
     private String name;
-    @Getter
     private boolean isNotify;
-    @Getter
     private boolean canSellToPlayers;
-    @Getter
     private boolean canBuyFromPlayers;
-    @Getter
     private List<UUID> addedPlayers;
-    @Getter
     private double moneyEarned;
-    @Getter
+    private double moneySpent;
     private int soldItems;
-    @Getter
+    private int boughtItems;
     private ShopHologram hologram;
-    @Getter
     @Setter
     private boolean isSaved = false;
+    private ShopTransactions shopTransactions;
 
     private static final List<Shop> SHOPS = new ArrayList<>();
     private static ChestShop plugin = ChestShop.getInstance();
 
     public Shop(Player owner, String shopName, Location chestLocation, String createdAt) {
-        this(owner.getUniqueId(), shopName, 0, null, chestLocation, createdAt, false, new ArrayList<>());
+        this(owner.getUniqueId(), shopName, 0, 0, null, chestLocation, createdAt, false, true, false, new ArrayList<>());
     }
 
-    public Shop(UUID owner, String shopName, Location chestLocation, String createdAt) {
-        this(owner, shopName, 0, null, chestLocation, createdAt, false, new ArrayList<>());
+    public Shop(UUID ownerId, String shopName, Location chestLocation, String createdAt) {
+        this(ownerId, shopName, 0, 0, null, chestLocation, createdAt, false, true, false, new ArrayList<>());
     }
 
-    public Shop(UUID ownerId, String shopName, double price, Material material, Location chestLocation, String createdAt, boolean isNotify, List<UUID> addedPlayers) {
+    public Shop(UUID ownerId, String shopName, double sellPrice, double buyPrice, Material material, Location chestLocation, String createdAt, boolean isNotify, boolean canSell, boolean canBuy,
+            List<UUID> addedPlayers) {
         synchronized (SHOPS) {
             if (Shop.getShop(ownerId, shopName) != null) {
                 return;
@@ -77,8 +66,8 @@ public class Shop {
         }
         this.ownerId = ownerId;
         this.name = shopName;
-        this.sellPrice = ShopUtils.parsePrice(sellPrice);
-        this.buyPrice = ShopUtils.parsePrice(buyPrice);
+        this.sellPrice = sellPrice;
+        this.buyPrice = buyPrice;
         this.material = material;
         this.chestLocation = chestLocation;
         this.createdAt = createdAt;
@@ -86,6 +75,7 @@ public class Shop {
         this.canSellToPlayers = canSell;
         this.canBuyFromPlayers = canBuy;
         this.addedPlayers = addedPlayers;
+        this.shopTransactions = new ShopTransactions(this);
         this.hologram = new ShopHologram(this, plugin);
     }
 
@@ -96,6 +86,38 @@ public class Shop {
         String materialString = material.name();
         return materialString.length() > 14 ? materialString.substring(0, 14) : materialString;
     }
+
+    public double getSellPrice() {
+        return ShopUtils.parsePrice(this.sellPrice);
+    }
+
+    public double getBuyPrice() {
+        return ShopUtils.parsePrice(this.buyPrice);
+    }
+
+    public boolean acceptsCustomerPurchases() {
+        return isCanSellToPlayers();
+    }
+
+    public boolean acceptsCustomerSales() {
+        return isCanBuyFromPlayers();
+    }
+
+    public double getCustomerPurchasePrice() {
+        return getSellPrice();
+    }
+
+    public double getCustomerSalePrice() {
+        return getBuyPrice();
+    }
+
+    // public int getBoughtItems() {
+    // return shopFile.getInt("shops." + name + ".sold-items");
+    // }
+
+    // public int getMoneySpent() {
+    // return shopFile.getInt("shops." + name + ".money-spent");
+    // }
 
     public void setSoldItems(int soldItems) {
         plugin.getDataManager().updateSoldItems(ownerId, name, soldItems).thenAccept(success -> {
@@ -121,12 +143,28 @@ public class Shop {
         });
     }
 
-    public int getBoughtItems() {
-        return shopFile.getInt("shops." + name + ".bought-items");
+    public void setBoughtItems(int boughtItems) {
+        plugin.getDataManager().updateSoldItems(ownerId, name, boughtItems).thenAccept(success -> {
+            if (!success) {
+                plugin.getLogger().warning("Failed to update shop stats for " + name);
+                return;
+            }
+            this.soldItems = boughtItems;
+            hologram.updateHologramRows();
+            isSaved = false;
+        });
     }
 
-    public int getMoneySpent() {
-        return shopFile.getInt("shops." + name + ".money-spent");
+    public void setMoneySpent(double moneySpent) {
+        plugin.getDataManager().updateMoneyEarned(ownerId, name, moneySpent).thenAccept(success -> {
+            if (!success) {
+                plugin.getLogger().warning("Failed to update shop stats for " + name);
+                return;
+            }
+            this.moneyEarned = moneySpent;
+            hologram.updateHologramRows();
+            isSaved = false;
+        });
     }
 
     public String getChestLocationString() {
@@ -159,27 +197,30 @@ public class Shop {
         });
     }
 
-    public double getSellPrice() {
-        return ShopUtils.parsePrice(this.sellPrice);
-    }
-
-    public void setPrice(double price) {
-        double parsedPrice = ShopUtils.parsePrice(price);
+    public void setBuyPrice(double buyPrice) {
+        double parsedPrice = ShopUtils.parsePrice(buyPrice);
         plugin.getDataManager().updateShopPrice(ownerId, name, parsedPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop price for " + name);
                 return;
             }
-            this.price = parsedPrice;
+            this.buyPrice = parsedPrice;
             hologram.updateHologramRows();
             isSaved = false;
         });
     }
 
-    public void setBuyPrice(double buyPrice) {
-        this.buyPrice = ShopUtils.parsePrice(buyPrice);
-        ShopFile.getShopFile(ownerId).setBuyPrice(name, this.buyPrice);
-        hologram.updateHologramRows();
+    public void setSellPrice(double sellPrice) {
+        double parsedPrice = ShopUtils.parsePrice(sellPrice);
+        plugin.getDataManager().updateShopPrice(ownerId, name, parsedPrice).thenAccept(success -> {
+            if (!success) {
+                plugin.getLogger().warning("Failed to update shop price for " + name);
+                return;
+            }
+            this.sellPrice = parsedPrice;
+            hologram.updateHologramRows();
+            isSaved = false;
+        });
     }
 
     public void setNotify(boolean notify) {
@@ -194,15 +235,25 @@ public class Shop {
     }
 
     public void setCanSellToPlayers(boolean canSellToPlayers) {
-        this.canSellToPlayers = canSellToPlayers;
-        shopFile.overwriteSet("shops." + name + ".can-sell", canSellToPlayers);
-        hologram.updateHologramRows();
+        plugin.getDataManager().setCanSellToPlayers(ownerId, name, canSellToPlayers).thenAccept(success -> {
+            if (!success) {
+                plugin.getLogger().warning("Failed to update shop canSellToPlayers setting for " + name);
+                return;
+            }
+            this.canSellToPlayers = canSellToPlayers;
+            isSaved = false;
+        });
     }
 
     public void setCanBuyFromPlayers(boolean canBuyFromPlayers) {
-        this.canBuyFromPlayers = canBuyFromPlayers;
-        shopFile.overwriteSet("shops." + name + ".can-buy", canBuyFromPlayers);
-        hologram.updateHologramRows();
+        plugin.getDataManager().setCanSellToPlayers(ownerId, name, canBuyFromPlayers).thenAccept(success -> {
+            if (!success) {
+                plugin.getLogger().warning("Failed to update shop canBuyFromPlayers setting for " + name);
+                return;
+            }
+            this.canBuyFromPlayers = canBuyFromPlayers;
+            isSaved = false;
+        });
     }
 
     public void addPlayer(UUID uuid) {
@@ -268,88 +319,6 @@ public class Shop {
             return;
         }
         player.openInventory(chest.getInventory());
-    }
-
-    public void sell(Player buyer, int amount) {
-        int itemsLeft = getItemsLeft();
-        int itemCount = itemsLeft < amount ? itemsLeft : amount;
-        if (!InventoryUtils.hasFreeSlot(buyer)) {
-            Message.SHOP_INVENTORY_FULL.send(buyer);
-            return;
-        }
-
-        double itemsPrice = itemCount * price;
-        Economy economy = plugin.getEconomy();
-        EconomyResponse response = economy.withdrawPlayer(buyer, itemsPrice);
-
-        if (!response.transactionSuccess()) {
-            Message.NOT_ENOUGH_MONEY.send(buyer, Map.of("%price%", String.valueOf(itemsPrice)));
-            return;
-        }
-
-        economy.depositPlayer(Bukkit.getOfflinePlayer(getOwnerId()), itemsPrice);
-        extractItems(buyer, (Chest) getChestLocation().getBlock().getState(), itemCount);
-        itemsLeft = itemsLeft - itemCount;
-
-        Message.SHOP_BOUGHT.send(buyer, Map.of(
-                "%price%", String.valueOf(itemsPrice),
-                "%material%", material.name(),
-                "%items-left%", String.valueOf(itemsLeft),
-                "%items-bought%", String.valueOf(itemCount)));
-
-        plugin.getDataManager().updateShopStats(ownerId, name, itemCount, itemsPrice).thenAccept(success -> {
-            if (!success) {
-                plugin.getLogger().warning("Failed to update shop stats for " + name + " owned by " + ownerId);
-                return;
-            }
-            setSoldItems(getSoldItems() + itemCount);
-            setMoneyEarned(getMoneyEarned() + itemsPrice);
-            isSaved = false;
-        });
-
-        Player owner = Bukkit.getPlayer(ownerId);
-        if (isNotify && owner != null) {
-            Message.SHOP_SOLD.send(owner, Map.of(
-                    "%price%", String.valueOf(itemsPrice),
-                    "%material%", material.name(),
-                    "%player-name%", buyer.getName(),
-                    "%items-left%", String.valueOf(itemsLeft),
-                    "%items-bought%", String.valueOf(itemCount)));
-        }
-    }
-
-    public void buy(Player seller, int amount) {
-        // Implement the buy logic if needed
-        // This method is currently not used in the provided code
-    }
-
-    private int extractItems(Player buyer, Chest chest, int itemCount) {
-        for (ItemStack chestItem : chest.getInventory().getContents()) {
-            if (itemCount <= 0)
-                break;
-
-            if (chestItem != null && chestItem.getType() == material) {
-                int chestAmount = chestItem.getAmount();
-                int removeAmount = Math.min(itemCount, chestAmount);
-
-                ItemStack clone = chestItem.clone();
-                clone.setAmount(removeAmount);
-
-                HashMap<Integer, ItemStack> leftover = buyer.getInventory().addItem(clone);
-
-                if (leftover.isEmpty()) {
-                    chestItem.setAmount(chestAmount - removeAmount);
-                    itemCount -= removeAmount;
-                } else {
-                    int added = removeAmount - leftover.values().stream().mapToInt(ItemStack::getAmount).sum();
-                    chestItem.setAmount(chestAmount - added);
-                    itemCount -= added;
-                    break;
-                }
-            }
-        }
-
-        return itemCount;
     }
 
     public void unload() {

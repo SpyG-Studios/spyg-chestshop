@@ -5,7 +5,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -47,18 +46,6 @@ public class YamlStorage implements DataManager {
     public CompletableFuture<List<Shop>> getPlayerShops(UUID ownerId) {
         List<Shop> shops = Shop.getShops(ownerId);
         return CompletableFuture.completedFuture(shops);
-    }
-
-    @Override
-    public void loadShopsInChunk(Chunk chunk) {
-        // This method is not used in YamlStorage, as shops are loaded on
-        // initialization.
-    }
-
-    @Override
-    public void unloadShopsInChunk(Chunk chunk) {
-        // This method is not used in YamlStorage, as shops are loaded on
-        // initialization.
     }
 
     @Override
@@ -113,7 +100,7 @@ public class YamlStorage implements DataManager {
     }
 
     @Override
-    public CompletableFuture<Boolean> updateShopStats(UUID ownerId, String shopName, int soldItems, double moneyEarned) {
+    public CompletableFuture<Boolean> updateShopSellStats(UUID ownerId, String shopName, int soldItems, double moneyEarned) {
         return updateMoneyEarned(ownerId, shopName, moneyEarned)
                 .thenCompose(moneyUpdated -> updateSoldItems(ownerId, shopName, soldItems))
                 .thenApply(soldItemsUpdated -> true);
@@ -204,17 +191,39 @@ public class YamlStorage implements DataManager {
     }
 
     @Override
-    public CompletableFuture<List<Shop>> loadPlayerShops(UUID ownerId) {
-        // This method is not used in YamlStorage, as shops are loaded on
-        // initialization.
-        return CompletableFuture.completedFuture(List.of());
+    public CompletableFuture<Boolean> updateShopBuyStats(UUID ownerId, String shopName, int boughtItems, double moneyEarned) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateShopBuyStats'");
     }
 
     @Override
-    public CompletableFuture<Boolean> unloadPlayerShops(UUID ownerId) {
-        // This method is not used in YamlStorage, as shops are loaded on
-        // initialization.
-        return CompletableFuture.completedFuture(true);
+    public CompletableFuture<Integer> getBoughtItems(UUID ownerId, String shopName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getBoughtItems'");
+    }
+
+    @Override
+    public CompletableFuture<Integer> getSoldItems(UUID ownerId, String shopName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSoldItems'");
+    }
+
+    @Override
+    public CompletableFuture<Integer> getMoneySpent(UUID ownerId, String shopName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getMoneySpent'");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> setCanBuyFromPlayers(UUID ownerId, String shopName, boolean canBuy) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setCanBuyFromPlayers'");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> setCanSellToPlayers(UUID ownerId, String shopName, boolean canSell) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setCanSellToPlayers'");
     }
 
 }

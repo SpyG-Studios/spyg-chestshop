@@ -26,7 +26,6 @@ import com.spygstudios.chestshop.config.MessageConfig;
 import com.spygstudios.chestshop.database.sql.MysqlStorage;
 import com.spygstudios.chestshop.database.sqlite.SqliteStorage;
 import com.spygstudios.chestshop.database.yaml.YamlStorage;
-import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
 import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.interfaces.DataManager;
@@ -42,11 +41,9 @@ import com.spygstudios.chestshop.listeners.InteractListener;
 import com.spygstudios.chestshop.listeners.PlayerJoinListener;
 import com.spygstudios.chestshop.listeners.gui.DashboardGuiHandler;
 import com.spygstudios.chestshop.listeners.PlayerQuitListener;
-import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
 import com.spygstudios.chestshop.listeners.gui.PlayerGuiHandler;
 import com.spygstudios.chestshop.listeners.gui.ShopGuiHandler;
-import com.spygstudios.chestshop.shop.ShopFile;
 import com.spygstudios.spyglib.hologram.HologramManager;
 import com.spygstudios.spyglib.version.VersionChecker;
 
@@ -54,27 +51,19 @@ import lombok.Getter;
 import lombok.Setter;
 import net.milkbowl.vault.economy.Economy;
 
+@Getter
 public class ChestShop extends JavaPlugin {
     @Getter
     private static ChestShop instance;
-    @Getter
     private Economy economy;
-    @Getter
     private Config conf;
-    @Getter
     private GuiConfig guiConfig;
-    @Getter
     private HologramManager hologramManager;
-    @Getter
     private CommandHandler commandHandler;
-    @Getter
     @Setter
     private MessageConfig messageConfig;
-    @Getter
     private DataManager dataManager;
-    @Getter
     private boolean latestVersion = true;
-    @Getter
     private String currentVersion;
     private static final String API_URL = "https://hangar.papermc.io/api/v1/projects/Spyg-ChestShop/latestrelease";
 
@@ -101,13 +90,11 @@ public class ChestShop extends JavaPlugin {
         new ExplosionListener(instance);
         new ChatListener(instance);
         new HopperListener(instance);
-        Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
         new PlayerJoinListener(this);
         new PlayerQuitListener(this);
         new ChunkLoadListener(this);
         new ChunkUnloadListener(this);
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-        new InventoryClickListener(this);
             Entry<String, Boolean> versionInfo = VersionChecker.isLatestVersion(API_URL, getPluginMeta().getVersion());
             this.currentVersion = versionInfo.getKey();
             this.latestVersion = versionInfo.getValue();

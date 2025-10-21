@@ -24,12 +24,13 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.database.DatabaseHandler;
 import com.spygstudios.chestshop.enums.DatabaseType;
 import com.spygstudios.chestshop.interfaces.DataManager;
+import com.spygstudios.chestshop.interfaces.SqlDataManager;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.utils.FutureUtils;
 
 import lombok.Getter;
 
-public class MysqlStorage extends DatabaseHandler implements DataManager {
+public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
 
     @Getter
     private final DatabaseType databaseType;
@@ -256,7 +257,7 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
     }
 
     @Override
-    public CompletableFuture<Boolean> updateShopStats(UUID ownerId, String shopName, int soldItems, double moneyEarned) {
+    public CompletableFuture<Boolean> updateShopSellStats(UUID ownerId, String shopName, int soldItems, double moneyEarned) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
             return CompletableFuture.completedFuture(true);
@@ -385,7 +386,7 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                         sql = "UPDATE shops SET price = ?, material = ?, world = ?, x = ?, y = ?, z = ?, created_at = ?, do_notify = ? " +
                                 "WHERE owner_uuid = ? AND shop_name = ?";
                         stmt = connection.prepareStatement(sql);
-                        stmt.setDouble(1, shop.getPrice());
+                        stmt.setDouble(1, shop.getSellPrice());
                         stmt.setString(2, shop.getMaterial() != null ? shop.getMaterial().name() : null);
                         stmt.setString(3, shop.getChestLocation().getWorld().getName());
                         stmt.setInt(4, shop.getChestLocation().getBlockX());
@@ -401,7 +402,7 @@ public class MysqlStorage extends DatabaseHandler implements DataManager {
                         stmt = connection.prepareStatement(sql);
                         stmt.setString(1, shop.getOwnerId().toString());
                         stmt.setString(2, shop.getName());
-                        stmt.setDouble(3, shop.getPrice());
+                        stmt.setDouble(3, shop.getSellPrice());
                         stmt.setString(4, shop.getMaterial() != null ? shop.getMaterial().name() : null);
                         stmt.setString(5, shop.getChestLocation().getWorld().getName());
                         stmt.setInt(6, shop.getChestLocation().getBlockX());

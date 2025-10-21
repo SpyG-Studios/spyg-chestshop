@@ -5,6 +5,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 
 import com.spygstudios.chestshop.ChestShop;
+import com.spygstudios.chestshop.interfaces.SqlDataManager;
 
 public class ChunkLoadListener implements Listener {
 
@@ -17,7 +18,10 @@ public class ChunkLoadListener implements Listener {
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
-        plugin.getDataManager().loadShopsInChunk(event.getChunk());
+        if (!(plugin.getDataManager() instanceof SqlDataManager dataManager)) {
+            return;
+        }
+        dataManager.loadShopsInChunk(event.getChunk());
     }
 
 }

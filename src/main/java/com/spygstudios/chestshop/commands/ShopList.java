@@ -1,6 +1,5 @@
 package com.spygstudios.chestshop.commands;
 
-import java.util.List;
 import java.util.Map;
 
 import org.bukkit.entity.Player;
@@ -45,31 +44,19 @@ public class ShopList {
                 return;
             }
             Message.SHOP_LIST_HEAD.send(player);
-            List<Shop> filteredShops = shops.stream().sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).skip((currentPage - 1) * 10L).limit(10).toList();
-            for (Shop shop : filteredShops) {
+            for (Shop shop : shops) {
                 Component hoverMessage = ComponentUtils.replaceComponent(Message.SHOP_LIST_SHOPS_HOVER.get(), Map.of(
                         "%shop-name%", shop.getName(),
                         "%material%", shop.getMaterialString(),
-                        "%price%", shop.getPrice() + "",
+                        "%sell-price%", String.format("%.2f", shop.getCustomerPurchasePrice()),
+                        "%buy-price%", String.format("%.2f", shop.getCustomerSalePrice()),
                         "%items-left%", shop.getItemsLeft() + "",
                         "%location%", shop.getChestLocationString(),
                         "%created%", shop.getCreatedAt()));
                 player.sendMessage(ComponentUtils.replaceComponent(Message.SHOP_LIST_SHOPS.get(), "%shop-name%", shop.getName()).hoverEvent(HoverEvent.showText(hoverMessage)));
             }
-
-        Message.SHOP_LIST_HEAD.send(player);
-        List<Shop> shops = Shop.getShops(player).stream().sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).skip((page - 1) * 10L).limit(10).toList();
-        for (Shop shop : shops) {
-            Component hoverMessage = ComponentUtils.replaceComponent(Message.SHOP_LIST_SHOPS_HOVER.get(), Map.of(
-                    "%shop-name%", shop.getName(),
-                    "%material%", shop.getMaterialString(),
-                    "%sell-price%", String.format("%.2f", shop.getCustomerPurchasePrice()),
-                    "%buy-price%", String.format("%.2f", shop.getCustomerSalePrice()),
-                    "%items-left%", shop.getItemsLeft() + "",
-                    "%location%", shop.getChestLocationString(),
-                    "%created%", shop.getCreatedAt()));
-            player.sendMessage(ComponentUtils.replaceComponent(Message.SHOP_LIST_SHOPS.get(), "%shop-name%", shop.getName()).hoverEvent(HoverEvent.showText(hoverMessage)));
-        }
+            player.sendMessage(PageUtil.getPages(currentPage, shops.size(), 10, "/spygchestshop list"));
+        });
 
     }
 }

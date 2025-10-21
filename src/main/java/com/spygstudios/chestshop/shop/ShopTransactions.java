@@ -20,10 +20,8 @@ public class ShopTransactions {
 
     private final Shop shop;
     private final ChestShop plugin;
-    private final ShopFile shopFile;
 
-    public ShopTransactions(Shop shop, ShopFile shopFile) {
-        this.shopFile = shopFile;
+    public ShopTransactions(Shop shop) {
         this.shop = shop;
         this.plugin = ChestShop.getInstance();
     }
@@ -56,9 +54,15 @@ public class ShopTransactions {
 
         Message.SHOP_BOUGHT.send(buyer,
                 Map.of("%price%", String.valueOf(itemsPrice), "%material%", shop.getMaterial().name(), "%items-left%", String.valueOf(itemsLeft), "%items-bought%", String.valueOf(soldItems)));
-        shopFile.overwriteSet("shops." + shop.getName() + ".sold-items", shopFile.getInt("shops." + shop.getName() + ".sold-items") + soldItems);
-        shopFile.overwriteSet("shops." + shop.getName() + ".money-earned", shopFile.getDouble("shops." + shop.getName() + ".money-earned") + itemsPrice);
-        shopFile.save();
+        plugin.getDataManager().updateShopSellStats(shop.getOwnerId(), shop.getName(), itemCount, itemsPrice).thenAccept(success -> {
+            if (!success) {
+                plugin.getLogger().warning("Failed to update shop stats for " + shop.getName() + " owned by " + shop.getOwnerId());
+                return;
+            }
+            shop.setSoldItems(shop.getSoldItems() + itemCount);
+            shop.setMoneyEarned(shop.getMoneyEarned() + itemsPrice);
+            shop.setSaved(false);
+        });
         Player owner = Bukkit.getPlayer(shop.getOwnerId());
         if (shop.isNotify() && owner != null) {
             Message.SHOP_SOLD.send(owner, Map.of("%price%", String.valueOf(itemsPrice), "%material%", shop.getMaterial().name(), "%player-name%", buyer.getName(), "%items-left%",
@@ -108,7 +112,7 @@ public class ShopTransactions {
                 Message.SHOP_OWNER_NO_MONEY_OWNER.send(owner, Map.of("%player-name%", seller.getName(), "%material%", material.name(), "%price%", String.valueOf(itemsPrice)));
             }
         }
-        Inventory chestInventory = ((Chest) shop.getChestLocation().getBlock().getState()).getInventory();
+        Inventory chestInventory = chest.getInventory();
         int soldItems = ShopUtils.extractItems(seller.getInventory(), chestInventory, material, amount);
 
         EconomyResponse withdrawResponse = economy.withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwnerId()), itemsPrice);
@@ -116,9 +120,15 @@ public class ShopTransactions {
             economy.depositPlayer(seller, itemsPrice);
         }
 
-        shopFile.overwriteSet("shops." + shop.getName() + ".bought-items", shopFile.getInt("shops." + shop.getName() + ".bought-items") + soldItems);
-        shopFile.overwriteSet("shops." + shop.getName() + ".money-spent", shopFile.getDouble("shops." + shop.getName() + ".money-spent") + itemsPrice);
-        shopFile.save();
+        plugin.getDataManager().updateShopBuyStats(shop.getOwnerId(), shop.getName(), amount, itemsPrice).thenAccept(success -> {
+            if (!success) {
+                plugin.getLogger().warning("Failed to update shop stats for " + shop.getName() + " owned by " + shop.getOwnerId());
+                return;
+            }
+            shop.setBoughtItems(shop.getBoughtItems() + amount);
+            shop.setMoneySpent(shop.getMoneySpent() + itemsPrice);
+            shop.setSaved(false);
+        });
 
         Message.SHOP_SOLD_TO.send(seller, Map.of("%price%", String.valueOf(itemsPrice), "%material%", material.name(), "%items-sold%", String.valueOf(soldItems)));
 

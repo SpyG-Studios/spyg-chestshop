@@ -1,6 +1,5 @@
 package com.spygstudios.chestshop.commands.admin;
 
-import java.util.List;
 import java.util.Map;
 
 import org.bukkit.OfflinePlayer;
@@ -42,40 +41,24 @@ public class ShopListAdmin {
         }
         final int currentPage = page;
         DataManager dataManager = plugin.getDataManager();
-        dataManager.getPlayerShops(target.getUniqueId()).thenAccept(shops -> {
+        dataManager.getPlayerShops(player.getUniqueId()).thenAccept(shops -> {
             if (shops == null || shops.isEmpty()) {
                 Message.SHOP_NO_SHOPS.send(player);
                 return;
             }
-
-            Message.ADMIN_SHOP_LIST_HEAD.send(player, Map.of("%player-name%", target.getName()));
-            List<Shop> filteredShops = shops.stream().sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).skip((currentPage - 1) * 10L).limit(10).toList();
-            for (Shop shop : filteredShops) {
-                Component hoverMessage = ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS_HOVER.get(), Map.of(
+            Message.SHOP_LIST_HEAD.send(player);
+            for (Shop shop : shops) {
+                Component hoverMessage = ComponentUtils.replaceComponent(Message.SHOP_LIST_SHOPS_HOVER.get(), Map.of(
                         "%shop-name%", shop.getName(),
                         "%material%", shop.getMaterialString(),
-                        "%price%", shop.getPrice() + "",
+                        "%sell-price%", String.format("%.2f", shop.getCustomerPurchasePrice()),
+                        "%buy-price%", String.format("%.2f", shop.getCustomerSalePrice()),
                         "%items-left%", shop.getItemsLeft() + "",
                         "%location%", shop.getChestLocationString(),
                         "%created%", shop.getCreatedAt()));
-                player.sendMessage(ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS.get(), "%shop-name%", shop.getName()).hoverEvent(HoverEvent.showText(hoverMessage)));
+                player.sendMessage(ComponentUtils.replaceComponent(Message.SHOP_LIST_SHOPS.get(), "%shop-name%", shop.getName()).hoverEvent(HoverEvent.showText(hoverMessage)));
             }
-
-        Message.ADMIN_SHOP_LIST_HEAD.send(player, Map.of("%player-name%", target.getName()));
-        List<Shop> shops = Shop.getShops(target.getUniqueId()).stream().sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).skip((page - 1) * 10L).limit(10).toList();
-        for (Shop shop : shops) {
-            Component hoverMessage = ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS_HOVER.get(), Map.of(
-                    "%shop-name%", shop.getName(),
-                    "%material%", shop.getMaterialString(),
-                    "%sell-price%", String.format("%.2f", shop.getCustomerPurchasePrice()),
-                    "%buy-price%", String.format("%.2f", shop.getCustomerSalePrice()),
-                    "%items-left%", shop.getItemsLeft() + "",
-                    "%location%", shop.getChestLocationString(),
-                    "%created%", shop.getCreatedAt()));
-            player.sendMessage(ComponentUtils.replaceComponent(Message.ADMIN_SHOP_LIST_SHOPS.get(), "%shop-name%", shop.getName()).hoverEvent(HoverEvent.showText(hoverMessage)));
-        }
             player.sendMessage(PageUtil.getPages(currentPage, shops.size(), 10, "/spygchestshop list"));
         });
-
     }
 }
