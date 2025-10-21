@@ -25,6 +25,7 @@ public class Rename {
     }
 
     @Execute
+    @Permission("spygchestshop.*")
     @Permission("spygchestshop.use")
     public void onAdd(@Context Player player, @Arg Shop shop, @Arg String name) {
         if (shop.getName().equals(name)) {

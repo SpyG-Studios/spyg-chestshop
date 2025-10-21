@@ -27,6 +27,7 @@ public class AddPlayer {
 
     @Execute
     @Permission("spygchestshop.use")
+    @Permission("spygchestshop.*")
     public void onAdd(@Context Player sender, @Arg Shop shop, @Async @Arg OfflinePlayer player) {
         if (sender.getUniqueId().equals(player.getUniqueId())) {
             Message.CANT_ADD_YOURSELF.send(sender);

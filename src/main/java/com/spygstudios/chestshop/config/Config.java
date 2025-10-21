@@ -12,6 +12,12 @@ public class Config extends YamlManager {
         set("check-for-updates", true, Arrays.asList("Check for updates on join (spygchestshop.admin.updates)."));
         set("locale", "en_US", Arrays.asList("The locale of the plugin. (file name)"));
         set("cancel", "cancel", Arrays.asList("The text to cancel the amount action."));
+        set("storage-type", "yaml", Arrays.asList("The storage type of the plugin. (yaml, sqlite, mysql)"));
+        set("mysql.host", "localhost", Arrays.asList("The host of the MySQL database."));
+        set("mysql.port", 3306, Arrays.asList("The port of the MySQL database."));
+        set("mysql.database", "chestshop", Arrays.asList("The database name of the MySQL database."));
+        set("mysql.username", "root", Arrays.asList("The username of the MySQL database."));
+        set("mysql.password", "password", Arrays.asList("The password of the MySQL database."));
         set("colors.command.required-arg", " &c");
         set("colors.command.optional-arg", " &7");
         set("colors.command.list", "&8- ");
@@ -30,7 +36,7 @@ public class Config extends YamlManager {
         set("shops.name.min-length", 3);
         set("shops.blacklisted-names", Arrays.asList("stupid"));
         set("shops.disabled-worlds", Arrays.asList("disabled_world"));
-        set("shops.unknown.material", "-", Arrays.asList("The material text to use when the material is unknown."));
+        set("shops.unknown-material", "-", Arrays.asList("The material text to use when the material is unknown."));
         set("shops.unknown.mode", "&cOffline", Arrays.asList("The text to use when the shop mode is not set."));
         set("shops.unknown.owner", "Unknown Owner", Arrays.asList("The text to use when the shop owner is unknown."));
         set("shops.max-shops.default", -1, Arrays.asList(

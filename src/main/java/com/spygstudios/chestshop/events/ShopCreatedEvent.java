@@ -7,14 +7,14 @@ import com.spygstudios.chestshop.shop.Shop;
 
 import lombok.Getter;
 
-public class ShopCreateEvent extends Event {
+public class ShopCreatedEvent extends Event {
 
     @Getter
     private final Shop shop;
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    public ShopCreateEvent(Shop shop) {
+    public ShopCreatedEvent(Shop shop) {
         this.shop = shop;
     }
 

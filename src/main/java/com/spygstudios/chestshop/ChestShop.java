@@ -23,17 +23,26 @@ import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.config.MessageConfig;
+import com.spygstudios.chestshop.database.sql.MysqlStorage;
+import com.spygstudios.chestshop.database.sqlite.SqliteStorage;
+import com.spygstudios.chestshop.database.yaml.YamlStorage;
+import com.spygstudios.chestshop.gui.ChestShopGui.ChestShopHolder;
 import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
+import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.listeners.BreakListener;
 import com.spygstudios.chestshop.listeners.BuildListener;
 import com.spygstudios.chestshop.listeners.ChatListener;
+import com.spygstudios.chestshop.listeners.ChunkLoadListener;
+import com.spygstudios.chestshop.listeners.ChunkUnloadListener;
 import com.spygstudios.chestshop.listeners.ExplosionListener;
 import com.spygstudios.chestshop.listeners.HopperListener;
 import com.spygstudios.chestshop.listeners.InteractListener;
 import com.spygstudios.chestshop.listeners.PlayerJoinListener;
 import com.spygstudios.chestshop.listeners.gui.DashboardGuiHandler;
+import com.spygstudios.chestshop.listeners.PlayerQuitListener;
+import com.spygstudios.chestshop.listeners.gui.InventoryClickListener;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
 import com.spygstudios.chestshop.listeners.gui.PlayerGuiHandler;
 import com.spygstudios.chestshop.listeners.gui.ShopGuiHandler;
@@ -61,6 +70,12 @@ public class ChestShop extends JavaPlugin {
     @Getter
     @Setter
     private MessageConfig messageConfig;
+    @Getter
+    private DataManager dataManager;
+    @Getter
+    private boolean latestVersion = true;
+    @Getter
+    private String currentVersion;
     private static final String API_URL = "https://hangar.papermc.io/api/v1/projects/Spyg-ChestShop/latestrelease";
 
     public ChestShop() {
@@ -74,8 +89,8 @@ public class ChestShop extends JavaPlugin {
         messageConfig = new MessageConfig(this, conf.getString("locale"));
         Message.init(messageConfig);
 
-        hologramManager = HologramManager.getManager(instance);
-        commandHandler = new CommandHandler(instance);
+        hologramManager = HologramManager.getManager(this);
+        commandHandler = new CommandHandler(this);
         new InteractListener(this);
         new BreakListener(this);
         new BuildListener(this);
@@ -87,8 +102,15 @@ public class ChestShop extends JavaPlugin {
         new ChatListener(instance);
         new HopperListener(instance);
         Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+        new PlayerJoinListener(this);
+        new PlayerQuitListener(this);
+        new ChunkLoadListener(this);
+        new ChunkUnloadListener(this);
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+        new InventoryClickListener(this);
             Entry<String, Boolean> versionInfo = VersionChecker.isLatestVersion(API_URL, getPluginMeta().getVersion());
-            new PlayerJoinListener(instance, versionInfo.getKey(), versionInfo.getValue());
+            this.currentVersion = versionInfo.getKey();
+            this.latestVersion = versionInfo.getValue();
         });
 
         loadLocalizations();
@@ -99,7 +121,7 @@ public class ChestShop extends JavaPlugin {
         } catch (Exception e) {
         }
 
-        getLogger().info("Loading economy plugin...");
+        getLogger().info("Looking for economy plugin...");
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
             getLogger().severe("Vault or economy plugin (e.g. Essentials) not found! Disabling plugin...");
@@ -107,11 +129,39 @@ public class ChestShop extends JavaPlugin {
             return;
         }
         economy = rsp.getProvider();
-        getLogger().info("Loaded economy plugin: " + economy.getName());
+        getLogger().info("Found economy plugin: " + economy.getName());
 
-        ShopFile.loadShopFiles(instance);
+        String storageType = conf.getString("storage-type");
+        switch (storageType) {
+            case "yaml":
+                dataManager = new YamlStorage(this);
+                break;
+            case "mysql":
+                String host = conf.getString("mysql.host");
+                int port = conf.getInt("mysql.port");
+                String database = conf.getString("mysql.database");
+                String username = conf.getString("mysql.username");
+                String password = conf.getString("mysql.password");
+                if (host == null || database == null || username == null || password == null) {
+                    getLogger().severe("MySQL configuration is incomplete! Disabling plugin...");
+                    getServer().getPluginManager().disablePlugin(this);
+                    return;
+                }
+                dataManager = new MysqlStorage(this, host, port, database, username, password);
+                break;
+            case "sqlite":
+                dataManager = new SqliteStorage(this);
+                break;
+        }
+        if (dataManager == null) {
+            getLogger().severe("Invalid storage type in config! Disabling plugin...");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        dataManager.startSaveScheduler();
 
-        ShopFile.startSaveScheduler(instance);
+        getLogger().info("Using " + storageType + " storage type.");
+
         String info = String.format("%s v. %s plugin has been enabled!", getName(), getPluginMeta().getVersion());
         getLogger().info(info);
     }
@@ -121,7 +171,7 @@ public class ChestShop extends JavaPlugin {
         if (commandHandler != null) {
             commandHandler.unregister();
         }
-        ShopFile.saveShops();
+        dataManager.close();
 
         List<Object> guis = Arrays.asList(DashboardHolder.class, PlayersHolder.class, ShopHolder.class);
         for (Player player : Bukkit.getOnlinePlayers()) {
