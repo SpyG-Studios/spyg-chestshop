@@ -23,7 +23,6 @@ import org.bukkit.OfflinePlayer;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.database.DatabaseHandler;
 import com.spygstudios.chestshop.enums.DatabaseType;
-import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.interfaces.SqlDataManager;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.utils.FutureUtils;
@@ -492,14 +491,17 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
         if (existingShop != null) {
             return null;
         }
-        double price = rs.getDouble("price");
+        double sellPrice = rs.getDouble("price"); // TODO column rename
+        double buyPrice = rs.getDouble("price");
+        boolean canBuy = rs.getBoolean("can_buy");
+        boolean canSell = rs.getBoolean("can_sell");
         String materialName = rs.getString("material");
         Material material = materialName != null ? Material.getMaterial(materialName) : null;
         Location shopLocation = new Location(Bukkit.getWorld(rs.getString("world")), rs.getDouble("x"), rs.getDouble("y"), rs.getDouble("z"));
         String createdAt = rs.getString("created_at");
         boolean notify = rs.getBoolean("do_notify");
 
-        Shop shop = new Shop(ownerId, shopName, price, material, shopLocation, createdAt, notify, new ArrayList<>());
+        Shop shop = new Shop(ownerId, shopName, sellPrice, buyPrice, material, shopLocation, createdAt, notify, canSell, canBuy, new ArrayList<>());
         return new SimpleEntry<Integer, Shop>(id, shop);
     }
 
@@ -571,6 +573,42 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
             }
             return true;
         });
+    }
+
+    @Override
+    public CompletableFuture<Boolean> updateShopBuyStats(UUID ownerId, String shopName, int boughtItems, double moneyEarned) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateShopBuyStats'");
+    }
+
+    @Override
+    public CompletableFuture<Integer> getBoughtItems(UUID ownerId, String shopName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getBoughtItems'");
+    }
+
+    @Override
+    public CompletableFuture<Integer> getSoldItems(UUID ownerId, String shopName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSoldItems'");
+    }
+
+    @Override
+    public CompletableFuture<Integer> getMoneySpent(UUID ownerId, String shopName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getMoneySpent'");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> setCanBuyFromPlayers(UUID ownerId, String shopName, boolean canBuy) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setCanBuyFromPlayers'");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> setCanSellToPlayers(UUID ownerId, String shopName, boolean canSell) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setCanSellToPlayers'");
     }
 
 }
