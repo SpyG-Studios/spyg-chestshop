@@ -24,13 +24,7 @@ public class YamlStorage implements DataManager {
     public YamlStorage(ChestShop plugin) {
         this.plugin = plugin;
         databaseType = DatabaseType.YAML;
-
-        boolean initialized = plugin.getDataManager().initialize().join();
-        if (initialized) {
-            plugin.getLogger().info("YamlStorage initialized successfully.");
-        } else {
-            plugin.getLogger().severe("Failed to initialize YamlStorage.");
-        }
+        initialize().join();
     }
 
     @Override
