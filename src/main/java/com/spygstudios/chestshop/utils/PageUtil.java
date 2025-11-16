@@ -42,7 +42,7 @@ public class PageUtil {
         }
 
         if (pages == 1) {
-            return pagesComponent.build(); // Csak egy oldal van
+            return pagesComponent.build();
         } else if (page < pages && page == 1) {
             return Component.text().append(pagesComponent.build()).append(next).build();
         } else if (page < pages) {
