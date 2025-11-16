@@ -27,12 +27,8 @@ import com.spygstudios.chestshop.interfaces.SqlDataManager;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.utils.FutureUtils;
 
-import lombok.Getter;
-
 public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
 
-    @Getter
-    private final DatabaseType databaseType;
     private final String host;
     private final int port;
     private final String database;
@@ -41,7 +37,6 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
 
     public MysqlStorage(ChestShop plugin, String host, int port, String database, String username, String password) {
         super(plugin, DatabaseType.MYSQL);
-        this.databaseType = super.databaseType;
         this.host = host;
         this.port = port;
         this.database = database;
