@@ -38,7 +38,9 @@ configurations {
 dependencies {
     // Paper API + Vault as provided/compileOnly
     compileOnly "io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT"
-    compileOnly "com.github.MilkBowl:VaultAPI:1.7"
+    compileOnly ("com.github.MilkBowl:VaultAPI:1.7"){
+        transitive = false
+    }
 
     // Project libs provided by server
     compileOnly "com.spygstudios:spyglib:${spyglibVersion}"
