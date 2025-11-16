@@ -1,4 +1,4 @@
-package com.spygstudios.chestshop;
+package com.spygstudios.chestshop.utils;
 
 import java.util.List;
 import java.util.Map;
@@ -8,6 +8,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.spyglib.color.TranslateColor;

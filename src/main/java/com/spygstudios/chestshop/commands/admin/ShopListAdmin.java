@@ -6,10 +6,10 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.PageUtil;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.chestshop.utils.PageUtil;
 import com.spygstudios.spyglib.components.ComponentUtils;
 
 import dev.rollczi.litecommands.annotations.argument.Arg;

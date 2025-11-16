@@ -14,10 +14,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.PageUtil;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.chestshop.utils.PageUtil;
 import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.item.PlayerHeads;
 import com.spygstudios.spyglib.persistentdata.PersistentData;
