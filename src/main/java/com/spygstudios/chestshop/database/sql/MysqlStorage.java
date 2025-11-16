@@ -50,7 +50,7 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            plugin.getLogger().severe("MySQL driver not found: " + e.getMessage());
+            throw new RuntimeException("MySQL JDBC Driver not found.", e);
         }
 
         return FutureUtils.runTaskAsync(plugin, () -> {
