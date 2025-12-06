@@ -22,14 +22,14 @@ public class YamlStorage implements DataManager {
     private final ChestShop plugin;
 
     public YamlStorage(ChestShop plugin) {
+        this.databaseType = DatabaseType.YAML;
         this.plugin = plugin;
-        databaseType = DatabaseType.YAML;
-        initialize().join();
+        this.initialize().join();
     }
 
     @Override
     public CompletableFuture<Shop> createShop(UUID ownerId, String shopName, Location location) {
-        String createdAt = plugin.getDataManager().getDateString();
+        String createdAt = getDateString();
         Shop shop = new Shop(ownerId, shopName, location, createdAt);
         YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
         shopFile.addShop(shop);
