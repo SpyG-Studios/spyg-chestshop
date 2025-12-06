@@ -39,7 +39,7 @@ public class YamlShopFile extends YamlManager {
         if (SHOPS_FILES.containsKey(ownerId)) {
             return;
         }
-        set("shops", null);
+        setOrDefault("shops", null);
         setDefaultValues(this);
         this.isSaved = true;
         this.ownerId = ownerId;
@@ -47,7 +47,7 @@ public class YamlShopFile extends YamlManager {
     }
 
     public void setPlayers(List<UUID> players, String shopName) {
-        overwriteSet(getPath(shopName, ".added-players"), players.stream().map(UUID::toString).toList());
+        set(getPath(shopName, ".added-players"), players.stream().map(UUID::toString).toList());
         isSaved = false;
     }
 
@@ -79,53 +79,58 @@ public class YamlShopFile extends YamlManager {
         if (!getPlayerShops().contains(shopName)) {
             return;
         }
-        overwriteSet("shops." + shopName, null);
+        set("shops." + shopName, null);
         isSaved = false;
     }
 
     private static void setDefaultValues(YamlShopFile shopFile) {
         for (String shopName : shopFile.getPlayerShops()) {
             String shopPath = "shops." + shopName;
-            shopFile.set(shopPath + ".price", 0);
-            shopFile.set(shopPath + ".sell-price", 0);
-            shopFile.set(shopPath + ".buy-price", 0);
-            shopFile.set(shopPath + ".do-notify", false);
-            shopFile.set(shopPath + ".can-sell", true);
-            shopFile.set(shopPath + ".can-buy", false);
-            shopFile.set(shopPath + ".sold-items", 0);
-            shopFile.set(shopPath + ".money-earned", 0);
-            shopFile.set(shopPath + ".created", getDateString());
+            shopFile.setOrDefault(shopPath + ".price", 0);
+            shopFile.setOrDefault(shopPath + ".sell-price", 0);
+            shopFile.setOrDefault(shopPath + ".buy-price", 0);
+            shopFile.setOrDefault(shopPath + ".do-notify", false);
+            shopFile.setOrDefault(shopPath + ".can-sell", true);
+            shopFile.setOrDefault(shopPath + ".can-buy", false);
+            shopFile.setOrDefault(shopPath + ".sold-items", 0);
+            shopFile.setOrDefault(shopPath + ".money-earned", 0);
+            shopFile.setOrDefault(shopPath + ".created", getDateString());
             shopFile.isSaved = false;
         }
     }
 
     public void addShop(Shop shop) {
-        set(getPath(shop.getName(), ".price"), 0);
-        set(getPath(shop.getName(), ".material"), null);
-        set(getPath(shop.getName(), ".location"), LocationUtils.fromLocation(shop.getChestLocation(), true));
-        set(getPath(shop.getName(), ".do-notify"), false);
-        set(getPath(shop.getName(), ".created"), getDateString());
-        set(getPath(shop.getName(), ".added-players"), new ArrayList<String>());
+        setOrDefault(getPath(shop.getName(), ".price"), 0);
+        setOrDefault(getPath(shop.getName(), ".material"), null);
+        setOrDefault(getPath(shop.getName(), ".location"), LocationUtils.fromLocation(shop.getChestLocation(), true));
+        setOrDefault(getPath(shop.getName(), ".do-notify"), false);
+        setOrDefault(getPath(shop.getName(), ".created"), getDateString());
+        setOrDefault(getPath(shop.getName(), ".added-players"), new ArrayList<String>());
         isSaved = false;
     }
 
     public void renameShop(String oldName, String newName) {
         ConfigurationSection section = getConfigurationSection("shops." + oldName);
         if (section != null) {
-            set("shops." + newName, section);
-            overwriteSet("shops." + oldName, null);
+            setOrDefault("shops." + newName, section);
+            set("shops." + oldName, null);
             isSaved = false;
         }
     }
 
     public void setMaterial(String shopName, Material material) {
         String matName = material != null ? material.name() : null;
-        overwriteSet(getPath(shopName, ".material"), matName);
+        set(getPath(shopName, ".material"), matName);
         isSaved = false;
     }
 
-    public void setPrice(String shopName, double price) {
-        overwriteSet(getPath(shopName, ".price"), price);
+    public void setBuyPrice(String shopName, double price) {
+        set(getPath(shopName, ".buy-price"), price);
+        isSaved = false;
+    }
+
+    public void setSellPrice(String shopName, double price) {
+        set(getPath(shopName, ".sell-price"), price);
         isSaved = false;
     }
 

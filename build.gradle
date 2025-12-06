@@ -25,7 +25,7 @@ ext {
     sqliteVersion = '3.50.2.0'
     mysqlVersion = '9.4.0'
     bstatsVersion = '3.1.0'
-    spyglibVersion = '1.4.3'
+    spyglibVersion = '1.4.6'
     lombokVersion = '1.18.38'
 }
 
