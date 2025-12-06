@@ -218,7 +218,7 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
     }
 
     @Override
-    public CompletableFuture<Boolean> updateShopPrice(UUID ownerId, String shopName, double price) {
+    public CompletableFuture<Boolean> updateShopBuyPrice(UUID ownerId, String shopName, double price) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
             return CompletableFuture.completedFuture(true);
@@ -226,6 +226,12 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
 
         String sql = "UPDATE shops SET price = ? WHERE owner_uuid = ? AND shop_name = ?";
         return execute(sql, price, ownerId.toString(), shopName);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> updateShopSellPrice(UUID ownerId, String shopName, double price) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateShopSellPrice'");
     }
 
     @Override

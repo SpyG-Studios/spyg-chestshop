@@ -70,9 +70,15 @@ public class SqliteStorage extends DatabaseHandler implements SqlDataManager {
     }
 
     @Override
-    public CompletableFuture<Boolean> updateShopPrice(UUID ownerId, String shopName, double price) {
+    public CompletableFuture<Boolean> updateShopBuyPrice(UUID ownerId, String shopName, double price) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'updateShopPrice'");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> updateShopSellPrice(UUID ownerId, String shopName, double price) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateShopSellPrice'");
     }
 
     @Override

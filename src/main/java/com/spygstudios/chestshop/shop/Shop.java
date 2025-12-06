@@ -199,7 +199,7 @@ public class Shop {
 
     public void setBuyPrice(double buyPrice) {
         double parsedPrice = ShopUtils.parsePrice(buyPrice);
-        plugin.getDataManager().updateShopPrice(ownerId, name, parsedPrice).thenAccept(success -> {
+        plugin.getDataManager().updateShopBuyPrice(ownerId, name, parsedPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop price for " + name);
                 return;
@@ -212,7 +212,7 @@ public class Shop {
 
     public void setSellPrice(double sellPrice) {
         double parsedPrice = ShopUtils.parsePrice(sellPrice);
-        plugin.getDataManager().updateShopPrice(ownerId, name, parsedPrice).thenAccept(success -> {
+        plugin.getDataManager().updateShopBuyPrice(ownerId, name, parsedPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop price for " + name);
                 return;

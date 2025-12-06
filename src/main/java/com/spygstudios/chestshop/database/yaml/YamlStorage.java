@@ -54,9 +54,16 @@ public class YamlStorage implements DataManager {
     }
 
     @Override
-    public CompletableFuture<Boolean> updateShopPrice(UUID ownerId, String shopName, double price) {
+    public CompletableFuture<Boolean> updateShopBuyPrice(UUID ownerId, String shopName, double price) {
         YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
-        shopFile.setPrice(shopName, price);
+        shopFile.setBuyPrice(shopName, price);
+        return CompletableFuture.completedFuture(true);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> updateShopSellPrice(UUID ownerId, String shopName, double price) {
+        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+        shopFile.setSellPrice(shopName, price);
         return CompletableFuture.completedFuture(true);
     }
 
@@ -70,7 +77,7 @@ public class YamlStorage implements DataManager {
     @Override
     public CompletableFuture<Boolean> updateShopNotify(UUID ownerId, String shopName, boolean notify) {
         YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
-        shopFile.overwriteSet("shops." + shopName + ".do-notify", notify);
+        shopFile.set("shops." + shopName + ".do-notify", notify);
         shopFile.markUnsaved();
         return CompletableFuture.completedFuture(true);
     }
@@ -79,7 +86,7 @@ public class YamlStorage implements DataManager {
     public CompletableFuture<Boolean> updateSoldItems(UUID ownerId, String shopName, int soldItems) {
         YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
         String shopPath = "shops." + shopName;
-        shopFile.overwriteSet(shopPath + ".sold-items", shopFile.getInt(shopPath + ".sold-items") + soldItems);
+        shopFile.set(shopPath + ".sold-items", shopFile.getInt(shopPath + ".sold-items") + soldItems);
         shopFile.markUnsaved();
         return CompletableFuture.completedFuture(true);
     }
@@ -88,7 +95,7 @@ public class YamlStorage implements DataManager {
     public CompletableFuture<Boolean> updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned) {
         YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
         String shopPath = "shops." + shopName;
-        shopFile.overwriteSet(shopPath + ".money-earned", shopFile.getDouble(shopPath + ".money-earned") + moneyEarned);
+        shopFile.set(shopPath + ".money-earned", shopFile.getDouble(shopPath + ".money-earned") + moneyEarned);
         shopFile.markUnsaved();
         return CompletableFuture.completedFuture(true);
     }
