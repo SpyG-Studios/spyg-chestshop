@@ -114,12 +114,12 @@ public class ShopUtils {
         return maxShops;
     }
 
-    public static int countDurableItemsInInventory(Inventory inventory, Material material) {
-        int itemCount = InventoryUtils.countItems(inventory, item -> {
-            if (!item.getType().equals(material)) {
+    public static int countDurableItemsInInventory(Inventory inventory, ItemStack item) {
+        int itemCount = InventoryUtils.countItems(inventory, i -> {
+            if (!i.isSimilar(item)) {
                 return false;
             }
-            return isDurabilitySufficient(item);
+            return isDurabilitySufficient(i);
         });
 
         return itemCount;
@@ -138,13 +138,13 @@ public class ShopUtils {
         return true;
     }
 
-    public static int extractItems(Inventory fromInventory, Inventory toInventory, Material material, int itemCount) {
+    public static int extractItems(Inventory fromInventory, Inventory toInventory, ItemStack item, int itemCount) {
         int extractedItems = 0;
         for (ItemStack chestItem : fromInventory.getContents()) {
             if (itemCount <= 0)
                 break;
 
-            if (chestItem != null && chestItem.getType() == material) {
+            if (chestItem != null && chestItem.isSimilar(item)) {
                 if (!isDurabilitySufficient(chestItem)) {
                     continue;
                 }

@@ -5,6 +5,7 @@ plugins {
 
 group = 'com.spygstudios'
 version = '1.8.1'
+ext.shouldCopy = true
 
 java {
     toolchain {
@@ -56,7 +57,7 @@ dependencies {
 }
 
 tasks.withType(JavaCompile).configureEach { t ->
-    options.encoding = 'UTF-8'
+    options.encoding = 'UTF-8' 
     options.compilerArgs += ['-parameters']
 }
 
@@ -72,7 +73,36 @@ tasks.processResources {
             ]
         )
     }
+
 }
+
+afterEvaluate {
+    if (project.hasProperty('shouldCopy') && project.shouldCopy) {
+        def destEnvProvider = providers.environmentVariable('LOCAL_SERVER_PLUGINS_PATH_SPYG')
+        def destinations = destEnvProvider.map { s ->
+            (s ?: '')
+                .split(';')
+                .collect { it.trim() }
+                .findAll { it }
+        }.getOrElse([])
+
+        if (!destinations.isEmpty()) {
+            def aggregate = tasks.register('copyShadowJarMulti')
+            def shadowTaskProvider = tasks.named('shadowJar')
+            destinations.eachWithIndex { String destPath, int idx ->
+                def copyTask = tasks.register("copyShadowJar_${idx}", Copy) { t ->
+                    t.dependsOn(shadowTaskProvider)
+                    t.from(shadowTaskProvider.flatMap { it.archiveFile })
+                    t.into(file(destPath))
+                }
+
+                aggregate.configure { dependsOn(copyTask) }
+                shadowTaskProvider.configure { finalizedBy(aggregate) }
+            }
+        }
+    }
+}
+
 
 // Produce a shaded artifact named like Maven's finalName
 tasks.jar {

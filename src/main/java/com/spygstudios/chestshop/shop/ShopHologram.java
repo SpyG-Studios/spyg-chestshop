@@ -17,10 +17,12 @@ public class ShopHologram {
     private final Hologram hologram;
     private final Shop shop;
     private final Config config;
+    private final ChestShop plugin;
 
     public ShopHologram(Shop shop, ChestShop plugin) {
         this.shop = shop;
         this.config = plugin.getConf();
+        this.plugin = plugin;
         int hologramRange = config.getInt("shops.holograms.range");
         boolean seeTroughWalls = config.getBoolean("shops.holograms.see-through-walls");
         this.hologram = plugin.getHologramManager().createHologram(shop.getChestLocation().clone().add(0.5, 0.7, 0.5), seeTroughWalls, hologramRange);
@@ -60,10 +62,14 @@ public class ShopHologram {
                     .replace("%price%", priceDisplay)
                     .replace("%sell-price%", sellPrice)
                     .replace("%buy-price%", buyPrice)
-                    .replace("%material%", shop.getMaterialString())));
+                    .replace("%item%", shop.getItemName())));
         });
-        hologram.addRow(new ItemStack(
-                shop.getMaterial() == null || (shop.getItemsLeft() == 0 && ChestShop.getInstance().getConf().getBoolean("shops.barrier-when-empty")) ? Material.BARRIER : shop.getMaterial()));
+        ItemStack displayItem = shop.getItem();
+        boolean showBarrier = plugin.getConf().getBoolean("shops.barrier-when-empty");
+        if (displayItem == null || (shop.getItemsLeft() == 0 && showBarrier)) {
+            displayItem = new ItemStack(Material.BARRIER);
+        }
+        hologram.addRow(displayItem);
     }
 
     public void removeHologram() {

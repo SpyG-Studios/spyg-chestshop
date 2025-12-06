@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.database.DatabaseHandler;
@@ -82,7 +82,7 @@ public class SqliteStorage extends DatabaseHandler implements SqlDataManager {
     }
 
     @Override
-    public CompletableFuture<Boolean> updateShopMaterial(UUID ownerId, String shopName, Material material) {
+    public CompletableFuture<Boolean> updateShopItem(UUID ownerId, String shopName, ItemStack item) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'updateShopMaterial'");
     }
@@ -178,12 +178,6 @@ public class SqliteStorage extends DatabaseHandler implements SqlDataManager {
     }
 
     @Override
-    public CompletableFuture<Integer> getMoneySpent(UUID ownerId, String shopName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMoneySpent'");
-    }
-
-    @Override
     public CompletableFuture<Boolean> setCanBuyFromPlayers(UUID ownerId, String shopName, boolean canBuy) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setCanBuyFromPlayers'");
@@ -193,6 +187,30 @@ public class SqliteStorage extends DatabaseHandler implements SqlDataManager {
     public CompletableFuture<Boolean> setCanSellToPlayers(UUID ownerId, String shopName, boolean canSell) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setCanSellToPlayers'");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> updateBoughtItems(UUID ownerId, String shopName, int boughtItems) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateBoughtItems'");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> updateMoneySpent(UUID ownerId, String shopName, double moneySpent) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateMoneySpent'");
+    }
+
+    @Override
+    public CompletableFuture<Double> getMoneySpent(UUID ownerId, String shopName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getMoneySpent'");
+    }
+
+    @Override
+    public CompletableFuture<Double> getMoneyEarned(UUID ownerId, String shopName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getMoneyEarned'");
     }
 
 }

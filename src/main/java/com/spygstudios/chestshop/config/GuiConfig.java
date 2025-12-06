@@ -12,10 +12,10 @@ public class GuiConfig extends YamlManager {
 
         set("chestshop.title", "&c%shop-name% &8(%player-name%)");
 
-        set("chestshop.material.title", "&cMaterial");
-        set("chestshop.material.slot", 13);
-        set("chestshop.material.lore", Arrays.asList("&7Put here the material you", "&7want to sell"));
-        set("chestshop.material.not-set-material", "BARRIER");
+        set("chestshop.item.title", "&cItem to Sell");
+        set("chestshop.item.slot", 13);
+        set("chestshop.item.lore", Arrays.asList("&7Put here the item you", "&7want to sell"));
+        set("chestshop.item.not-set", "BARRIER");
 
         set("chestshop.money.title", "&6&lPrice Settings");
         set("chestshop.money.slot", 11);
@@ -38,7 +38,7 @@ public class GuiConfig extends YamlManager {
         set("chestshop.info.lore",
                 Arrays.asList(
                         "&7owner: &e%player-name%",
-                        "&7material: &e%material%",
+                        "&7item: &e%item%",
                         "&7price: &e%price%",
                         "&7sold items: &e%sold-items%",
                         "&7money earned: &6$&e%money-earned%",
@@ -78,9 +78,9 @@ public class GuiConfig extends YamlManager {
                 Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26"));
 
         set("shop.title", "&c%shop-name%");
-        set("shop.item-to-buy.title", "&6&lBuy &7%material%");
+        set("shop.item-to-buy.title", "&6&lBuy &7%item%");
         set("shop.item-to-buy.lore", Arrays.asList("&7Buy item for &6$&e%price%"));
-        set("shop.item-to-sell.title", "&6&lSell &7%material%");
+        set("shop.item-to-sell.title", "&6&lSell &7%item%");
         set("shop.item-to-sell.lore", Arrays.asList("&7Sell item for &6$&e%price%"));
         set("shop.mode.buying.title", "&a&lBuying Mode");
         set("shop.mode.buying.material", "EMERALD");

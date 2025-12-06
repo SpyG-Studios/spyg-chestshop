@@ -17,8 +17,8 @@ import java.util.concurrent.CompletableFuture;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.database.DatabaseHandler;
@@ -75,7 +75,7 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
     @Override
     public CompletableFuture<Shop> createShop(UUID ownerId, String shopName, Location location) {
         return FutureUtils.runTaskAsync(plugin, () -> {
-            String createdAt = plugin.getDataManager().getDateString();
+            String createdAt = plugin.getDateString();
             Shop shop = new Shop(ownerId, shopName, location, createdAt);
             shop.setSaved(false);
             return shop;
@@ -235,14 +235,14 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
     }
 
     @Override
-    public CompletableFuture<Boolean> updateShopMaterial(UUID ownerId, String shopName, Material material) {
+    public CompletableFuture<Boolean> updateShopItem(UUID ownerId, String shopName, ItemStack item) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
             return CompletableFuture.completedFuture(true);
         }
 
-        String sql = "UPDATE shops SET material = ? WHERE owner_uuid = ? AND shop_name = ?";
-        return execute(sql, material != null ? material.name() : null, ownerId.toString(), shopName);
+        String sql = "UPDATE shops SET item = ? WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, item != null ? plugin.bytesToString(item.serializeAsBytes()) : null, ownerId.toString(), shopName);
     }
 
     @Override
@@ -381,35 +381,38 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                     boolean exists = rs.next();
                     String sql;
                     PreparedStatement stmt;
-
+                    String itemData = shop.getItem() != null ? plugin.bytesToString(shop.getItem().serializeAsBytes()) : null;
+                    int index = 1;
                     if (exists) {
-                        sql = "UPDATE shops SET price = ?, material = ?, world = ?, x = ?, y = ?, z = ?, created_at = ?, do_notify = ? " +
+                        sql = "UPDATE shops SET sell_price = ?, buy_price = ?, item = ?, world = ?, x = ?, y = ?, z = ?, created_at = ?, do_notify = ? " +
                                 "WHERE owner_uuid = ? AND shop_name = ?";
                         stmt = connection.prepareStatement(sql);
-                        stmt.setDouble(1, shop.getSellPrice());
-                        stmt.setString(2, shop.getMaterial() != null ? shop.getMaterial().name() : null);
-                        stmt.setString(3, shop.getChestLocation().getWorld().getName());
-                        stmt.setInt(4, shop.getChestLocation().getBlockX());
-                        stmt.setInt(5, shop.getChestLocation().getBlockY());
-                        stmt.setInt(6, shop.getChestLocation().getBlockZ());
-                        stmt.setString(7, shop.getCreatedAt());
-                        stmt.setBoolean(8, shop.isNotify());
-                        stmt.setString(9, shop.getOwnerId().toString());
-                        stmt.setString(10, shop.getName());
+                        stmt.setDouble(index++, shop.getSellPrice());
+                        stmt.setDouble(index++, shop.getBuyPrice());
+                        stmt.setString(index++, itemData);
+                        stmt.setString(index++, shop.getChestLocation().getWorld().getName());
+                        stmt.setInt(index++, shop.getChestLocation().getBlockX());
+                        stmt.setInt(index++, shop.getChestLocation().getBlockY());
+                        stmt.setInt(index++, shop.getChestLocation().getBlockZ());
+                        stmt.setString(index++, shop.getCreatedAt());
+                        stmt.setBoolean(index++, shop.isNotify());
+                        stmt.setString(index++, shop.getOwnerId().toString());
+                        stmt.setString(index++, shop.getName());
                     } else {
-                        sql = "INSERT INTO shops (owner_uuid, shop_name, price, material, world, x, y, z, created_at, do_notify) " +
+                        sql = "INSERT INTO shops (owner_uuid = ?, shop_name = ?, sell_price = ?, buy_price = ?, item, world, x, y, z, created_at, do_notify) " +
                                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                         stmt = connection.prepareStatement(sql);
-                        stmt.setString(1, shop.getOwnerId().toString());
-                        stmt.setString(2, shop.getName());
-                        stmt.setDouble(3, shop.getSellPrice());
-                        stmt.setString(4, shop.getMaterial() != null ? shop.getMaterial().name() : null);
-                        stmt.setString(5, shop.getChestLocation().getWorld().getName());
-                        stmt.setInt(6, shop.getChestLocation().getBlockX());
-                        stmt.setInt(7, shop.getChestLocation().getBlockY());
-                        stmt.setInt(8, shop.getChestLocation().getBlockZ());
-                        stmt.setString(9, shop.getCreatedAt());
-                        stmt.setBoolean(10, shop.isNotify());
+                        stmt.setString(index++, shop.getOwnerId().toString());
+                        stmt.setString(index++, shop.getName());
+                        stmt.setDouble(index++, shop.getSellPrice());
+                        stmt.setDouble(index++, shop.getBuyPrice());
+                        stmt.setString(index++, itemData);
+                        stmt.setString(index++, shop.getChestLocation().getWorld().getName());
+                        stmt.setInt(index++, shop.getChestLocation().getBlockX());
+                        stmt.setInt(index++, shop.getChestLocation().getBlockY());
+                        stmt.setInt(index++, shop.getChestLocation().getBlockZ());
+                        stmt.setString(index++, shop.getCreatedAt());
+                        stmt.setBoolean(index++, shop.isNotify());
                     }
 
                     int rowsAffected = stmt.executeUpdate();
@@ -456,7 +459,7 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                                 owner_uuid VARCHAR(36) NOT NULL,
                                 shop_name VARCHAR(255) NOT NULL,
                                 price DECIMAL(15,2) NOT NULL DEFAULT 0,
-                                material VARCHAR(255),
+                                item TEXT,
                                 world VARCHAR(100) NOT NULL,
                                 x INT NOT NULL,
                                 y INT NOT NULL,
@@ -496,13 +499,13 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
         double buyPrice = rs.getDouble("price");
         boolean canBuy = rs.getBoolean("can_buy");
         boolean canSell = rs.getBoolean("can_sell");
-        String materialName = rs.getString("material");
-        Material material = materialName != null ? Material.getMaterial(materialName) : null;
+        String itemData = rs.getString("item");
+        ItemStack item = itemData != null ? ItemStack.deserializeBytes(plugin.stringToBytes(itemData)) : null;
         Location shopLocation = new Location(Bukkit.getWorld(rs.getString("world")), rs.getDouble("x"), rs.getDouble("y"), rs.getDouble("z"));
         String createdAt = rs.getString("created_at");
         boolean notify = rs.getBoolean("do_notify");
 
-        Shop shop = new Shop(ownerId, shopName, sellPrice, buyPrice, material, shopLocation, createdAt, notify, canSell, canBuy, new ArrayList<>());
+        Shop shop = new Shop(ownerId, shopName, sellPrice, buyPrice, item, shopLocation, createdAt, notify, canSell, canBuy, new ArrayList<>());
         return new SimpleEntry<Integer, Shop>(id, shop);
     }
 
@@ -583,6 +586,18 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
     }
 
     @Override
+    public CompletableFuture<Boolean> updateBoughtItems(UUID ownerId, String shopName, int boughtItems) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateBoughtItems'");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> updateMoneySpent(UUID ownerId, String shopName, double moneySpent) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateMoneySpent'");
+    }
+
+    @Override
     public CompletableFuture<Integer> getBoughtItems(UUID ownerId, String shopName) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getBoughtItems'");
@@ -595,9 +610,15 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
     }
 
     @Override
-    public CompletableFuture<Integer> getMoneySpent(UUID ownerId, String shopName) {
+    public CompletableFuture<Double> getMoneySpent(UUID ownerId, String shopName) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getMoneySpent'");
+    }
+
+    @Override
+    public CompletableFuture<Double> getMoneyEarned(UUID ownerId, String shopName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getMoneyEarned'");
     }
 
     @Override

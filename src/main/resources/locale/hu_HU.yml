@@ -13,7 +13,7 @@ usage: '%prefix% &7%usage%'
 config-reloaded: '%prefix% &aKonfiguráció sikeresen újratöltve!'
 no-permission: '%prefix% &cEhhez nincs jogod!'
 not-enough-money: '%prefix% &cNincs elég pénzed! ($%price%)'
-not-enough-items: '%prefix% &cNincs elég &f%material% &c(&e%amount%&c szükséges)!'
+not-enough-items: '%prefix% &cNincs elég &f%item% &c(&e%amount%&c szükséges)!'
 player:
   only-players: '%prefix% &cCsak játékosok használhatják ezt a parancsot!'
   already-added: '%prefix% &f%player-name% &cmár hozzá lett adva a boltodhoz!'
@@ -23,7 +23,7 @@ player:
 player-not-added: '%prefix% &f%player-name% &cjátékos nincs hozzáadva ehhez a bolthoz!'
 shop:
   already-exists: '%prefix% &f%shop-name% &cnévvle már van boltod!'
-  bought: '%prefix% &aSikeresen vásároltál &7x%items-bought% &f%material% &f$%price%
+  bought: '%prefix% &aSikeresen vásároltál &7x%items-bought% &f%item% &f$%price%
     &aért! &7(&8%items-left%&7)'
   chest-already-shop: '%prefix% &cEz a láda már jelenleg is bolt!'
   created:

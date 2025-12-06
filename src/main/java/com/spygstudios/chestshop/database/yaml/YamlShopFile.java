@@ -1,8 +1,6 @@
 package com.spygstudios.chestshop.database.yaml;
 
 import java.io.File;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.shop.Shop;
@@ -28,6 +27,8 @@ public class YamlShopFile extends YamlManager {
     @Getter
     private UUID ownerId;
     private boolean isSaved;
+    private ChestShop plugin;
+
     private static final Map<UUID, YamlShopFile> SHOPS_FILES = new HashMap<>();
 
     public YamlShopFile(ChestShop plugin, Player owner) {
@@ -39,10 +40,11 @@ public class YamlShopFile extends YamlManager {
         if (SHOPS_FILES.containsKey(ownerId)) {
             return;
         }
-        setOrDefault("shops", null);
-        setDefaultValues(this);
         this.isSaved = true;
         this.ownerId = ownerId;
+        this.plugin = plugin;
+        setOrDefault("shops", null);
+        setDefaultValues();
         SHOPS_FILES.put(ownerId, this);
     }
 
@@ -83,28 +85,28 @@ public class YamlShopFile extends YamlManager {
         isSaved = false;
     }
 
-    private static void setDefaultValues(YamlShopFile shopFile) {
-        for (String shopName : shopFile.getPlayerShops()) {
+    private void setDefaultValues() {
+        for (String shopName : getPlayerShops()) {
             String shopPath = "shops." + shopName;
-            shopFile.setOrDefault(shopPath + ".price", 0);
-            shopFile.setOrDefault(shopPath + ".sell-price", 0);
-            shopFile.setOrDefault(shopPath + ".buy-price", 0);
-            shopFile.setOrDefault(shopPath + ".do-notify", false);
-            shopFile.setOrDefault(shopPath + ".can-sell", true);
-            shopFile.setOrDefault(shopPath + ".can-buy", false);
-            shopFile.setOrDefault(shopPath + ".sold-items", 0);
-            shopFile.setOrDefault(shopPath + ".money-earned", 0);
-            shopFile.setOrDefault(shopPath + ".created", getDateString());
-            shopFile.isSaved = false;
+            setOrDefault(shopPath + ".price", 0);
+            setOrDefault(shopPath + ".sell-price", 0);
+            setOrDefault(shopPath + ".buy-price", 0);
+            setOrDefault(shopPath + ".do-notify", false);
+            setOrDefault(shopPath + ".can-sell", true);
+            setOrDefault(shopPath + ".can-buy", false);
+            setOrDefault(shopPath + ".sold-items", 0);
+            setOrDefault(shopPath + ".money-earned", 0);
+            setOrDefault(shopPath + ".created", plugin.getDateString());
+            isSaved = false;
         }
     }
 
     public void addShop(Shop shop) {
         setOrDefault(getPath(shop.getName(), ".price"), 0);
-        setOrDefault(getPath(shop.getName(), ".material"), null);
+        setOrDefault(getPath(shop.getName(), ".item"), null);
         setOrDefault(getPath(shop.getName(), ".location"), LocationUtils.fromLocation(shop.getChestLocation(), true));
         setOrDefault(getPath(shop.getName(), ".do-notify"), false);
-        setOrDefault(getPath(shop.getName(), ".created"), getDateString());
+        setOrDefault(getPath(shop.getName(), ".created"), plugin.getDateString());
         setOrDefault(getPath(shop.getName(), ".added-players"), new ArrayList<String>());
         isSaved = false;
     }
@@ -118,9 +120,9 @@ public class YamlShopFile extends YamlManager {
         }
     }
 
-    public void setMaterial(String shopName, Material material) {
-        String matName = material != null ? material.name() : null;
-        set(getPath(shopName, ".material"), matName);
+    public void setItem(String shopName, ItemStack item) {
+        byte[] itemData = item != null ? item.serializeAsBytes() : null;
+        set(getPath(shopName, ".item"), plugin.bytesToString(itemData));
         isSaved = false;
     }
 
@@ -134,13 +136,18 @@ public class YamlShopFile extends YamlManager {
         isSaved = false;
     }
 
-    public void markUnsaved() {
+    public void setCanBuy(String shopName, boolean canBuy) {
+        set(getPath(shopName, ".can-buy"), canBuy);
         isSaved = false;
     }
 
-    public static String getDateString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        return LocalDateTime.now().format(formatter);
+    public void setCanSell(String shopName, boolean canSell) {
+        set(getPath(shopName, ".can-sell"), canSell);
+        isSaved = false;
+    }
+
+    public void markUnsaved() {
+        isSaved = false;
     }
 
     public static void loadShopFiles(ChestShop plugin) {
@@ -195,16 +202,22 @@ public class YamlShopFile extends YamlManager {
         }
         double sellPrice = shopFile.getDouble("shops." + shopName + ".sell-price", shopFile.getDouble("shops." + shopName + ".price", 0));
         double buyPrice = shopFile.getDouble("shops." + shopName + ".buy-price", 0);
-        Material material = Material.getMaterial(shopFile.getString("shops." + shopName + ".material"));
+        String itemData = shopFile.getString("shops." + shopName + ".item");
+        ItemStack item = itemData != null ? ItemStack.deserializeBytes(plugin.stringToBytes(itemData)) : null;
         String createdAt = shopFile.getString("shops." + shopName + ".created");
         boolean isNotify = shopFile.getBoolean("shops." + shopName + ".do-notify");
         boolean canSell = shopFile.getBoolean("shops." + shopName + ".can-sell", true);
         boolean canBuy = shopFile.getBoolean("shops." + shopName + ".can-buy", false);
-        return new Shop(shopFile.getOwnerId(), shopName, sellPrice, buyPrice, material, location, createdAt, isNotify, canSell, canBuy, shopFile.getAddedUuids(shopName));
+        return new Shop(shopFile.getOwnerId(), shopName, sellPrice, buyPrice, item, location, createdAt, isNotify, canSell, canBuy, shopFile.getAddedUuids(shopName));
     }
 
     public static YamlShopFile getShopFile(UUID ownerId) {
-        return SHOPS_FILES.get(ownerId);
+        YamlShopFile shopFile = SHOPS_FILES.get(ownerId);
+        if (shopFile == null) {
+            ChestShop plugin = ChestShop.getInstance();
+            shopFile = new YamlShopFile(plugin, ownerId);
+        }
+        return shopFile;
     }
 
     public static YamlShopFile getShopFile(Player owner) {

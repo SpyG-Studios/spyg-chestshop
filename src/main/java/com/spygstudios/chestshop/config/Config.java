@@ -36,7 +36,7 @@ public class Config extends YamlManager {
         set("shops.name.min-length", 3);
         set("shops.blacklisted-names", Arrays.asList("stupid"));
         set("shops.disabled-worlds", Arrays.asList("disabled_world"));
-        set("shops.unknown-material", "-", Arrays.asList("The material text to use when the material is unknown."));
+        set("shops.unknown.item", "-", Arrays.asList("The text to use when the item is unknown."));
         set("shops.unknown.mode", "&cOffline", Arrays.asList("The text to use when the shop mode is not set."));
         set("shops.unknown.owner", "Unknown Owner", Arrays.asList("The text to use when the shop owner is unknown."));
         set("shops.max-shops.default", -1, Arrays.asList(

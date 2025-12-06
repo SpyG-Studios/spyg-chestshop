@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.enums.DatabaseType;
@@ -29,7 +29,7 @@ public class YamlStorage implements DataManager {
 
     @Override
     public CompletableFuture<Shop> createShop(UUID ownerId, String shopName, Location location) {
-        String createdAt = getDateString();
+        String createdAt = plugin.getDateString();
         Shop shop = new Shop(ownerId, shopName, location, createdAt);
         YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
         shopFile.addShop(shop);
@@ -68,9 +68,9 @@ public class YamlStorage implements DataManager {
     }
 
     @Override
-    public CompletableFuture<Boolean> updateShopMaterial(UUID ownerId, String shopName, Material material) {
+    public CompletableFuture<Boolean> updateShopItem(UUID ownerId, String shopName, ItemStack item) {
         YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
-        shopFile.setMaterial(shopName, material);
+        shopFile.setItem(shopName, item);
         return CompletableFuture.completedFuture(true);
     }
 
@@ -92,6 +92,15 @@ public class YamlStorage implements DataManager {
     }
 
     @Override
+    public CompletableFuture<Boolean> updateBoughtItems(UUID ownerId, String shopName, int boughtItems) {
+        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+        String shopPath = "shops." + shopName;
+        shopFile.set(shopPath + ".bought-items", shopFile.getInt(shopPath + ".bought-items") + boughtItems);
+        shopFile.markUnsaved();
+        return CompletableFuture.completedFuture(true);
+    }
+
+    @Override
     public CompletableFuture<Boolean> updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned) {
         YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
         String shopPath = "shops." + shopName;
@@ -101,9 +110,25 @@ public class YamlStorage implements DataManager {
     }
 
     @Override
+    public CompletableFuture<Boolean> updateMoneySpent(UUID ownerId, String shopName, double moneySpent) {
+        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+        String shopPath = "shops." + shopName;
+        shopFile.set(shopPath + ".money-spent", shopFile.getDouble(shopPath + ".money-spent") + moneySpent);
+        shopFile.markUnsaved();
+        return CompletableFuture.completedFuture(true);
+    }
+
+    @Override
     public CompletableFuture<Boolean> updateShopSellStats(UUID ownerId, String shopName, int soldItems, double moneyEarned) {
         return updateMoneyEarned(ownerId, shopName, moneyEarned)
                 .thenCompose(moneyUpdated -> updateSoldItems(ownerId, shopName, soldItems))
+                .thenApply(soldItemsUpdated -> true);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> updateShopBuyStats(UUID ownerId, String shopName, int boughtItems, double moneyEarned) {
+        return updateMoneyEarned(ownerId, shopName, moneyEarned)
+                .thenCompose(moneyUpdated -> updateSoldItems(ownerId, shopName, boughtItems))
                 .thenApply(soldItemsUpdated -> true);
     }
 
@@ -164,6 +189,7 @@ public class YamlStorage implements DataManager {
             YamlShopFile.loadShopFiles(plugin);
             return CompletableFuture.completedFuture(true);
         } catch (Exception e) {
+            e.printStackTrace();
             return CompletableFuture.completedFuture(false);
         }
     }
@@ -192,39 +218,57 @@ public class YamlStorage implements DataManager {
     }
 
     @Override
-    public CompletableFuture<Boolean> updateShopBuyStats(UUID ownerId, String shopName, int boughtItems, double moneyEarned) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopBuyStats'");
+    public CompletableFuture<Integer> getSoldItems(UUID ownerId, String shopName) {
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(shop.getSoldItems());
+        } else {
+            return CompletableFuture.completedFuture(0);
+        }
     }
 
     @Override
     public CompletableFuture<Integer> getBoughtItems(UUID ownerId, String shopName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getBoughtItems'");
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(shop.getBoughtItems());
+        } else {
+            return CompletableFuture.completedFuture(0);
+        }
     }
 
     @Override
-    public CompletableFuture<Integer> getSoldItems(UUID ownerId, String shopName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getSoldItems'");
+    public CompletableFuture<Double> getMoneySpent(UUID ownerId, String shopName) {
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(shop.getMoneySpent());
+        } else {
+            return CompletableFuture.completedFuture(0.0);
+        }
     }
 
     @Override
-    public CompletableFuture<Integer> getMoneySpent(UUID ownerId, String shopName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMoneySpent'");
+    public CompletableFuture<Double> getMoneyEarned(UUID ownerId, String shopName) {
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(shop.getMoneyEarned());
+        } else {
+            return CompletableFuture.completedFuture(0.0);
+        }
     }
 
     @Override
     public CompletableFuture<Boolean> setCanBuyFromPlayers(UUID ownerId, String shopName, boolean canBuy) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setCanBuyFromPlayers'");
+        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+        shopFile.setCanBuy(shopName, canBuy);
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override
     public CompletableFuture<Boolean> setCanSellToPlayers(UUID ownerId, String shopName, boolean canSell) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setCanSellToPlayers'");
+        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+        shopFile.setCanSell(shopName, canSell);
+        return CompletableFuture.completedFuture(true);
     }
 
 }

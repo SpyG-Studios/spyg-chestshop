@@ -7,12 +7,13 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
@@ -22,13 +23,15 @@ import com.spygstudios.spyglib.hologram.HologramItemRow;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 
 @Getter
 public class Shop {
     private UUID ownerId;
     private double sellPrice;
     private double buyPrice;
-    private Material material;
+    private ItemStack item;
     private Location chestLocation;
     private String createdAt;
     private String name;
@@ -56,7 +59,7 @@ public class Shop {
         this(ownerId, shopName, 0, 0, null, chestLocation, createdAt, false, true, false, new ArrayList<>());
     }
 
-    public Shop(UUID ownerId, String shopName, double sellPrice, double buyPrice, Material material, Location chestLocation, String createdAt, boolean isNotify, boolean canSell, boolean canBuy,
+    public Shop(UUID ownerId, String shopName, double sellPrice, double buyPrice, ItemStack item, Location chestLocation, String createdAt, boolean isNotify, boolean canSell, boolean canBuy,
             List<UUID> addedPlayers) {
         synchronized (SHOPS) {
             if (Shop.getShop(ownerId, shopName) != null) {
@@ -68,7 +71,7 @@ public class Shop {
         this.name = shopName;
         this.sellPrice = sellPrice;
         this.buyPrice = buyPrice;
-        this.material = material;
+        this.item = item;
         this.chestLocation = chestLocation;
         this.createdAt = createdAt;
         this.isNotify = isNotify;
@@ -79,12 +82,22 @@ public class Shop {
         this.hologram = new ShopHologram(this, plugin);
     }
 
-    public String getMaterialString() {
-        if (material == null) {
-            return plugin.getConf().getString("shops.unknown.material");
+    public String getItemName() {
+        if (item == null) {
+            return plugin.getConf().getString("shops.unknown.item");
         }
-        String materialString = material.name();
-        return materialString.length() > 14 ? materialString.substring(0, 14) : materialString;
+        Component displayName = item.getItemMeta().displayName();
+        if (displayName != null && !displayName.equals(Component.empty())) {
+            return ((TextComponent) displayName).content();
+        }
+        return item.getType().name();
+    }
+
+    public ItemStack getItem() {
+        if (item == null) {
+            return null;
+        }
+        return item.clone();
     }
 
     public double getSellPrice() {
@@ -171,15 +184,21 @@ public class Shop {
         return chestLocation.getWorld().getName() + ", x: " + chestLocation.getBlockX() + " y: " + chestLocation.getBlockY() + " z: " + chestLocation.getBlockZ();
     }
 
-    public void setMaterial(Material material) {
-        plugin.getDataManager().updateShopMaterial(ownerId, name, material).thenAccept(success -> {
+    public void setShopItem(ItemStack item) {
+        plugin.getDataManager().updateShopItem(ownerId, name, item).thenAccept(success -> {
             if (!success) {
-                plugin.getLogger().warning("Failed to update shop material for " + name);
+                plugin.getLogger().warning("Failed to update shop item for " + name);
                 return;
             }
-            this.material = material;
+            this.item = item.clone();
+            this.item.setAmount(1);
+            ItemMeta meta = this.item.getItemMeta();
+            if (meta instanceof Damageable damageable) {
+                damageable.setDamage(0);
+                this.item.setItemMeta(meta);
+            }
             if (hologram.getHologram().getRows().get(plugin.getConf().getStringList("shops.lines").size()) instanceof HologramItemRow row) {
-                row.setItem(new ItemStack(material));
+                row.setItem(this.item);
             }
             isSaved = false;
         });
@@ -212,7 +231,7 @@ public class Shop {
 
     public void setSellPrice(double sellPrice) {
         double parsedPrice = ShopUtils.parsePrice(sellPrice);
-        plugin.getDataManager().updateShopBuyPrice(ownerId, name, parsedPrice).thenAccept(success -> {
+        plugin.getDataManager().updateShopSellPrice(ownerId, name, parsedPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop price for " + name);
                 return;
@@ -241,17 +260,19 @@ public class Shop {
                 return;
             }
             this.canSellToPlayers = canSellToPlayers;
+            hologram.updateHologramRows();
             isSaved = false;
         });
     }
 
     public void setCanBuyFromPlayers(boolean canBuyFromPlayers) {
-        plugin.getDataManager().setCanSellToPlayers(ownerId, name, canBuyFromPlayers).thenAccept(success -> {
+        plugin.getDataManager().setCanBuyFromPlayers(ownerId, name, canBuyFromPlayers).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop canBuyFromPlayers setting for " + name);
                 return;
             }
             this.canBuyFromPlayers = canBuyFromPlayers;
+            hologram.updateHologramRows();
             isSaved = false;
         });
     }
@@ -310,7 +331,7 @@ public class Shop {
 
     public int getItemsLeft() {
         Chest chest = (Chest) chestLocation.getBlock().getState();
-        return ShopUtils.countDurableItemsInInventory(chest.getInventory(), material);
+        return ShopUtils.countDurableItemsInInventory(chest.getInventory(), item);
 
     }
 

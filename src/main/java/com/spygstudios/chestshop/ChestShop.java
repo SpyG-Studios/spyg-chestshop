@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map.Entry;
@@ -119,6 +122,7 @@ public class ChestShop extends JavaPlugin {
         getLogger().info("Found economy plugin: " + economy.getName());
 
         String storageType = conf.getString("storage-type");
+        getLogger().info("Using " + storageType + " storage type.");
         switch (storageType) {
             case "yaml":
                 dataManager = new YamlStorage(this);
@@ -146,8 +150,6 @@ public class ChestShop extends JavaPlugin {
             return;
         }
         dataManager.startSaveScheduler();
-
-        getLogger().info("Using " + storageType + " storage type.");
 
         String info = String.format("%s v. %s plugin has been enabled!", getName(), getPluginMeta().getVersion());
         getLogger().info(info);
@@ -198,5 +200,24 @@ public class ChestShop extends JavaPlugin {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String bytesToString(byte[] bytes) {
+        if (bytes == null) {
+            return null;
+        }
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    public byte[] stringToBytes(String str) {
+        if (str == null) {
+            return null;
+        }
+        return Base64.getDecoder().decode(str);
+    }
+
+    public String getDateString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return LocalDateTime.now().format(formatter);
     }
 }

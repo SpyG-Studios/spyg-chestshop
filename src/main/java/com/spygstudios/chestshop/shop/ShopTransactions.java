@@ -3,7 +3,6 @@ package com.spygstudios.chestshop.shop;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -49,11 +48,11 @@ public class ShopTransactions {
 
         economy.depositPlayer(Bukkit.getOfflinePlayer(shop.getOwnerId()), itemsPrice);
         Inventory chestInventory = ((Chest) shop.getChestLocation().getBlock().getState()).getInventory();
-        int soldItems = ShopUtils.extractItems(chestInventory, buyer.getInventory(), shop.getMaterial(), itemCount);
+        int soldItems = ShopUtils.extractItems(chestInventory, buyer.getInventory(), shop.getItem(), itemCount);
         itemsLeft = itemsLeft - itemCount;
 
         Message.SHOP_BOUGHT.send(buyer,
-                Map.of("%price%", String.valueOf(itemsPrice), "%material%", shop.getMaterial().name(), "%items-left%", String.valueOf(itemsLeft), "%items-bought%", String.valueOf(soldItems)));
+                Map.of("%price%", String.valueOf(itemsPrice), "%item%", shop.getItemName(), "%items-left%", String.valueOf(itemsLeft), "%items-bought%", String.valueOf(soldItems)));
         plugin.getDataManager().updateShopSellStats(shop.getOwnerId(), shop.getName(), itemCount, itemsPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop stats for " + shop.getName() + " owned by " + shop.getOwnerId());
@@ -65,7 +64,7 @@ public class ShopTransactions {
         });
         Player owner = Bukkit.getPlayer(shop.getOwnerId());
         if (shop.isNotify() && owner != null) {
-            Message.SHOP_SOLD.send(owner, Map.of("%price%", String.valueOf(itemsPrice), "%material%", shop.getMaterial().name(), "%player-name%", buyer.getName(), "%items-left%",
+            Message.SHOP_SOLD.send(owner, Map.of("%price%", String.valueOf(itemsPrice), "%item%", shop.getItemName(), "%player-name%", buyer.getName(), "%items-left%",
                     String.valueOf(itemsLeft), "%items-bought%", String.valueOf(itemCount)));
         }
     }
@@ -75,16 +74,16 @@ public class ShopTransactions {
             return;
         }
 
-        Material material = shop.getMaterial();
-        int playerItemCount = ShopUtils.countDurableItemsInInventory(seller.getInventory(), material);
+        ItemStack item = shop.getItem();
+        int playerItemCount = ShopUtils.countDurableItemsInInventory(seller.getInventory(), item);
         if (playerItemCount < amount) {
-            Message.NOT_ENOUGH_ITEMS.send(seller, Map.of("%material%", material.name(), "%amount%", String.valueOf(amount)));
+            Message.NOT_ENOUGH_ITEMS.send(seller, Map.of("%item%", shop.getItemName(), "%amount%", String.valueOf(amount)));
             seller.closeInventory();
             return;
         }
 
         Chest chest = (Chest) shop.getChestLocation().getBlock().getState();
-        if (!hasChestSpace(chest, material, amount)) {
+        if (!hasChestSpace(chest, item, amount)) {
             Message.SHOP_CHEST_FULL.send(seller);
             if (!shop.isNotify()) {
                 return;
@@ -93,7 +92,7 @@ public class ShopTransactions {
             if (owner != null) {
                 Message.SHOP_CHEST_FULL_OWNER.send(owner, Map.of(
                         "%player-name%", seller.getName(),
-                        "%material%", material.name(),
+                        "%item%", shop.getName(),
                         "%amount%", String.valueOf(amount),
                         "%shop-name%", shop.getName()));
             }
@@ -109,11 +108,11 @@ public class ShopTransactions {
             }
             Player owner = Bukkit.getPlayer(shop.getOwnerId());
             if (owner != null) {
-                Message.SHOP_OWNER_NO_MONEY_OWNER.send(owner, Map.of("%player-name%", seller.getName(), "%material%", material.name(), "%price%", String.valueOf(itemsPrice)));
+                Message.SHOP_OWNER_NO_MONEY_OWNER.send(owner, Map.of("%player-name%", seller.getName(), "%item%", shop.getName(), "%price%", String.valueOf(itemsPrice)));
             }
         }
         Inventory chestInventory = chest.getInventory();
-        int soldItems = ShopUtils.extractItems(seller.getInventory(), chestInventory, material, amount);
+        int soldItems = ShopUtils.extractItems(seller.getInventory(), chestInventory, item, amount);
 
         EconomyResponse withdrawResponse = economy.withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwnerId()), itemsPrice);
         if (withdrawResponse.transactionSuccess()) {
@@ -130,27 +129,27 @@ public class ShopTransactions {
             shop.setSaved(false);
         });
 
-        Message.SHOP_SOLD_TO.send(seller, Map.of("%price%", String.valueOf(itemsPrice), "%material%", material.name(), "%items-sold%", String.valueOf(soldItems)));
+        Message.SHOP_SOLD_TO.send(seller, Map.of("%price%", String.valueOf(itemsPrice), "%item%", shop.getItemName(), "%items-sold%", String.valueOf(soldItems)));
 
         Player owner = Bukkit.getPlayer(shop.getOwnerId());
         if (shop.isNotify() && owner != null) {
             Message.SHOP_BOUGHT_FROM.send(owner,
-                    Map.of("%price%", String.valueOf(itemsPrice), "%material%", material.name(), "%player-name%", seller.getName(), "%items-bought%", String.valueOf(soldItems)));
+                    Map.of("%price%", String.valueOf(itemsPrice), "%item%", shop.getItemName(), "%player-name%", seller.getName(), "%items-bought%", String.valueOf(soldItems)));
         }
     }
 
-    private boolean hasChestSpace(Chest chest, Material material, int amount) {
-        int maxStackSize = material.getMaxStackSize();
+    private boolean hasChestSpace(Chest chest, ItemStack item, int amount) {
+        int maxStackSize = item.getMaxStackSize();
         int remainingAmount = amount;
 
-        for (ItemStack item : chest.getInventory().getContents()) {
+        for (ItemStack i : chest.getInventory().getContents()) {
             if (remainingAmount <= 0)
                 break;
 
-            if (item == null) {
+            if (i == null) {
                 remainingAmount -= maxStackSize;
-            } else if (item.getType() == material && item.getAmount() < maxStackSize) {
-                remainingAmount -= (maxStackSize - item.getAmount());
+            } else if (i.isSimilar(item) && i.getAmount() < maxStackSize) {
+                remainingAmount -= (maxStackSize - i.getAmount());
             }
         }
 

@@ -1,13 +1,11 @@
 package com.spygstudios.chestshop.interfaces;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.shop.Shop;
 
@@ -24,7 +22,7 @@ public interface DataManager {
 
     CompletableFuture<Boolean> updateShopSellPrice(UUID ownerId, String shopName, double price);
 
-    CompletableFuture<Boolean> updateShopMaterial(UUID ownerId, String shopName, Material material);
+    CompletableFuture<Boolean> updateShopItem(UUID ownerId, String shopName, ItemStack itemStack);
 
     CompletableFuture<Boolean> updateShopNotify(UUID ownerId, String shopName, boolean notify);
 
@@ -44,13 +42,19 @@ public interface DataManager {
 
     CompletableFuture<Boolean> updateSoldItems(UUID ownerId, String shopName, int soldItems);
 
+    CompletableFuture<Boolean> updateBoughtItems(UUID ownerId, String shopName, int boughtItems);
+
     CompletableFuture<Boolean> updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned);
+
+    CompletableFuture<Boolean> updateMoneySpent(UUID ownerId, String shopName, double moneySpent);
 
     CompletableFuture<Integer> getBoughtItems(UUID ownerId, String shopName);
 
     CompletableFuture<Integer> getSoldItems(UUID ownerId, String shopName);
 
-    CompletableFuture<Integer> getMoneySpent(UUID ownerId, String shopName);
+    CompletableFuture<Double> getMoneySpent(UUID ownerId, String shopName);
+
+    CompletableFuture<Double> getMoneyEarned(UUID ownerId, String shopName);
 
     CompletableFuture<Boolean> saveShop(Shop shop);
 
@@ -62,8 +66,4 @@ public interface DataManager {
 
     void close();
 
-    default String getDateString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        return LocalDateTime.now().format(formatter);
-    }
 }

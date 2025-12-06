@@ -57,7 +57,7 @@ public class ShopGui {
             inventory.setItem(4, modeItem);
         }
 
-        ItemStack shopItem = new ItemStack(shop.getMaterial());
+        ItemStack shopItem = shop.getItem();
         ItemMeta shopMeta = shopItem.getItemMeta();
 
         String titleKey = mode == ShopMode.CUSTOMER_PURCHASING
@@ -67,7 +67,7 @@ public class ShopGui {
                 ? "shop.item-to-buy.lore"
                 : "shop.item-to-sell.lore";
 
-        shopMeta.displayName(TranslateColor.translate(config.getString(titleKey, "&e%material%").replace("%material%", shop.getMaterial().name())));
+        shopMeta.displayName(TranslateColor.translate(config.getString(titleKey, "&e%item%").replace("%item%", shop.getItemName())));
         double priceForMode = mode == ShopMode.CUSTOMER_PURCHASING
                 ? shop.getCustomerPurchasePrice()
                 : shop.getCustomerSalePrice();

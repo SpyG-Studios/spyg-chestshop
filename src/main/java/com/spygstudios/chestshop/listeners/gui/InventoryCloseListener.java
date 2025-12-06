@@ -55,14 +55,14 @@ public class InventoryCloseListener implements Listener {
     private void itemAdding(InventoryCloseEvent event, DashboardHolder holdder) {
         ItemStack item = event.getInventory().getItem(13);
         Shop shop = holdder.getShop();
-        if (item == null || item.getType().equals(shop.getMaterial())) {
+        if (item == null || item.isSimilar(shop.getItem())) {
             return;
         }
 
         if (item.getItemMeta().displayName() != null) {
             return;
         }
-        shop.setMaterial(item.getType());
+        shop.setShopItem(item);
     }
 
 }

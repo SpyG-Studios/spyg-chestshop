@@ -47,18 +47,18 @@ public class DashboardGui {
 
         private static void setShopItems(ChestShop plugin, Shop shop, Inventory inventory) {
                 Config config = plugin.getConf();
-                ConfigurationSection guiMaterialSection = guiConfig.getConfigurationSection("chestshop.material");
-                ItemStack shopMaterial = shop.getMaterial() != null
-                                ? new ItemStack(shop.getMaterial())
+                ConfigurationSection guiShopItemSection = guiConfig.getConfigurationSection("chestshop.item");
+                ItemStack shopMaterial = shop.getItem() != null
+                                ? shop.getItem()
                                 : ItemUtils.create(
-                                                Material.getMaterial(guiMaterialSection.getString("not-set-material", "BARRIER")),
-                                                guiMaterialSection.getString("title"),
-                                                guiMaterialSection.getStringList("lore"),
-                                                guiMaterialSection.getFloatList("model-data.floats"),
-                                                guiMaterialSection.getStringList("model-data.strings"));
-                inventory.setItem(guiMaterialSection.getInt("slot"), shopMaterial);
+                                                Material.getMaterial(guiShopItemSection.getString("not-set", "BARRIER")),
+                                                guiShopItemSection.getString("title"),
+                                                guiShopItemSection.getStringList("lore"),
+                                                guiShopItemSection.getFloatList("model-data.floats"),
+                                                guiShopItemSection.getStringList("model-data.strings"));
+                inventory.setItem(guiShopItemSection.getInt("slot"), shopMaterial);
                 PersistentData materialData = new PersistentData(plugin, shopMaterial);
-                materialData.set("action", GuiAction.SET_MATERIAL.name());
+                materialData.set("action", GuiAction.SET_ITEM.name());
 
                 // info item
                 String buyPrice = config.getString("shops.price-format.buy")
@@ -85,7 +85,7 @@ public class DashboardGui {
                                 infoSection.getString("title"),
                                 ParseListPlaceholder.parse(infoSection.getStringList("lore"), Map.of(
                                                 "%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName(),
-                                                "%material%", shop.getMaterial() == null ? "AIR" : shop.getMaterial().name(),
+                                                "%item%", shop.getItem() == null ? "AIR" : shop.getItemName(),
                                                 "%price%", priceDisplay,
                                                 "%created%", shop.getCreatedAt(),
                                                 "%location%", shop.getChestLocationString(),
@@ -188,14 +188,14 @@ public class DashboardGui {
                 private final Player player;
 
                 @Getter
-                private final Material material;
+                private final ItemStack item;
 
                 @Getter
                 private final Shop shop;
 
                 public DashboardHolder(Player player, Shop shop) {
                         this.player = player;
-                        this.material = shop.getMaterial() == null ? Material.AIR : shop.getMaterial();
+                        this.item = shop.getItem() == null ? new ItemStack(Material.AIR) : shop.getItem();
                         this.shop = shop;
                 }
 
