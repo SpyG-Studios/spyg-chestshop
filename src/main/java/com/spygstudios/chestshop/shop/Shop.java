@@ -124,14 +124,6 @@ public class Shop {
         return getBuyPrice();
     }
 
-    // public int getBoughtItems() {
-    // return shopFile.getInt("shops." + name + ".sold-items");
-    // }
-
-    // public int getMoneySpent() {
-    // return shopFile.getInt("shops." + name + ".money-spent");
-    // }
-
     public void setSoldItems(int soldItems) {
         plugin.getDataManager().updateSoldItems(ownerId, name, soldItems).thenAccept(success -> {
             if (!success) {
@@ -139,8 +131,8 @@ public class Shop {
                 return;
             }
             this.soldItems = soldItems;
-            hologram.updateHologramRows();
-            isSaved = false;
+            this.hologram.updateHologramRows();
+            this.isSaved = false;
         });
     }
 
@@ -151,8 +143,8 @@ public class Shop {
                 return;
             }
             this.moneyEarned = moneyEarned;
-            hologram.updateHologramRows();
-            isSaved = false;
+            this.hologram.updateHologramRows();
+            this.isSaved = false;
         });
     }
 
@@ -163,8 +155,8 @@ public class Shop {
                 return;
             }
             this.soldItems = boughtItems;
-            hologram.updateHologramRows();
-            isSaved = false;
+            this.hologram.updateHologramRows();
+            this.isSaved = false;
         });
     }
 
@@ -175,8 +167,8 @@ public class Shop {
                 return;
             }
             this.moneyEarned = moneySpent;
-            hologram.updateHologramRows();
-            isSaved = false;
+            this.hologram.updateHologramRows();
+            this.isSaved = false;
         });
     }
 
@@ -200,7 +192,7 @@ public class Shop {
             if (hologram.getHologram().getRows().get(plugin.getConf().getStringList("shops.lines").size()) instanceof HologramItemRow row) {
                 row.setItem(this.item);
             }
-            isSaved = false;
+            this.isSaved = false;
         });
     }
 
@@ -211,8 +203,8 @@ public class Shop {
                 return;
             }
             this.name = newName;
-            hologram.updateHologramRows();
-            isSaved = false;
+            this.hologram.updateHologramRows();
+            this.isSaved = false;
         });
     }
 
@@ -224,8 +216,8 @@ public class Shop {
                 return;
             }
             this.buyPrice = parsedPrice;
-            hologram.updateHologramRows();
-            isSaved = false;
+            this.hologram.updateHologramRows();
+            this.isSaved = false;
         });
     }
 
@@ -237,8 +229,8 @@ public class Shop {
                 return;
             }
             this.sellPrice = parsedPrice;
-            hologram.updateHologramRows();
-            isSaved = false;
+            this.hologram.updateHologramRows();
+            this.isSaved = false;
         });
     }
 
@@ -248,8 +240,8 @@ public class Shop {
                 plugin.getLogger().warning("Failed to update shop notify setting for " + name);
                 return;
             }
-            isNotify = notify;
-            isSaved = false;
+            this.isNotify = notify;
+            this.isSaved = false;
         });
     }
 
@@ -260,8 +252,8 @@ public class Shop {
                 return;
             }
             this.canSellToPlayers = canSellToPlayers;
-            hologram.updateHologramRows();
-            isSaved = false;
+            this.hologram.updateHologramRows();
+            this.isSaved = false;
         });
     }
 
@@ -272,8 +264,8 @@ public class Shop {
                 return;
             }
             this.canBuyFromPlayers = canBuyFromPlayers;
-            hologram.updateHologramRows();
-            isSaved = false;
+            this.hologram.updateHologramRows();
+            this.isSaved = false;
         });
     }
 
@@ -287,9 +279,9 @@ public class Shop {
                 plugin.getLogger().warning("Failed to add player " + uuid + " to shop " + name);
                 return;
             }
-            addedPlayers.add(uuid);
+            this.addedPlayers.add(uuid);
             Message.PLAYER_ADDED.send(Bukkit.getPlayer(ownerId), Map.of("%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
-            isSaved = false;
+            this.isSaved = false;
         });
     }
 
@@ -307,9 +299,9 @@ public class Shop {
                 plugin.getLogger().warning("Failed to remove player " + uuid + " from shop " + name);
                 return;
             }
-            addedPlayers.remove(uuid);
+            this.addedPlayers.remove(uuid);
             Message.PLAYER_REMOVED.send(Bukkit.getPlayer(ownerId), Map.of("%player-name%", Bukkit.getOfflinePlayer(uuid).getName()));
-            isSaved = false;
+            this.isSaved = false;
         });
     }
 

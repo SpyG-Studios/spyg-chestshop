@@ -25,14 +25,15 @@ public class ShopHologram {
         this.plugin = plugin;
         int hologramRange = config.getInt("shops.holograms.range");
         boolean seeTroughWalls = config.getBoolean("shops.holograms.see-through-walls");
-        this.hologram = plugin.getHologramManager().createHologram(shop.getChestLocation().clone().add(0.5, 0.7, 0.5), seeTroughWalls, hologramRange);
+        this.hologram = plugin.getHologramManager().createHologram(
+                shop.getChestLocation().clone().add(0.5, 0.7, 0.5),
+                seeTroughWalls,
+                hologramRange);
         updateHologramRows();
     }
 
     public void updateHologramRows() {
-        while (!hologram.getRows().isEmpty()) {
-            hologram.removeRow(0);
-        }
+        hologram.getRows().clear();
         hologram.setViewDistance(config.getInt("shops.holograms.range"));
         hologram.setSeeTrough(config.getBoolean("shops.holograms.see-through-walls"));
         String owner = Bukkit.getOfflinePlayer(shop.getOwnerId()).getName();
@@ -42,8 +43,8 @@ public class ShopHologram {
                     .replace("%price%", String.valueOf(shop.getCustomerPurchasePrice()));
             String sellPrice = config.getString("shops.price-format.sell")
                     .replace("%price%", String.valueOf(shop.getCustomerSalePrice()));
-            String priceDisplay = "";
 
+            String priceDisplay = "";
             if (shop.acceptsCustomerPurchases() && shop.acceptsCustomerSales()) {
                 priceDisplay = config.getString("shops.price-format.combined")
                         .replace("%sell-price%", sellPrice)
