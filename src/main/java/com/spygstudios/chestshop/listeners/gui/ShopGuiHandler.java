@@ -21,7 +21,7 @@ import com.spygstudios.chestshop.gui.ShopGui;
 import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.shop.ShopUtils;
 import com.spygstudios.spyglib.color.TranslateColor;
-import com.spygstudios.spyglib.persistentdata.PersistentData;
+import com.spygstudios.spyglib.datacontainer.ItemContainer;
 
 import net.kyori.adventure.text.Component;
 
@@ -46,7 +46,7 @@ public class ShopGuiHandler implements Listener {
             return;
         }
         event.setCancelled(true);
-        PersistentData data = new PersistentData(plugin, clickedItem);
+        ItemContainer data = ItemContainer.create(plugin, clickedItem);
         String action = data.getString("action");
         if (action == null) {
             return;

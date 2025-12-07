@@ -14,7 +14,7 @@ import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.gui.PlayersGui;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.shop.Shop;
-import com.spygstudios.spyglib.persistentdata.PersistentData;
+import com.spygstudios.spyglib.datacontainer.ItemContainer;
 
 public class PlayerGuiHandler implements Listener {
 
@@ -35,7 +35,7 @@ public class PlayerGuiHandler implements Listener {
             return;
         }
         event.setCancelled(true);
-        PersistentData data = new PersistentData(plugin, clickedItem);
+        ItemContainer data = ItemContainer.create(plugin, clickedItem);
         String action = data.getString("action");
         if (action == null) {
             return;

@@ -22,9 +22,9 @@ import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.utils.PageUtil;
 import com.spygstudios.spyglib.color.TranslateColor;
+import com.spygstudios.spyglib.datacontainer.ItemContainer;
 import com.spygstudios.spyglib.item.ItemUtils;
 import com.spygstudios.spyglib.item.PlayerHeads;
-import com.spygstudios.spyglib.persistentdata.PersistentData;
 import com.spygstudios.spyglib.placeholder.ParseListPlaceholder;
 
 import lombok.Getter;
@@ -57,7 +57,7 @@ public class DashboardGui {
                                                 guiShopItemSection.getFloatList("model-data.floats"),
                                                 guiShopItemSection.getStringList("model-data.strings"));
                 inventory.setItem(guiShopItemSection.getInt("slot"), shopMaterial);
-                PersistentData materialData = new PersistentData(plugin, shopMaterial);
+                ItemContainer materialData = ItemContainer.create(plugin, shopMaterial);
                 materialData.set("action", GuiAction.SET_ITEM.name());
 
                 // info item
@@ -109,7 +109,7 @@ public class DashboardGui {
                                                 : notifySection.getString("off")),
                                 notifySection.getFloatList("model-data.floats"),
                                 notifySection.getStringList("model-data.strings"));
-                PersistentData notifyData = new PersistentData(plugin, notifyItem);
+                ItemContainer notifyData = ItemContainer.create(plugin, notifyItem);
                 notifyData.set("action", GuiAction.TOGGLE_NOTIFY.name());
                 inventory.setItem(notifySection.getInt("slot"), notifyItem);
 
@@ -129,7 +129,7 @@ public class DashboardGui {
                                 moneyLore,
                                 moneySection.getFloatList("model-data.floats"),
                                 moneySection.getStringList("model-data.strings"));
-                PersistentData moneyData = new PersistentData(plugin, moneyItem);
+                ItemContainer moneyData = ItemContainer.create(plugin, moneyItem);
                 moneyData.set("action", GuiAction.SET_SHOP_BUY_PRICE.name());
                 inventory.setItem(moneySection.getInt("slot"), moneyItem);
 
@@ -142,7 +142,7 @@ public class DashboardGui {
                                 inventorySection.getStringList("lore"),
                                 inventorySection.getFloatList("model-data.floats"),
                                 inventorySection.getStringList("model-data.strings"));
-                PersistentData inventoryData = new PersistentData(plugin, inventoryItem);
+                ItemContainer inventoryData = ItemContainer.create(plugin, inventoryItem);
                 inventoryData.set("action", GuiAction.OPEN_SHOP_INVENTORY.name());
                 inventory.setItem(inventorySection.getInt("slot"), inventoryItem);
 
@@ -165,7 +165,7 @@ public class DashboardGui {
                                 buySellLore,
                                 buySellSection.getFloatList("model-data.floats"),
                                 buySellSection.getStringList("model-data.strings"));
-                PersistentData buySellData = new PersistentData(plugin, buySellItem);
+                ItemContainer buySellData = ItemContainer.create(plugin, buySellItem);
                 buySellData.set("action", GuiAction.TOGGLE_SELLING.name());
                 inventory.setItem(buySellSection.getInt("slot"), buySellItem);
 
@@ -177,7 +177,7 @@ public class DashboardGui {
                 playrMeta.displayName(TranslateColor.translate(playerSection.getString("title").replace("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName())));
                 playrMeta.lore(TranslateColor.translate(playerSection.getStringList("lore")));
                 playrItem.setItemMeta(playrMeta);
-                PersistentData playerData = new PersistentData(plugin, playrItem);
+                ItemContainer playerData = ItemContainer.create(plugin, playrItem);
                 playerData.set("action", GuiAction.OPEN_PLAYERS.name());
                 inventory.setItem(playerSection.getInt("slot"), playrItem);
         }

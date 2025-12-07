@@ -21,7 +21,7 @@ import com.spygstudios.chestshop.gui.PlayersGui;
 import com.spygstudios.chestshop.shop.AmountHandler;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.color.TranslateColor;
-import com.spygstudios.spyglib.persistentdata.PersistentData;
+import com.spygstudios.spyglib.datacontainer.ItemContainer;
 
 public class DashboardGuiHandler implements Listener {
 
@@ -68,7 +68,7 @@ public class DashboardGuiHandler implements Listener {
 
     private void chestShopGui(InventoryClickEvent event) {
         ItemStack clickedItem = event.getCurrentItem();
-        PersistentData data = new PersistentData(plugin, clickedItem);
+        ItemContainer data = ItemContainer.create(plugin, clickedItem);
         String action = data.getString("action");
         if (action == null) {
             return;
@@ -127,7 +127,7 @@ public class DashboardGuiHandler implements Listener {
             item.setItemMeta(meta);
         }
         event.getInventory().setItem(13, item);
-        PersistentData newData = new PersistentData(plugin, event.getInventory().getItem(13));
+        ItemContainer newData = ItemContainer.create(plugin, event.getInventory().getItem(13));
         newData.set("action", GuiAction.SET_ITEM.name());
     }
 

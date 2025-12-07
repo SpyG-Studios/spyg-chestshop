@@ -16,6 +16,7 @@ import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.spyglib.datacontainer.ItemContainer;
 
 public class InventoryCloseListener implements Listener {
 
@@ -62,6 +63,8 @@ public class InventoryCloseListener implements Listener {
         if (item.getItemMeta().displayName() != null) {
             return;
         }
+        ItemContainer newData = ItemContainer.create(plugin, event.getInventory().getItem(13));
+        newData.remove("action");
         shop.setShopItem(item);
     }
 

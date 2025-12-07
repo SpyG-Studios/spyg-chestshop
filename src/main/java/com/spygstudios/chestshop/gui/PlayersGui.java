@@ -19,8 +19,8 @@ import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.utils.PageUtil;
 import com.spygstudios.spyglib.color.TranslateColor;
+import com.spygstudios.spyglib.datacontainer.ItemContainer;
 import com.spygstudios.spyglib.item.PlayerHeads;
-import com.spygstudios.spyglib.persistentdata.PersistentData;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -62,7 +62,7 @@ public class PlayersGui {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             ItemStack skull = offlinePlayer.isOnline() ? PlayerHeads.getOnlinePlayerHead(uuid) : new ItemStack(Material.PLAYER_HEAD);
             skull.setItemMeta(getPlayerHeadMeta(skull, offlinePlayer));
-            PersistentData skullData = new PersistentData(plugin, skull);
+            ItemContainer skullData = ItemContainer.create(plugin, skull);
             skullData.set("action", GuiAction.REMOVE_PLAYER.name());
             skullData.set("uuid", offlinePlayer.getUniqueId().toString());
             inventory.setItem(i, skull);
@@ -76,7 +76,7 @@ public class PlayersGui {
                 Bukkit.getScheduler().runTask(plugin, () -> {
                     inventory.remove(skull);
                     head.setItemMeta(getPlayerHeadMeta(head, offlinePlayer));
-                    PersistentData headData = new PersistentData(plugin, head);
+                    ItemContainer headData = ItemContainer.create(plugin, head);
                     headData.set("action", GuiAction.REMOVE_PLAYER.name());
                     headData.set("uuid", offlinePlayer.getUniqueId().toString());
                     inventory.setItem(index, head);
@@ -96,7 +96,7 @@ public class PlayersGui {
         ItemMeta arrowMeta = arrow.getItemMeta();
         arrowMeta.displayName(TranslateColor.translate(displayName));
         arrow.setItemMeta(arrowMeta);
-        PersistentData nextData = new PersistentData(plugin, arrow);
+        ItemContainer nextData = ItemContainer.create(plugin, arrow);
         nextData.set("action", action.name());
         return arrow;
     }
