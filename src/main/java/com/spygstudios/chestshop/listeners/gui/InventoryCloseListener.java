@@ -20,7 +20,7 @@ import com.spygstudios.spyglib.datacontainer.ItemContainer;
 
 public class InventoryCloseListener implements Listener {
 
-    ChestShop plugin;
+    final ChestShop plugin;
 
     public InventoryCloseListener(ChestShop plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -66,6 +66,24 @@ public class InventoryCloseListener implements Listener {
         ItemContainer newData = ItemContainer.create(plugin, event.getInventory().getItem(13));
         newData.remove("action");
         shop.setShopItem(item);
+        shop.getHologram().updateHologramRows();
+    }
+
+    @EventHandler
+    public void onShopContainerClosed(InventoryCloseEvent event) {
+        Inventory inventory = event.getInventory();
+        InventoryHolder invHolder = inventory.getHolder();
+
+        Location invLocation = inventory.getLocation();
+        if (invHolder.getInventory() == null || invHolder.getInventory().getLocation() == null) {
+            return;
+        }
+
+        Shop shop = Shop.getShop(invLocation);
+        if (shop == null || !invLocation.getWorld().isChunkLoaded(invLocation.getBlockX() >> 4, invLocation.getBlockZ() >> 4)) {
+            return;
+        }
+        shop.getHologram().updateHologramRows();
     }
 
 }
