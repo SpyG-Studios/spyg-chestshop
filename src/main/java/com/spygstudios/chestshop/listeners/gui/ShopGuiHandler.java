@@ -69,7 +69,7 @@ public class ShopGuiHandler implements Listener {
                     int itemsLeft = holder.getShop().getItemsLeft();
                     max = Math.min(item.getMaxStackSize(), itemsLeft);
                 } else {
-                    int playerItems = ShopUtils.countDurableItemsInInventory(player.getInventory(), holder.getShop().getItem());
+                    int playerItems = ShopUtils.getSellableItemCount(player.getInventory(), holder.getShop().getItem());
                     max = Math.min(item.getMaxStackSize(), playerItems);
                 }
                 int min = 1;

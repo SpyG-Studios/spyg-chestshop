@@ -114,7 +114,7 @@ public class ShopUtils {
         return maxShops;
     }
 
-    public static int countDurableItemsInInventory(Inventory inventory, ItemStack item) {
+    public static int getSellableItemCount(Inventory inventory, ItemStack item) {
         int itemCount = InventoryUtils.countItems(inventory, i -> {
             if (!i.isSimilar(item)) {
                 return false;

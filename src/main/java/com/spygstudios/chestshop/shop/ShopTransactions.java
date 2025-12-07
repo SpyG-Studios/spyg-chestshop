@@ -75,7 +75,7 @@ public class ShopTransactions {
         }
 
         ItemStack item = shop.getItem();
-        int playerItemCount = ShopUtils.countDurableItemsInInventory(seller.getInventory(), item);
+        int playerItemCount = ShopUtils.getSellableItemCount(seller.getInventory(), item);
         if (playerItemCount < amount) {
             Message.NOT_ENOUGH_ITEMS.send(seller, Map.of("%item%", shop.getItemName(), "%amount%", String.valueOf(amount)));
             seller.closeInventory();

@@ -63,6 +63,7 @@ public class ShopHologram {
                     .replace("%price%", priceDisplay)
                     .replace("%sell-price%", sellPrice)
                     .replace("%buy-price%", buyPrice)
+                    .replace("%items-left%", String.valueOf(shop.getItemsLeft()))
                     .replace("%item%", shop.getItemName())));
         });
         ItemStack displayItem = shop.getItem();

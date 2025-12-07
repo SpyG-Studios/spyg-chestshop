@@ -323,7 +323,7 @@ public class Shop {
 
     public int getItemsLeft() {
         Chest chest = (Chest) chestLocation.getBlock().getState();
-        return ShopUtils.countDurableItemsInInventory(chest.getInventory(), item);
+        return ShopUtils.getSellableItemCount(chest.getInventory(), item);
 
     }
 
