@@ -33,7 +33,7 @@ public class ShopHologram {
     }
 
     public void updateHologramRows() {
-        hologram.getRows().clear();
+        hologram.clearRows();
         hologram.setViewDistance(config.getInt("shops.holograms.range"));
         hologram.setSeeTrough(config.getBoolean("shops.holograms.see-through-walls"));
         String owner = Bukkit.getOfflinePlayer(shop.getOwnerId()).getName();
