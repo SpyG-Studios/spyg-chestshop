@@ -72,6 +72,7 @@ public class ShopGuiHandler implements Listener {
                     int playerItems = ShopUtils.getSellableItemCount(player.getInventory(), holder.getShop().getItem());
                     max = Math.min(item.getMaxStackSize(), playerItems);
                 }
+                max = Math.max(1, max);
                 int min = 1;
                 int modifier = data.getInt("amount");
                 int currentAmount = item.getAmount();
