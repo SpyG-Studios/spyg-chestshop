@@ -5,13 +5,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.Bukkit;
@@ -74,12 +73,9 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
 
     @Override
     public CompletableFuture<Shop> createShop(UUID ownerId, String shopName, Location location) {
-        return FutureUtils.runTaskAsync(plugin, () -> {
-            String createdAt = plugin.getDateString();
-            Shop shop = new Shop(ownerId, shopName, location, createdAt);
-            shop.setSaved(false);
-            return shop;
-        });
+        String createdAt = plugin.getDateString();
+        Shop shop = new Shop(ownerId, shopName, location, createdAt);
+        return CompletableFuture.completedFuture(shop);
     }
 
     @Override
@@ -97,16 +93,25 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                 stmt.setString(1, ownerId.toString());
                 ResultSet rs = stmt.executeQuery();
 
-                Map<Integer, Shop> shops = new HashMap<>();
+                Map<Integer, ShopRow> shopDataList = new HashMap<>();
                 while (rs.next()) {
-                    Entry<Integer, Shop> shopEntry = loadShopMapFromResult(rs);
-                    if (shopEntry == null) {
-                        continue;
+                    ShopRow shopData = extractShopRow(rs);
+                    if (shopData != null) {
+                        shopDataList.put(shopData.id(), shopData);
                     }
-                    shops.put(shopEntry.getKey(), shopEntry.getValue());
                 }
-                loadShopPlayers(shops);
-                return new ArrayList<>(shops.values());
+                loadShopPlayersData(shopDataList);
+
+                return runSync(() -> {
+                    List<Shop> shops = new ArrayList<>();
+                    for (ShopRow data : shopDataList.values()) {
+                        Shop shop = createShopFromRow(data);
+                        if (shop != null) {
+                            shops.add(shop);
+                        }
+                    }
+                    return shops;
+                });
             } catch (SQLException e) {
                 plugin.getLogger().severe("Failed to get player shops: " + e.getMessage());
                 return List.of();
@@ -121,13 +126,25 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                 stmt.setString(1, ownerId.toString());
                 ResultSet rs = stmt.executeQuery();
 
-                Map<Integer, Shop> shops = new HashMap<>();
+                Map<Integer, ShopRow> shopDataList = new HashMap<>();
                 while (rs.next()) {
-                    Entry<Integer, Shop> shopEntry = loadShopMapFromResult(rs);
-                    shops.put(shopEntry.getKey(), shopEntry.getValue());
+                    ShopRow shopData = extractShopRow(rs);
+                    if (shopData != null) {
+                        shopDataList.put(shopData.id(), shopData);
+                    }
                 }
-                loadShopPlayers(shops);
-                return new ArrayList<>(shops.values());
+                loadShopPlayersData(shopDataList);
+
+                return runSync(() -> {
+                    List<Shop> shops = new ArrayList<>();
+                    for (ShopRow data : shopDataList.values()) {
+                        Shop shop = createShopFromRow(data);
+                        if (shop != null) {
+                            shops.add(shop);
+                        }
+                    }
+                    return shops;
+                });
             } catch (SQLException e) {
                 plugin.getLogger().severe("Failed to load player shops: " + e.getMessage());
                 return List.of();
@@ -152,12 +169,20 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                 stmt.setInt(5, (chunk.getZ() + 1) * 16);
 
                 ResultSet rs = stmt.executeQuery();
-                Map<Integer, Shop> shops = new HashMap<>();
+                Map<Integer, ShopRow> shopDataList = new HashMap<>();
                 while (rs.next()) {
-                    Entry<Integer, Shop> shopEntry = loadShopMapFromResult(rs);
-                    shops.put(shopEntry.getKey(), shopEntry.getValue());
+                    ShopRow shopData = extractShopRow(rs);
+                    if (shopData != null) {
+                        shopDataList.put(shopData.id(), shopData);
+                    }
                 }
-                loadShopPlayers(shops);
+                loadShopPlayersData(shopDataList);
+
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    for (ShopRow data : shopDataList.values()) {
+                        createShopFromRow(data);
+                    }
+                });
 
                 return null;
             } catch (SQLException e) {
@@ -207,9 +232,15 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                     return null;
                 }
 
-                Entry<Integer, Shop> shopEntry = loadShopMapFromResult(rs);
-                loadShopPlayers(shopEntry);
-                return shopEntry.getValue();
+                ShopRow shopData = extractShopRow(rs);
+                if (shopData != null) {
+                    Map<Integer, ShopRow> dataMap = new HashMap<>();
+                    dataMap.put(shopData.id(), shopData);
+                    loadShopPlayersData(dataMap);
+
+                    return runSync(() -> createShopFromRow(shopData));
+                }
+                return null;
             } catch (SQLException e) {
                 plugin.getLogger().severe("Failed to get shop: " + e.getMessage());
                 return null;
@@ -218,20 +249,25 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
     }
 
     @Override
-    public CompletableFuture<Boolean> updateShopBuyPrice(UUID ownerId, String shopName, double price) {
+    public CompletableFuture<Boolean> updateShopBuyPrice(UUID ownerId, String shopName, double buyPrice) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
             return CompletableFuture.completedFuture(true);
         }
 
-        String sql = "UPDATE shops SET price = ? WHERE owner_uuid = ? AND shop_name = ?";
-        return execute(sql, price, ownerId.toString(), shopName);
+        String sql = "UPDATE shops SET buy_price = ? WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, buyPrice, ownerId.toString(), shopName);
     }
 
     @Override
-    public CompletableFuture<Boolean> updateShopSellPrice(UUID ownerId, String shopName, double price) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopSellPrice'");
+    public CompletableFuture<Boolean> updateShopSellPrice(UUID ownerId, String shopName, double sellPrice) {
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(true);
+        }
+
+        String sql = "UPDATE shops SET sell_price = ? WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, sellPrice, ownerId.toString(), shopName);
     }
 
     @Override
@@ -265,6 +301,17 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
 
         String sql = "UPDATE shops SET sold_items = ?, money_earned = ? WHERE owner_uuid = ? AND shop_name = ?";
         return execute(sql, soldItems, moneyEarned, ownerId.toString(), shopName);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> updateShopBuyStats(UUID ownerId, String shopName, int boughtItems, double moneySpent) {
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(true);
+        }
+
+        String sql = "UPDATE shops SET bought_items = ?, money_spent = ? WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, boughtItems, moneySpent, ownerId.toString(), shopName);
     }
 
     @Override
@@ -332,8 +379,6 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
             if (!shop.getAddedPlayers().contains(toRemove)) {
                 return CompletableFuture.completedFuture(true);
             }
-            shop.removePlayer(toRemove);
-            plugin.getLogger().info("Player removed from shop in memory for owner: " + ownerId + ", shopName: " + shopName);
             return CompletableFuture.completedFuture(true);
         }
 
@@ -345,8 +390,6 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
     public CompletableFuture<Boolean> updateSoldItems(UUID ownerId, String shopName, int soldItems) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
-            shop.setSoldItems(shop.getSoldItems() + soldItems);
-            plugin.getLogger().info("Sold items updated in memory for owner: " + ownerId + ", shopName: " + shopName);
             return CompletableFuture.completedFuture(true);
         }
 
@@ -358,8 +401,6 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
     public CompletableFuture<Boolean> updateMoneyEarned(UUID ownerId, String shopName, double moneyEarned) {
         Shop shop = Shop.getShop(ownerId, shopName);
         if (shop != null) {
-            shop.setMoneyEarned(shop.getMoneyEarned() + moneyEarned);
-            plugin.getLogger().info("Money earned updated in memory for owner: " + ownerId + ", shopName: " + shopName);
             return CompletableFuture.completedFuture(true);
         }
 
@@ -381,38 +422,71 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                     boolean exists = rs.next();
                     String sql;
                     PreparedStatement stmt;
-                    String itemData = shop.getItem() != null ? plugin.bytesToString(shop.getItem().serializeAsBytes()) : null;
+
+                    byte[] itemData = shop.getItem() != null ? shop.getItem().serializeAsBytes() : null;
                     int index = 1;
+
                     if (exists) {
-                        sql = "UPDATE shops SET sell_price = ?, buy_price = ?, item = ?, world = ?, x = ?, y = ?, z = ?, created_at = ?, do_notify = ? " +
-                                "WHERE owner_uuid = ? AND shop_name = ?";
+                        sql = """
+                                UPDATE shops SET
+                                sell_price = ?,
+                                buy_price = ?,
+                                item = ?,
+                                world = ?, x = ?, y = ?, z = ?,
+                                created_at = ?,
+                                do_notify = ?,
+                                sold_items = ?,
+                                bought_items = ?,
+                                money_spent = ?,
+                                money_earned = ?,
+                                can_buy = ?,
+                                can_sell = ?
+                                WHERE owner_uuid = ?
+                                AND shop_name = ?
+                                        """;
                         stmt = connection.prepareStatement(sql);
                         stmt.setDouble(index++, shop.getSellPrice());
                         stmt.setDouble(index++, shop.getBuyPrice());
-                        stmt.setString(index++, itemData);
+                        stmt.setBytes(index++, itemData);
                         stmt.setString(index++, shop.getChestLocation().getWorld().getName());
                         stmt.setInt(index++, shop.getChestLocation().getBlockX());
                         stmt.setInt(index++, shop.getChestLocation().getBlockY());
                         stmt.setInt(index++, shop.getChestLocation().getBlockZ());
                         stmt.setString(index++, shop.getCreatedAt());
                         stmt.setBoolean(index++, shop.isNotify());
+                        stmt.setInt(index++, shop.getSoldItems());
+                        stmt.setInt(index++, shop.getBoughtItems());
+                        stmt.setDouble(index++, shop.getMoneySpent());
+                        stmt.setDouble(index++, shop.getMoneyEarned());
+                        stmt.setBoolean(index++, shop.acceptsCustomerSales());
+                        stmt.setBoolean(index++, shop.acceptsCustomerPurchases());
                         stmt.setString(index++, shop.getOwnerId().toString());
                         stmt.setString(index++, shop.getName());
+
                     } else {
-                        sql = "INSERT INTO shops (owner_uuid = ?, shop_name = ?, sell_price = ?, buy_price = ?, item, world, x, y, z, created_at, do_notify) " +
-                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        sql = """
+                                INSERT INTO shops
+                                (owner_uuid, shop_name, sell_price, buy_price, item, world, x, y, z, created_at, do_notify, sold_items, bought_items, money_spent, money_earned, can_buy, can_sell)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                        """;
                         stmt = connection.prepareStatement(sql);
                         stmt.setString(index++, shop.getOwnerId().toString());
                         stmt.setString(index++, shop.getName());
                         stmt.setDouble(index++, shop.getSellPrice());
                         stmt.setDouble(index++, shop.getBuyPrice());
-                        stmt.setString(index++, itemData);
+                        stmt.setBytes(index++, itemData);
                         stmt.setString(index++, shop.getChestLocation().getWorld().getName());
                         stmt.setInt(index++, shop.getChestLocation().getBlockX());
                         stmt.setInt(index++, shop.getChestLocation().getBlockY());
                         stmt.setInt(index++, shop.getChestLocation().getBlockZ());
                         stmt.setString(index++, shop.getCreatedAt());
                         stmt.setBoolean(index++, shop.isNotify());
+                        stmt.setInt(index++, shop.getSoldItems());
+                        stmt.setInt(index++, shop.getBoughtItems());
+                        stmt.setDouble(index++, shop.getMoneySpent());
+                        stmt.setDouble(index++, shop.getMoneyEarned());
+                        stmt.setBoolean(index++, shop.acceptsCustomerPurchases());
+                        stmt.setBoolean(index++, shop.acceptsCustomerSales());
                     }
 
                     int rowsAffected = stmt.executeUpdate();
@@ -458,8 +532,9 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                                 id INT AUTO_INCREMENT PRIMARY KEY,
                                 owner_uuid VARCHAR(36) NOT NULL,
                                 shop_name VARCHAR(255) NOT NULL,
-                                price DECIMAL(15,2) NOT NULL DEFAULT 0,
-                                item TEXT,
+                                sell_price DECIMAL(15,2) NOT NULL DEFAULT 0,
+                                buy_price DECIMAL(15,2) NOT NULL DEFAULT 0,
+                                item BLOB,
                                 world VARCHAR(100) NOT NULL,
                                 x INT NOT NULL,
                                 y INT NOT NULL,
@@ -467,7 +542,11 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                                 created_at VARCHAR(50) NOT NULL,
                                 do_notify BOOLEAN NOT NULL DEFAULT FALSE,
                                 sold_items INT NOT NULL DEFAULT 0,
+                                bought_items INT NOT NULL DEFAULT 0,
+                                money_spent DECIMAL(15,2) NOT NULL DEFAULT 0,
                                 money_earned DECIMAL(15,2) NOT NULL DEFAULT 0,
+                                can_buy BOOLEAN NOT NULL DEFAULT TRUE,
+                                can_sell BOOLEAN NOT NULL DEFAULT FALSE,
                                 UNIQUE KEY unique_shop (owner_uuid, shop_name),
                                 INDEX idx_owner (owner_uuid)
                         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -487,7 +566,7 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
         }
     }
 
-    private Entry<Integer, Shop> loadShopMapFromResult(ResultSet rs) throws SQLException {
+    private ShopRow extractShopRow(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         UUID ownerId = UUID.fromString(rs.getString("owner_uuid"));
         String shopName = rs.getString("shop_name");
@@ -495,48 +574,92 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
         if (existingShop != null) {
             return null;
         }
-        double sellPrice = rs.getDouble("price"); // TODO column rename
-        double buyPrice = rs.getDouble("price");
-        boolean canBuy = rs.getBoolean("can_buy");
-        boolean canSell = rs.getBoolean("can_sell");
-        String itemData = rs.getString("item");
-        ItemStack item = itemData != null ? ItemStack.deserializeBytes(plugin.stringToBytes(itemData)) : null;
-        Location shopLocation = new Location(Bukkit.getWorld(rs.getString("world")), rs.getDouble("x"), rs.getDouble("y"), rs.getDouble("z"));
-        String createdAt = rs.getString("created_at");
-        boolean notify = rs.getBoolean("do_notify");
 
-        Shop shop = new Shop(ownerId, shopName, sellPrice, buyPrice, item, shopLocation, createdAt, notify, canSell, canBuy, new ArrayList<>());
-        return new SimpleEntry<Integer, Shop>(id, shop);
+        return new ShopRow(
+                id,
+                ownerId,
+                shopName,
+                rs.getDouble("sell_price"),
+                rs.getDouble("buy_price"),
+                rs.getBytes("item"),
+                rs.getString("world"),
+                rs.getInt("x"),
+                rs.getInt("y"),
+                rs.getInt("z"),
+                rs.getString("created_at"),
+                rs.getBoolean("do_notify"),
+                rs.getInt("sold_items"),
+                rs.getInt("bought_items"),
+                rs.getDouble("money_spent"),
+                rs.getDouble("money_earned"),
+                rs.getBoolean("can_buy"),
+                rs.getBoolean("can_sell"),
+                new ArrayList<>());
     }
 
-    private void loadShopPlayers(Map<Integer, Shop> shops) throws SQLException {
-        if (shops.isEmpty())
+    private Shop createShopFromRow(ShopRow data) {
+        Shop existingShop = Shop.getShop(data.ownerId(), data.shopName());
+        if (existingShop != null) {
+            return existingShop;
+        }
+
+        ItemStack item = data.item() != null ? ItemStack.deserializeBytes(data.item()) : null;
+        Location shopLocation = new Location(
+                Bukkit.getWorld(data.world()),
+                data.x(),
+                data.y(),
+                data.z());
+
+        return new Shop(
+                data.ownerId(),
+                data.shopName(),
+                data.sellPrice(),
+                data.buyPrice(),
+                item,
+                shopLocation,
+                data.createdAt(),
+                data.doNotify(),
+                data.canSell(),
+                data.canBuy(),
+                data.playersWithAccess());
+    }
+
+    private void loadShopPlayersData(Map<Integer, ShopRow> shopDataMap) throws SQLException {
+        if (shopDataMap.isEmpty()) {
             return;
-        String sql = "SELECT player_uuid, shop_id FROM shop_players where shop_id IN (" + String.join(",", shops.keySet().stream().map(String::valueOf).toList()) + ")";
+        }
+        String sql = "SELECT player_uuid, shop_id FROM shop_players where shop_id IN (" + String.join(",", shopDataMap.keySet().stream().map(String::valueOf).toList()) + ")";
         try (Statement playerStmt = connection.createStatement()) {
             ResultSet playerRs = playerStmt.executeQuery(sql);
             while (playerRs.next()) {
                 int shopId = playerRs.getInt("shop_id");
                 UUID playerUuid = UUID.fromString(playerRs.getString("player_uuid"));
-                Shop shop = shops.get(shopId);
-                if (shop != null) {
-                    shop.addPlayer(playerUuid);
+                ShopRow shopData = shopDataMap.get(shopId);
+                if (shopData != null) {
+                    shopData.playersWithAccess().add(playerUuid);
                 }
             }
         }
     }
 
-    private void loadShopPlayers(Entry<Integer, Shop> shop) throws SQLException {
-        Map<Integer, Shop> shops = new HashMap<>();
-        shops.put(shop.getKey(), shop.getValue());
-        loadShopPlayers(shops);
+    private <T> T runSync(Callable<T> task) {
+        CompletableFuture<T> f = new CompletableFuture<>();
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            try {
+                f.complete(task.call());
+            } catch (Exception e) {
+                f.completeExceptionally(e);
+            }
+        });
+        return f.join();
     }
 
     @Override
     public void startSaveScheduler() {
         long interval = plugin.getConf().getInt("shops.save-interval", 60);
-        if (interval <= 0)
+        if (interval <= 0) {
             interval = 60;
+        }
         plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (Shop shop : Shop.getShops()) {
                 if (shop.isSaved()) {
@@ -580,57 +703,141 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
     }
 
     @Override
-    public CompletableFuture<Boolean> updateShopBuyStats(UUID ownerId, String shopName, int boughtItems, double moneyEarned) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateShopBuyStats'");
-    }
-
-    @Override
     public CompletableFuture<Boolean> updateBoughtItems(UUID ownerId, String shopName, int boughtItems) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateBoughtItems'");
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(true);
+        }
+
+        String sql = "UPDATE shops SET bought_items = bought_items + ? WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, boughtItems, ownerId.toString(), shopName);
     }
 
     @Override
     public CompletableFuture<Boolean> updateMoneySpent(UUID ownerId, String shopName, double moneySpent) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateMoneySpent'");
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(true);
+        }
+
+        String sql = "UPDATE shops SET money_spent = money_spent + ? WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, moneySpent, ownerId.toString(), shopName);
     }
 
     @Override
     public CompletableFuture<Integer> getBoughtItems(UUID ownerId, String shopName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getBoughtItems'");
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(shop.getBoughtItems());
+        }
+        String sql = "SELECT bought_items FROM shops WHERE owner_uuid = ? AND shop_name = ?";
+        return FutureUtils.runTaskAsync(plugin, () -> {
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, ownerId.toString());
+                stmt.setString(2, shopName);
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    return rs.getInt("bought_items");
+                }
+                return 0;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to get bought items: " + e.getMessage());
+                return 0;
+            }
+        });
     }
 
     @Override
     public CompletableFuture<Integer> getSoldItems(UUID ownerId, String shopName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getSoldItems'");
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(shop.getSoldItems());
+        }
+        String sql = "SELECT sold_items FROM shops WHERE owner_uuid = ? AND shop_name = ?";
+        return FutureUtils.runTaskAsync(plugin, () -> {
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, ownerId.toString());
+                stmt.setString(2, shopName);
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    return rs.getInt("sold_items");
+                }
+                return 0;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to get sold items: " + e.getMessage());
+                return 0;
+            }
+        });
     }
 
     @Override
     public CompletableFuture<Double> getMoneySpent(UUID ownerId, String shopName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMoneySpent'");
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(shop.getMoneySpent());
+        }
+        String sql = "SELECT money_spent FROM shops WHERE owner_uuid = ? AND shop_name = ?";
+        return FutureUtils.runTaskAsync(plugin, () -> {
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, ownerId.toString());
+                stmt.setString(2, shopName);
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    return rs.getDouble("money_spent");
+                }
+                return 0.0;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to get money spent: " + e.getMessage());
+                return 0.0;
+            }
+        });
     }
 
     @Override
     public CompletableFuture<Double> getMoneyEarned(UUID ownerId, String shopName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMoneyEarned'");
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(shop.getMoneyEarned());
+        }
+        String sql = "SELECT money_earned FROM shops WHERE owner_uuid = ? AND shop_name = ?";
+        return FutureUtils.runTaskAsync(plugin, () -> {
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, ownerId.toString());
+                stmt.setString(2, shopName);
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    return rs.getDouble("money_earned");
+                }
+                return 0.0;
+            } catch (SQLException e) {
+                plugin.getLogger().severe("Failed to get money earned: " + e.getMessage());
+                return 0.0;
+            }
+        });
     }
 
     @Override
     public CompletableFuture<Boolean> setCanBuyFromPlayers(UUID ownerId, String shopName, boolean canBuy) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setCanBuyFromPlayers'");
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(true);
+        }
+        String sql = "UPDATE shops SET can_buy = ? WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, canBuy, ownerId.toString(), shopName);
     }
 
     @Override
     public CompletableFuture<Boolean> setCanSellToPlayers(UUID ownerId, String shopName, boolean canSell) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setCanSellToPlayers'");
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(true);
+        }
+        String sql = "UPDATE shops SET can_sell = ? WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, canSell, ownerId.toString(), shopName);
     }
 
 }
