@@ -41,6 +41,7 @@ public class FutureUtils {
                 completeSync(plugin, future, result);
             } catch (Exception e) {
                 completeSyncExceptionally(plugin, future, e);
+                Bukkit.getLogger().severe("An error occurred while executing an asynchronous task: " + e.getMessage());
             }
         });
         return future;
