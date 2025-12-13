@@ -23,6 +23,9 @@ public class HopperListener implements Listener {
         if (!config.getBoolean("shops.hopper-protection")) {
             return;
         }
+        if (event.getSource() == null || event.getSource().getLocation() == null) {
+            return;
+        }
         if (ShopUtils.isDisabledWorld(event.getSource().getLocation().getWorld().getName())) {
             return;
         }
