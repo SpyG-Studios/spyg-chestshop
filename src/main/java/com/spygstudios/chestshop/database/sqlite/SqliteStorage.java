@@ -19,6 +19,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.database.DatabaseHandler;
@@ -30,6 +31,7 @@ import com.spygstudios.chestshop.utils.FutureUtils;
 public class SqliteStorage extends DatabaseHandler implements SqlDataManager {
 
     private final String databasePath;
+    private BukkitTask saveTask;
 
     public SqliteStorage(ChestShop plugin) {
         super(plugin, DatabaseType.SQLITE);
@@ -656,7 +658,8 @@ public class SqliteStorage extends DatabaseHandler implements SqlDataManager {
         if (interval <= 0) {
             interval = 60;
         }
-        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+
+        saveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (Shop shop : Shop.getShops()) {
                 if (shop.isSaved()) {
                     continue;
@@ -671,7 +674,7 @@ public class SqliteStorage extends DatabaseHandler implements SqlDataManager {
                     plugin.getLogger().severe("Error: " + e.getMessage());
                 }
             }
-        }, 0, 20L * interval);
+        }, 0L, 20L * interval);
     }
 
     @Override

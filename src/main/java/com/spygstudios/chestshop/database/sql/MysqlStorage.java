@@ -18,6 +18,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.database.DatabaseHandler;
@@ -33,6 +34,8 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
     private final String database;
     private final String username;
     private final String password;
+
+    private BukkitTask saveTask;
 
     public MysqlStorage(ChestShop plugin, String host, int port, String database, String username, String password) {
         super(plugin, DatabaseType.MYSQL);
@@ -521,6 +524,9 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                 plugin.getLogger().severe("Error: " + e.getMessage());
             }
         }
+        if (saveTask != null) {
+            saveTask.cancel();
+        }
         super.close();
     }
 
@@ -660,7 +666,8 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
         if (interval <= 0) {
             interval = 60;
         }
-        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+
+        this.saveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (Shop shop : Shop.getShops()) {
                 if (shop.isSaved()) {
                     continue;
@@ -675,7 +682,7 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                     plugin.getLogger().severe("Error: " + e.getMessage());
                 }
             }
-        }, 0, 20L * interval);
+        }, 0L, 20L * interval);
     }
 
     @Override

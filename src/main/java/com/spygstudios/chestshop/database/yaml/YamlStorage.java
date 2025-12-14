@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.enums.DatabaseType;
@@ -20,6 +21,7 @@ public class YamlStorage implements DataManager {
     @Getter
     private final DatabaseType databaseType;
     private final ChestShop plugin;
+    private BukkitTask saveTask;
 
     public YamlStorage(ChestShop plugin) {
         this.databaseType = DatabaseType.YAML;
@@ -196,6 +198,9 @@ public class YamlStorage implements DataManager {
 
     public void close() {
         YamlShopFile.saveShopFiles();
+        if (saveTask != null) {
+            saveTask.cancel();
+        }
     }
 
     @Override
@@ -211,10 +216,15 @@ public class YamlStorage implements DataManager {
 
     @Override
     public void startSaveScheduler() {
+        if (!plugin.isEnabled()) {
+            return;
+        }
         long interval = plugin.getConf().getInt("shops.save-interval", 60);
-        if (interval <= 0)
+        if (interval <= 0) {
             interval = 60;
-        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, YamlShopFile::saveShopFiles, 0, 20L * interval);
+        }
+
+        this.saveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, YamlShopFile::saveShopFiles, 0L, 20L * interval);
     }
 
     @Override
