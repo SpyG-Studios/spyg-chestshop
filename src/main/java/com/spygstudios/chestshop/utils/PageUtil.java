@@ -69,10 +69,6 @@ public class PageUtil {
                     ChestShop.getInstance().getLogger().warning("Invalid slot in " + configPath + " fill-items: " + s);
                     continue;
                 }
-                if (inventory.getItem(slot) != null) {
-                    ChestShop.getInstance().getLogger().warning("Slot " + slot + " is already occupied in " + configPath + " fill-items.");
-                    continue;
-                }
                 ItemMeta glassMeta = fillerItem.getItemMeta();
                 glassMeta.displayName(TranslateColor.translate("&7"));
                 fillerItem.setItemMeta(glassMeta);
