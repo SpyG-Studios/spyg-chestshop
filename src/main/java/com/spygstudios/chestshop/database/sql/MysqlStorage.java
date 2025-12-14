@@ -44,7 +44,6 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
         this.database = database;
         this.username = username;
         this.password = password;
-        initialize();
     }
 
     @Override

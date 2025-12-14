@@ -26,7 +26,6 @@ public class YamlStorage implements DataManager {
     public YamlStorage(ChestShop plugin) {
         this.databaseType = DatabaseType.YAML;
         this.plugin = plugin;
-        this.initialize().join();
     }
 
     @Override

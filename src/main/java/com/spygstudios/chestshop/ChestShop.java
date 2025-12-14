@@ -26,13 +26,11 @@ import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.config.MessageConfig;
-import com.spygstudios.chestshop.database.sql.MysqlStorage;
-import com.spygstudios.chestshop.database.sqlite.SqliteStorage;
 import com.spygstudios.chestshop.database.yaml.YamlStorage;
 import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
-import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
+import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.listeners.BreakListener;
 import com.spygstudios.chestshop.listeners.BuildListener;
 import com.spygstudios.chestshop.listeners.ChatListener;
@@ -42,8 +40,8 @@ import com.spygstudios.chestshop.listeners.ExplosionListener;
 import com.spygstudios.chestshop.listeners.HopperListener;
 import com.spygstudios.chestshop.listeners.InteractListener;
 import com.spygstudios.chestshop.listeners.PlayerJoinListener;
-import com.spygstudios.chestshop.listeners.gui.DashboardGuiHandler;
 import com.spygstudios.chestshop.listeners.PlayerQuitListener;
+import com.spygstudios.chestshop.listeners.gui.DashboardGuiHandler;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
 import com.spygstudios.chestshop.listeners.gui.PlayerGuiHandler;
 import com.spygstudios.chestshop.listeners.gui.ShopGuiHandler;
@@ -65,6 +63,7 @@ public class ChestShop extends JavaPlugin {
     private CommandHandler commandHandler;
     @Setter
     private MessageConfig messageConfig;
+    @Setter
     private DataManager dataManager;
     private boolean latestVersion = true;
     private String currentVersion;
@@ -123,36 +122,53 @@ public class ChestShop extends JavaPlugin {
 
         String storageType = conf.getString("storage-type");
         getLogger().info("Using " + storageType + " storage type.");
-        switch (storageType) {
-            case "yaml":
-                dataManager = new YamlStorage(this);
-                break;
-            case "mysql":
-                String host = conf.getString("mysql.host");
-                int port = conf.getInt("mysql.port");
-                String database = conf.getString("mysql.database");
-                String username = conf.getString("mysql.username");
-                String password = conf.getString("mysql.password");
-                if (host == null || database == null || username == null || password == null) {
-                    getLogger().severe("MySQL configuration is incomplete! Disabling plugin...");
-                    getServer().getPluginManager().disablePlugin(this);
-                    return;
-                }
-                dataManager = new MysqlStorage(this, host, port, database, username, password);
-                break;
-            case "sqlite":
-                dataManager = new SqliteStorage(this);
-                break;
-        }
+        this.dataManager = createDataManager(storageType);
         if (dataManager == null) {
             getLogger().severe("Invalid storage type in config! Disabling plugin...");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        dataManager.startSaveScheduler();
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            dataManager.initialize().thenAccept(success -> {
+                if (!success) {
+                    getLogger().severe("Failed to initialize data manager! Disabling plugin...");
+                    getServer().getPluginManager().disablePlugin(this);
+                    return;
+                }
+            }).join();
+            dataManager.startSaveScheduler();
+        });
 
         String info = String.format("%s v. %s plugin has been enabled!", getName(), getPluginMeta().getVersion());
         getLogger().info(info);
+    }
+
+    public DataManager createDataManager(String type) {
+        DataManager dataManager = new YamlStorage(this);
+        // switch (type) {
+        // case "yaml":
+        // dataManager = new YamlStorage(this);
+        // break;
+        // case "mysql":
+        // String host = conf.getString("mysql.host");
+        // int port = conf.getInt("mysql.port");
+        // String database = conf.getString("mysql.database");
+        // String username = conf.getString("mysql.username");
+        // String password = conf.getString("mysql.password");
+        // if (host == null || database == null || username == null || password == null)
+        // {
+        // getLogger().severe("MySQL configuration is incomplete! Disabling plugin...");
+        // getServer().getPluginManager().disablePlugin(this);
+        // return null;
+        // }
+        // dataManager = new MysqlStorage(this, host, port, database, username,
+        // password);
+        // break;
+        // case "sqlite":
+        // dataManager = new SqliteStorage(this);
+        // break;
+        // }
+        return dataManager;
     }
 
     @Override

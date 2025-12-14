@@ -35,12 +35,7 @@ public class SqliteStorage extends DatabaseHandler implements SqlDataManager {
 
     public SqliteStorage(ChestShop plugin) {
         super(plugin, DatabaseType.SQLITE);
-        File shopsDir = new File(plugin.getDataFolder(), "shops");
-        if (!shopsDir.exists()) {
-            shopsDir.mkdirs();
-        }
-        this.databasePath = new File(shopsDir, "shops.db").getAbsolutePath();
-        initialize();
+        this.databasePath = new File(plugin.getDataFolder(), "shops.db").getAbsolutePath();
     }
 
     @Override
