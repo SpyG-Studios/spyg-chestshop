@@ -17,7 +17,7 @@ import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.execute.Execute;
 import dev.rollczi.litecommands.annotations.permission.Permission;
 
-@Command(name = "spygchestshop add", aliases = { "spcs add", "chestshop add", "scs add" })
+@Command(name = "spygchestshop addplayer", aliases = { "spcs addplayer", "chestshop addplayer", "scs addplayer" })
 public class AddPlayer {
     Config config;
 
