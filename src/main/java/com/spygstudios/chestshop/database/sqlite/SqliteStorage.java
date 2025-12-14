@@ -834,4 +834,38 @@ public class SqliteStorage extends DatabaseHandler implements SqlDataManager {
         return execute(sql, canSell, ownerId.toString(), shopName);
     }
 
+    @Override
+    public CompletableFuture<List<Shop>> getAllShops() {
+        return FutureUtils.runTaskAsync(plugin, () -> {
+            List<Shop> allShops = new ArrayList<>();
+
+            try {
+                PreparedStatement stmt = connection.prepareStatement("SELECT DISTINCT owner_uuid FROM shops");
+                ResultSet rs = stmt.executeQuery();
+
+                List<UUID> ownerIds = new ArrayList<>();
+                while (rs.next()) {
+                    try {
+                        ownerIds.add(UUID.fromString(rs.getString("owner_uuid")));
+                    } catch (IllegalArgumentException e) {
+                        plugin.getLogger().warning("Invalid UUID in database: " + rs.getString("owner_uuid"));
+                    }
+                }
+                rs.close();
+                stmt.close();
+
+                for (UUID ownerId : ownerIds) {
+                    List<Shop> playerShops = loadPlayerShops(ownerId).join();
+                    allShops.addAll(playerShops);
+                }
+
+            } catch (Exception e) {
+                plugin.getLogger().severe("Error during loading shops from SQL: " + e.getMessage());
+                e.printStackTrace();
+            }
+            System.out.println("Loaded total of " + allShops.size() + " shops from SQLite database.");
+            return allShops;
+        });
+    }
+
 }

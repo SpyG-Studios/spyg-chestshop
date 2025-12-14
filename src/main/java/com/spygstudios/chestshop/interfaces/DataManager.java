@@ -62,6 +62,8 @@ public interface DataManager {
 
     CompletableFuture<Boolean> setCanSellToPlayers(UUID ownerId, String shopName, boolean canSell);
 
+    CompletableFuture<List<Shop>> getAllShops();
+
     void startSaveScheduler();
 
     void close();

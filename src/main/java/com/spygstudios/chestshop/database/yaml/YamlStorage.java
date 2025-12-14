@@ -280,4 +280,10 @@ public class YamlStorage implements DataManager {
         return CompletableFuture.completedFuture(true);
     }
 
+    @Override
+    public CompletableFuture<List<Shop>> getAllShops() {
+        List<Shop> allShops = Shop.getShops();
+        return CompletableFuture.completedFuture(allShops);
+    }
+
 }
