@@ -159,11 +159,13 @@ public class YamlShopFile extends YamlManager {
             return;
         }
         int loadedShops = 0;
-        for (File file : shopsFolder.listFiles()) {
-            processShopFile(plugin, file);
-            loadedShops++;
-        }
-        plugin.getLogger().info("Shops loaded: " + loadedShops);
+        File[] files = shopsFolder.listFiles();
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            for (File file : files) {
+                processShopFile(plugin, file);
+            }
+            plugin.getLogger().info("Shops loaded: " + loadedShops);
+        });
     }
 
     private static void processShopFile(ChestShop plugin, File file) {
