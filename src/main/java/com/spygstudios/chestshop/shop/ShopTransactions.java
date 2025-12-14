@@ -148,7 +148,7 @@ public class ShopTransactions {
 
             if (i == null) {
                 remainingAmount -= maxStackSize;
-            } else if (i.isSimilar(item) && i.getAmount() < maxStackSize) {
+            } else if (ShopUtils.isSimilar(i, item) && i.getAmount() < maxStackSize) {
                 remainingAmount -= (maxStackSize - i.getAmount());
             }
         }

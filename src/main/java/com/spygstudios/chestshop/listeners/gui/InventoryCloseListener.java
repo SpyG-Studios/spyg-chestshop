@@ -16,6 +16,7 @@ import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.chestshop.shop.ShopUtils;
 import com.spygstudios.spyglib.datacontainer.ItemContainer;
 
 public class InventoryCloseListener implements Listener {
@@ -56,7 +57,7 @@ public class InventoryCloseListener implements Listener {
     private void itemAdding(InventoryCloseEvent event, DashboardHolder holdder) {
         ItemStack item = event.getInventory().getItem(13);
         Shop shop = holdder.getShop();
-        if (item == null || item.isSimilar(shop.getItem())) {
+        if (item == null || ShopUtils.isSimilar(item, shop.getItem())) {
             return;
         }
 
