@@ -17,13 +17,13 @@ public enum Message {
     COMMANDS("commands", "%prefix% &7Commands:"),
     NEW_VERSION("new-version", "%prefix% &aA new version of SpygChestShop is available! Current version: &#e80000%old-version% &aNew version: &#00bf0d%new-version% &7&o(Click to download)"),
 
-    ENTER_AMOUNT_CANCELLED("enter-amount-cancelled", "%prefix% &cAmount entering cancelled!"),
-    ENTER_AMOUNT("enter-amount-prompt", "%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel)"),
-    ENTER_AMOUNT_SUCCESS("enter-amount-success", "%prefix% &aAmount set successfully!"),
-    ENTER_SELL_PRICE("enter-sell-price-prompt", "%prefix% &aEnter the sell price &7&o(Enter a &f%cancel%&7&o to cancel)"),
-    ENTER_BUY_PRICE("enter-buy-price-prompt", "%prefix% &aEnter the buy price &7&o(Enter a &f%cancel%&7&o to cancel)"),
-    ENTER_SELL_PRICE_SUCCESS("enter-sell-price-success", "%prefix% &aSell price set successfully!"),
-    ENTER_BUY_PRICE_SUCCESS("enter-buy-price-success", "%prefix% &aBuy price set successfully!"),
+    ENTER_AMOUNT_CANCELLED("enter-amount.cancelled", "%prefix% &cAmount entering cancelled!"),
+    ENTER_AMOUNT("enter.amount.prompt", "%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel)"),
+    ENTER_AMOUNT_SUCCESS("enter.amount.success", "%prefix% &aAmount set successfully!"),
+    ENTER_SELL_PRICE("enter.sell-price.prompt", "%prefix% &aEnter the sell price &7&o(Enter a &f%cancel%&7&o to cancel)"),
+    ENTER_BUY_PRICE("enter.buy-price.prompt", "%prefix% &aEnter the buy price &7&o(Enter a &f%cancel%&7&o to cancel)"),
+    ENTER_SELL_PRICE_SUCCESS("enter.sell-price.success", "%prefix% &aSell price set successfully!"),
+    ENTER_BUY_PRICE_SUCCESS("enter.buy-price.success", "%prefix% &aBuy price set successfully!"),
 
     INVALID_NUMBER("invalid-number", "%prefix% &cInvalid number! (&e%entered%&c)"),
 
@@ -34,8 +34,8 @@ public enum Message {
 
     CONFIG_RELOADED("config-reloaded", "%prefix% &aConfig reloaded successfully!"),
     NO_PERMISSION("no-permission", "%prefix% &cYou don't have permission to do that!"),
-    NOT_ENOUGH_MONEY("not-enough-money", "%prefix% &cYou don't have enough money! ($%price%)"),
-    NOT_ENOUGH_ITEMS("not-enough-items", "%prefix% &cYou don't have enough &f%item% &c(&e%amount%&c required)!"),
+    NOT_ENOUGH_MONEY("not-enough.money", "%prefix% &cYou don't have enough money! ($%price%)"),
+    NOT_ENOUGH_ITEMS("not-enough.items", "%prefix% &cYou don't have enough &f%item% &c(&e%amount%&c required)!"),
     PLAYER_ONLY("player.only-players", "&cOnly players can use this command!"),
     PLAYER_NOT_FOUND("player.not-found", "%prefix% &cPlayer not found!"),
     PLAYER_ALREADY_ADDED("player.already-added", "%prefix% &cPlayer &f%player-name% &cis already added to the shop!"),
@@ -91,7 +91,23 @@ public enum Message {
     ADMIN_CUSTOMER_MODE("admin.customer-mode.message", "%prefix% &aCustomer mode %state%!"),
     ADMIN_CUSTOMER_MODE_OTHER("admin.customer-mode.message-other", "%prefix% &aCustomer mode %state% for &f%player-name%&a!"),
     ADMIN_CUSTOMER_MODE_STATE_DISABLED("admin.customer-mode.disabled", "&cdisabled"),
-    ADMIN_CUSTOMER_MODE_STATE_ENABLED("admin.customer-mode.enabled", "&2enabled");
+    ADMIN_CUSTOMER_MODE_STATE_ENABLED("admin.customer-mode.enabled", "&2enabled"),
+
+    MIGRATE_SAME_TYPE("migrate.same-type", "%prefix% &cThe current storage type is already %storage-type%!"),
+    MIGRATE_INVALID_TYPE("migrate.invalid-type", "%prefix% &cInvalid storage type! Available: yaml, sqlite, mysql"),
+    MIGRATE_IN_PROGRESS("migrate.in-progress", "%prefix% &eMigration in progress %old-type% -> %new-type%..."),
+    MIGRATE_COLLECTING("migrate.collecting", "%prefix% &7Collected %count% shops..."),
+    MIGRATE_ERROR_NEW_STORAGE("migrate.error-new-storage", "%prefix% &cError occurred while creating the new storage!"),
+    MIGRATE_ERROR_INIT("migrate.error-init", "%prefix% &cError occurred while initializing the new storage!"),
+    MIGRATE_SAVING("migrate.saving", "%prefix% &7Saving shops to the new storage..."),
+    MIGRATE_SAVED("migrate.saved", "%prefix% &aSaved: &f%count% &ashops"),
+    MIGRATE_FAILED("migrate.failed", "%prefix% &cFailed: &f%count% &cshops"),
+    MIGRATE_OLD_CLOSED("migrate.old-closed", "%prefix% &7Old storage closed (%storage-type%)"),
+    MIGRATE_COMPLETE("migrate.complete", "%prefix% &aMigration successfully completed!"),
+    MIGRATE_NEW_STORAGE("migrate.new-storage", "%prefix% &aNew storage type: &f%storage-type%"),
+    MIGRATE_CRITICAL_ERROR("migrate.critical-error", "%prefix% &cCritical error occurred during migration!"),
+    MIGRATE_MYSQL_CONFIG_INCOMPLETE("migrate.mysql-config-incomplete", "%prefix% &cMySQL configuration is incomplete!"),
+    MIGRATE_ERROR_LOADING("migrate.error-loading", "%prefix% &cError occurred while loading shops!");
 
     private String node;
     private String defaultMessage;

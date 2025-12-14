@@ -1,0 +1,106 @@
+prefix: '&8[&#ffbc1fChest&#ff711fShop&8] &7»&f'
+commands: '%prefix% &7Commands:'
+new-version: '%prefix% &aA new version of SpygChestShop is available! Current version: &#e80000%old-version% &aNew version: &#00bf0d%new-version% &7&o(Click to download)'
+enter-amount:
+  cancelled: '%prefix% &cAmount entering cancelled!'
+  prompt: '%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel)'
+  success: '%prefix% &aAmount set successfully!'
+enter-sell-price:
+  prompt: '%prefix% &aEnter the sell price &7&o(Enter a &f%cancel%&7&o to cancel)'
+  success: '%prefix% &aSell price set successfully!'
+enter-buy-price:
+  prompt: '%prefix% &aEnter the buy price &7&o(Enter a &f%cancel%&7&o to cancel)'
+  success: '%prefix% &aBuy price set successfully!'
+invalid-number: '%prefix% &cInvalid number! (&e%entered%&c)'
+cant-add-yourself: '%prefix% &cYou can''t add yourself to the shop!'
+cant-remove-yourself: '%prefix% &cYou can''t remove yourself from the shop!'
+cant-create-shop-here: '%prefix% &cYou can''t create a shop here!'
+usage: '%prefix% &7%usage%'
+config-reloaded: '%prefix% &aConfig reloaded successfully!'
+no-permission: '%prefix% &cYou don''t have permission to do that!'
+not-enough-money: '%prefix% &cYou don''t have enough money! ($%price%)'
+not-enough-items: '%prefix% &cYou don''t have enough &f%item% &c(&e%amount%&c required)!'
+player:
+  only-players: '&cOnly players can use this command!'
+  not-found: '%prefix% &cPlayer not found!'
+  already-added: '%prefix% &cPlayer &f%player-name% &cis already added to the shop!'
+  not-added: '%prefix% &cPlayer &f%player-name% &cis not added to the shop!'
+  added: '%prefix% &aPlayer &f%player-name% &aadded to the shop!'
+  removed: '%prefix% &aPlayer &f%player-name% &aremoved from the shop!'
+  not-played-before: '%prefix% &cPlayer &f%player-name% &chas never played before on this server!'
+shop:
+  already-exists: '%prefix% &cShop with name &f%shop-name% &calready exists!'
+  bought: '%prefix% &aYou bought &7x%items-bought% &f%item% &afor &f$%price%&a! &7(&8%items-left%&7)'
+  sold-to: '%prefix% &aYou sold &7x%items-sold% &f%item% &afor &f$%price%&a!'
+  bought-from: '%prefix% &aYou bought &7x%items-bought% &f%item% &afor &f$%price%&a from &f%player-name%&a!'
+  chest-already-shop: '%prefix% &cThis chest is already a shop!'
+  chest-full: '%prefix% &cThe shop chest is full!'
+  chest-full-owner: '%prefix% &c%player-name% &ctried to sell &7x%amount% &f%item% &cbut %shop-name%''s chest is full!'
+  created:
+    basic: '%prefix% &aShop &f%shop-name% &acreated!'
+    with-price: '%prefix% &aShop &f%shop-name% &acreated for &f$%price%&a!'
+  disabled-world: '%prefix% &cShops are disabled in this world!'
+  invalid-page: '%prefix% &cInvalid page! &7(&8%page%&7)'
+  limit-reached: '%prefix% &cYou have reached the shop limit! (&e%shop-limit%&c)'
+  player-limit-reached: '%prefix% &cYou have reached the player limit! (&e%max-players%&c)'
+  list:
+    header: '%prefix% &aYour shops:'
+    shops: '&7- &f%shop-name%'
+    shops-hover: |-
+      &6&l%item%&r
+       &8- &7price: &6$&a%sell-price%&e/&6$&c%buy-price%
+       &8- &7items left: &e%items-left%
+       &8- &7location: &e%location%
+       &8- &7created at: &e%created%
+    current-page: '&7[&e&l%page%&r&7]'
+    next: ' &7[&eNext&7]'
+    back: '&7[&cBack&7]'
+    page: '&7[&e%page%&7]'
+  blacklisted-name: '%prefix% &cThis name is blacklisted!'
+  name-length: '%prefix% &cShop name must be between &f%min-length% &cand &f%max-length% &ccharacters long!'
+  no-chest: '%prefix% &cYou need to look at a chest to create a shop!'
+  empty: '%prefix% &cThe shop is empty!'
+  inventory-full: '%prefix% &cYour inventory is full!'
+  exploded: '%prefix% &cYour %shop-name% shop exploded! &7&o(&f%shop-location%&7)'
+  no-shops: '%prefix% &cYou don''t have any shops!'
+  not-found: '%prefix% &cShop not found!'
+  not-owner: '%prefix% &cYou are not the owner of this shop!'
+  owner-no-money: '%prefix% &cThe shop owner doesn''t have enough money to buy your items!'
+  owner-no-money-owner: '%prefix% &c%player-name% &ctried to sell &f%item% &cfor &f$%price% &cbut you don''t have enough money!'
+  removed: '%prefix% &cShop &f%shop-name% &cremoved!'
+  setup-needed: '%prefix% &cThis shop is not set up properly!'
+  sold: '%prefix% &aYou sold &7x%items-bought% &f%item% &afor &f$%price%&a, to &f%player-name%&a! &7(&8%items-left%&7)'
+  renamed: '%prefix% &aShop &f%old-name% &arenamed to &f%new-name%!'
+admin:
+  shop:
+    list:
+      header: '%prefix% &e%player-name%&a''s shops:'
+      shops: '&7- &f%shop-name%'
+      shops-hover: |-
+        &6&l%item%&r
+         &8- &7price: &6$&a%sell-price%&e/&6$&c%buy-price%
+         &8- &7items left: &e%items-left%
+         &8- &7location: &e%location%
+         &8- &7created at: &e%created%
+  no-shops: '%prefix% &cPlayer &f%player-name% &chas no shops!'
+  customer-mode:
+    message: '%prefix% &aCustomer mode %state%!'
+    message-other: '%prefix% &aCustomer mode %state% for &f%player-name%&a!'
+    disabled: '&cdisabled'
+    enabled: '&2enabled'
+migrate:
+  same-type: '%prefix% &cThe current storage type is already %storage-type%!'
+  invalid-type: '%prefix% &cInvalid storage type! Available: yaml, sqlite, mysql'
+  in-progress: '%prefix% &eMigration in progress %old-type% -> %new-type%...'
+  collecting: '%prefix% &7Collected %count% shops...'
+  error-new-storage: '%prefix% &cError occurred while creating the new storage!'
+  error-init: '%prefix% &cError occurred while initializing the new storage!'
+  saving: '%prefix% &7Saving shops to the new storage...'
+  saved: '%prefix% &aSaved: &f%count% &ashops'
+  failed: '%prefix% &cFailed: &f%count% &cshops'
+  old-closed: '%prefix% &7Old storage closed (%storage-type%)'
+  complete: '%prefix% &aMigration successfully completed!'
+  new-storage: '%prefix% &aNew storage type: &f%storage-type%'
+  critical-error: '%prefix% &cCritical error occurred during migration!'
+  mysql-config-incomplete: '%prefix% &cMySQL configuration is incomplete!'
+  error-loading: '%prefix% &cError occurred while loading shops!'

@@ -1,10 +1,16 @@
-prefix: '&8[&#ffbc1fChest&#ff711fShop&8] &7»&f'
+﻿prefix: '&8[&#ffbc1fChest&#ff711fShop&8] &7»&f'
 commands: '%prefix% &7Parancsok:'
-new-version: '%prefix% &aElérhető a SpygChestShop egy új verziója! Jelenlegi verzió:  
-  &#e80000%old-version% &aÚj verzió: &#00bf0d%new-version% &7&o(Kattints a letöltéshez)'
-enter-amount-cancelled: '%prefix% &cÖsszeg beírása megszakítva!'
-enter-amount-prompt: '%prefix% &aÍrd be az értéket &7&o(A megszakításhoz írdbe: &f%cancel%&7&o)'
-enter-amount-success: '%prefix% &aÖsszeg sikeresen beállítva!'
+new-version: '%prefix% &aElérhető a SpygChestShop egy új verziója! Jelenlegi verzió: &#e80000%old-version% &aÚj verzió: &#00bf0d%new-version% &7&o(Kattints a letöltéshez)'
+enter-amount:
+  cancelled: '%prefix% &cÖsszeg beírása megszakítva!'
+  prompt: '%prefix% &aÍrd be az értéket &7&o(A megszakításhoz írd be: &f%cancel%&7&o)'
+  success: '%prefix% &aÖsszeg sikeresen beállítva!'
+enter-sell-price:
+  prompt: '%prefix% &aÍrd be az eladási árat &7&o(A megszakításhoz írd be: &f%cancel%&7&o)'
+  success: '%prefix% &aEladási ár sikeresen beállítva!'
+enter-buy-price:
+  prompt: '%prefix% &aÍrd be a vásárlási árat &7&o(A megszakításhoz írd be: &f%cancel%&7&o)'
+  success: '%prefix% &aVásárlási ár sikeresen beállítva!'
 invalid-number: '%prefix% &cÉrvénytelen szám! (&e%entered%&c)'
 cant-add-yourself: '%prefix% &cNem adhatod hozzá saját magad a bolthoz!'
 cant-remove-yourself: '%prefix% &cNem törölheted magad a boltból!'
@@ -16,30 +22,33 @@ not-enough-money: '%prefix% &cNincs elég pénzed! ($%price%)'
 not-enough-items: '%prefix% &cNincs elég &f%item% &c(&e%amount%&c szükséges)!'
 player:
   only-players: '%prefix% &cCsak játékosok használhatják ezt a parancsot!'
+  not-found: '%prefix% &cJátékos nem található!'
   already-added: '%prefix% &f%player-name% &cmár hozzá lett adva a boltodhoz!'
+  not-added: '%prefix% &f%player-name% &cjátékos nincs hozzáadva ehhez a bolthoz!'
   added: '%prefix% &aSikeresen hozzáadtad &f%player-name% &aa boltodhoz!'
   removed: '%prefix% &aSikeresen eltávolítottad &f%player-name% &aa boltodból!'
   not-played-before: '%prefix% &f%player-name% &cMég sohasem játszott a szerveren!'
-player-not-added: '%prefix% &f%player-name% &cjátékos nincs hozzáadva ehhez a bolthoz!'
 shop:
-  already-exists: '%prefix% &f%shop-name% &cnévvle már van boltod!'
-  bought: '%prefix% &aSikeresen vásároltál &7x%items-bought% &f%item% &f$%price%
-    &aért! &7(&8%items-left%&7)'
+  already-exists: '%prefix% &f%shop-name% &cnévvel már van boltod!'
+  bought: '%prefix% &aSikeresen vásároltál &7x%items-bought% &f%item% &af$%price% &aért! &7(&8%items-left%&7)'
+  sold-to: '%prefix% &aSikeresen eladtad &7x%items-sold% &f%item% &af$%price% &aért! &7(&8%items-left%&7)'
+  bought-from: '%prefix% &aSikeresen vásároltál &7x%items-bought% &f%item% &af$%price% &aért &f%player-name%&a-tól! &7(&8%items-left%&7)'
   chest-already-shop: '%prefix% &cEz a láda már jelenleg is bolt!'
+  chest-full: '%prefix% &cA bolt ládája tele van!'
+  chest-full-owner: '%prefix% &c%player-name% &cpróbálta eladni &7x%amount% &f%item% &cde a %shop-name% ládája tele van!'
   created:
-    with-price: '%prefix% &aBolt &f%shop-name% &a&f$%price%&a-ért létrehozva!'
     basic: '%prefix% &aBolt &f%shop-name% &alétrehozva!'
+    with-price: '%prefix% &aBolt &f%shop-name% &a&f$%price%&a-ért létrehozva!'
   disabled-world: '%prefix% &cEbben a világban nem hozhatsz létre boltot!'
   invalid-page: '%prefix% &cÉrvénytelen oldal! &7(&8%page%&7)'
   limit-reached: '%prefix% &cElérted a maximum boltok számát! (&e%shop-limit%&c)'
-  player-limit-reached: '%prefix% &cElérted a maximum hozzáadható játékosok számát!
-    (&e%max-players%&c)'
+  player-limit-reached: '%prefix% &cElérted a maximum hozzáadható játékosok számát! (&e%max-players%&c)'
   list:
     header: '%prefix% &aBoltjaid:'
     shops: '&7- &f%shop-name%'
     shops-hover: |-
-      &6&l%material%&r
-       &8- &7ár: &6$&e%price%
+      &6&l%item%&r
+       &8- &7ár: &6$&a%sell-price%&e/&6$&c%buy-price%
        &8- &7hátralévő tárgyak: &e%items-left%
        &8- &7hely: &e%location%
        &8- &7létrehozva: &e%created%
@@ -48,8 +57,7 @@ shop:
     back: '&7[&cVissza&7]'
     page: '&7[&e%page%&7]'
   blacklisted-name: '%prefix% &cEzt a nevet nem állíthatod be!'
-  name-length: '%prefix% &cA bolt neve nem lehet rövidebb mint &f%min-length% &ckarakter
-    és hosszabb mint &f%max-length% &ckarakter!'
+  name-length: '%prefix% &cA bolt neve nem lehet rövidebb mint &f%min-length% &ckarakter és hosszabb mint &f%max-length% &ckarakter!'
   no-chest: '%prefix% &cEgy ládára kell nézned, a bolt létrehozásához!'
   empty: '%prefix% &cEz a bolt üres!'
   inventory-full: '%prefix% &cAz eszköztárad tele van!'
@@ -57,27 +65,20 @@ shop:
   no-shops: '%prefix% &cNincsenek boltjaid!'
   not-found: '%prefix% &cA megadott bolt nem található!'
   not-owner: '%prefix% &cNem te vagy ennek a boltnak a tulajdonosa!'
+  owner-no-money: '%prefix% &cA bolt tulajdonosának nincs elég pénze, hogy megvegye a tárgyaidat!'
+  owner-no-money-owner: '%prefix% &c%player-name% &cpróbálta megvásárolni &f%item% &cért &f$%price% &cde nincs elég pénzed!'
   removed: '%prefix% &cSikeresen törölted a(z) &f%shop-name% &cboltot!'
   setup-needed: '%prefix% &cEz a bolt nincs megfelelően beállítva!'
-  sold: '%prefix% &aSikeresen eladtál &7x%items-bought% &f%material% &2$&a%price% &aértékben &f%player-name%
-    &ajátékosnak! &7(&8%items-left%&7)'
-  sold-to: '%prefix% &aSikeresen eladtad &7x%items-sold% &f%material% &2$&a%price% &ajátékosnak! &7(&8%items-left%&7)'
-  bought-from: '%prefix% &aSikeresen vásároltál &7x%items-bought% &f%material% &aforintért &f$%price%&a-tól &f%player-name%&a-tól!'
+  sold: '%prefix% &aSikeresen eladt ál &7x%items-bought% &f%item% &af$%price% &aértékben &f%player-name% &ajátékosnak! &7(&8%items-left%&7)'
   renamed: '%prefix% &f%old-name% &aúj neve: &f%new-name%!'
-  chest-full: '%prefix% &cA bolt ládája tele van!'
-  chest-full-owner: '%prefix% &c%player-name% &cpróbálta eladni &7x%amount% &f%material% &cde a %shop-name% ládája tele van!'
-  owner-no-money: '%prefix% &cA bolt tulajdonosának nincs elég pénze, hogy megvegye a tárgyaidat!'
-  owner-no-money-owner: '%prefix% &c%player-name% &cpróbálta eladni &f%material% &cért &f$%price% &cde nincs elég pénzed!'
-  not-enough-money: '%prefix% &cNincs elég pénzed, hogy megvásárold ezt a tárgyat! (&e%price%&c)'
-  not-enough-money-owner: '%prefix% &c%player-name% &cpróbálta megvásárolni &f%material% &cért &f$%price% &cde nincs elég pénzed!'
 admin:
   shop:
     list:
-      header: '%prefix% &e%player-name%&a''s shops:'
+      header: '%prefix% &e%player-name%''s boltjai:'
       shops: '&7- &f%shop-name%'
       shops-hover: |-
-        &6&l%material%&r
-         &8- &7ár: &6$&e%price%
+        &6&l%item%&r
+         &8- &7ár: &6$&a%sell-price%&e/&6$&c%buy-price%
          &8- &7hátralévő tárgyak: &e%items-left%
          &8- &7hely: &e%location%
          &8- &7létrehozva: &e%created%
@@ -85,5 +86,21 @@ admin:
   customer-mode:
     message: '%prefix% &aVásárlói mód %state%!'
     message-other: '%prefix% &aVásárlói mód %state% &f%player-name% &aszámára!'
-    disabled: '&ckikapcsolva'
-    enabled: '&2bekaolcsolva'
+    disabled: '&cletiltva'
+    enabled: '&2bekapcsolva'
+migrate:
+  same-type: '%prefix% &cA jelenlegi tárolási mód már %storage-type%!'
+  invalid-type: '%prefix% &cÉrvénytelen tárolási típus! Elérhető: yaml, sqlite, mysql'
+  in-progress: '%prefix% &eMigráció folyamatban %old-type% -> %new-type%...'
+  collecting: '%prefix% &7Összegyűjtve %count% shop...'
+  error-new-storage: '%prefix% &cHiba történt az új tároló létrehozása közben!'
+  error-init: '%prefix% &cHiba történt az új tároló inicializálása közben!'
+  saving: '%prefix% &7Shop-ok mentése az új tárolóba...'
+  saved: '%prefix% &aMentve: &f%count% &aShop'
+  failed: '%prefix% &cSikertelen &f%count% &cShop migrációja'
+  old-closed: '%prefix% &7Régi tároló bezárva (%storage-type%)'
+  complete: '%prefix% &aMigráció sikeresen befejezve!'
+  new-storage: '%prefix% &aÚj tárolási mód: &f%storage-type%'
+  critical-error: '%prefix% &cKritikus hiba történt a migráció során!'
+  mysql-config-incomplete: '%prefix% &cMySQL konfiguráció hiányos!'
+  error-loading: '%prefix% &cHiba történt a shop-ok betöltése közben!'

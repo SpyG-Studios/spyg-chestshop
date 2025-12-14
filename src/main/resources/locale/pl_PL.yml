@@ -79,6 +79,22 @@ admin:
     message-other: '%prefix% &aTryb klienta %state% dla &f%player-name%&a!'  # Wiadomość pokazująca, czy tryb klienta jest włączony, czy wyłączony dla innego gracza.
     disabled: '&cWyłączony'  # Stan trybu klienta, wyłączony.
     enabled: '&2Włączony'  # Stan trybu klienta, włączony.
+migrate:
+  same-type: '%prefix% &cAktualny typ przechowywania to już %storage-type%!'
+  invalid-type: '%prefix% &cNieprawidłowy typ przechowywania! Dostępne: yaml, sqlite, mysql'
+  in-progress: '%prefix% &eMigracja w toku %old-type% -> %new-type%...'
+  collecting: '%prefix% &7Zebrano %count% sklepów...'
+  error-new-storage: '%prefix% &cWystąpił błąd podczas tworzenia nowego magazynu!'
+  error-init: '%prefix% &cWystąpił błąd podczas inicjalizacji nowego magazynu!'
+  saving: '%prefix% &7Zapisywanie sklepów do nowego magazynu...'
+  saved: '%prefix% &aZapisano: &f%count% &asklepów'
+  failed: '%prefix% &cNie udało się: &f%count% &csklepów'
+  old-closed: '%prefix% &7Stary magazyn zamknięty (%storage-type%)'
+  complete: '%prefix% &aMigracja zakończona pomyślnie!'
+  new-storage: '%prefix% &aNowy typ przechowywania: &f%storage-type%'
+  critical-error: '%prefix% &cKrytyczny błąd wystąpił podczas migracji!'
+  mysql-config-incomplete: '%prefix% &cKonfiguracja MySQL jest niekompletna!'
+  error-loading: '%prefix% &cWystąpił błąd podczas ładowania sklepów!'
 
 # Tłumaczenie autorstwa vexu(1337vexu)/vexu1337 [Version 1.1 of the translation]
 # Translation by vexu(1337vexu)/vexu1337   
