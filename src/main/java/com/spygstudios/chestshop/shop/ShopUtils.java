@@ -126,6 +126,9 @@ public class ShopUtils {
     }
 
     public static boolean isSimilar(ItemStack item1, ItemStack item2) {
+        if (item1 == null || item2 == null) {
+            return false;
+        }
         if (item1.getItemMeta() instanceof Damageable d1 && item2.getItemMeta() instanceof Damageable d2) {
             ItemStack copy1 = item1.clone();
             ItemStack copy2 = item2.clone();
