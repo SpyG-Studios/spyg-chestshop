@@ -1,17 +1,17 @@
 prefix: '&8[&#ffbc1fChest&#ff711fShop&8] &7»&f'  # Prefiks używany przed każdą wiadomością z pluginu, np. dla kolorów i wyglądu.
 commands: '%prefix% &7Komendy:'  # Komenda wyświetlająca listę dostępnych komend z pluginu.
 new-version: '%prefix% &aDostępna jest nowa wersja SpygChestShop! Aktualna wersja: &#e80000%old-version% &aNowa wersja: &#00bf0d%new-version% &7&o(Kliknij by zainstalować!)' # Powiadomienie o dostępnej nowej wersji pluginu, zawiera link do instalacji.
-enter-amount-cancelled: '%prefix% &cWprowadzanie kwoty anulowane!'  # Wiadomość, gdy proces wprowadzania kwoty zostanie anulowany.
-enter-amount-prompt: '%prefix% &aWprowadź kwotę &7&o(Wprowadź&f%cancel%&7&o aby anulować)'  # Komunikat wyświetlający prośbę o wpisanie kwoty, z możliwością anulowania.
-enter-amount-success: '%prefix% &aKwota ustawiona pomyślnie!'  # Wiadomość, gdy kwota została ustawiona pomyślnie.
+enter-amount.cancelled: '%prefix% &cWprowadzanie kwoty anulowane!'  # Wiadomość, gdy proces wprowadzania kwoty zostanie anulowany.
+enter.amount.prompt: '%prefix% &aWprowadź kwotę &7&o(Wprowadź&f%cancel%&7&o aby anulować)'  # Komunikat wyświetlający prośbę o wpisanie kwoty, z możliwością anulowania.
+enter.amount.success: '%prefix% &aKwota ustawiona pomyślnie!'  # Wiadomość, gdy kwota została ustawiona pomyślnie.
 invalid-number: '%prefix% &cNieprawidłowy numer!(&e%entered%&c)'  # Wiadomość, gdy wpisany numer jest nieprawidłowy.
 cant-add-yourself: '%prefix% &cNie możesz dodać siebie do sklepu!'  # Wiadomość, gdy gracz próbuje dodać siebie do swojego sklepu.
 cant-create-shop-here: '%prefix% &cNie możesz utworzyć sklepu tutaj!'  # Wiadomość, gdy sklep nie może zostać stworzony w danym miejscu.
 usage: '%prefix% &7%usage%'  # Komunikat pokazujący poprawne użycie komendy, np. jak używać pluginu.
 config-reloaded: '%prefix% &aKonfiguracja została pomyślnie załadowana!'  # Wiadomość, gdy konfiguracja pluginu została pomyślnie załadowana.
 no-permission: '%prefix% &cNie masz do tego uprawnień!'  # Komunikat, gdy gracz nie ma uprawnień do wykonania danej akcji.
-not-enough-money: '%prefix% &cNie masz wystarczającej ilości pieniędzy! ($%price%)'  # Wiadomość, gdy gracz próbuje wykonać akcję bez wystarczających pieniędzy.
-not-enough-items: '%prefix% &cNie masz wystarczającej ilości &f%material% &c(&e%amount%&c wymagane)!'  # Wiadomość, gdy gracz nie ma wystarczającej ilości przedmiotów do wykonania akcji.
+not-enough.money: '%prefix% &cNie masz wystarczającej ilości pieniędzy! ($%price%)'  # Wiadomość, gdy gracz próbuje wykonać akcję bez wystarczających pieniędzy.
+not-enough.items: '%prefix% &cNie masz wystarczającej ilości &f%material% &c(&e%amount%&c wymagane)!'  # Wiadomość, gdy gracz nie ma wystarczającej ilości przedmiotów do wykonania akcji.
 player:
   only-players: '&cTylko gracze mogą używać tego polecenia!'  # Sprawdzanie, czy komenda jest używana przez gracza.
   already-added: '%prefix% &cGracz &f%player-name% &cjest już dodany do sklepu!'  # Wiadomość, gdy gracz już jest dodany do sklepu.
