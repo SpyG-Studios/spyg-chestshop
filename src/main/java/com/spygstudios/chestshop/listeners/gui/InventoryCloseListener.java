@@ -54,16 +54,16 @@ public class InventoryCloseListener implements Listener {
         }
     }
 
-    private void itemAdding(InventoryCloseEvent event, DashboardHolder holdder) {
+    private void itemAdding(InventoryCloseEvent event, DashboardHolder holder) {
         ItemStack item = event.getInventory().getItem(13);
-        Shop shop = holdder.getShop();
-        if (item == null || ShopUtils.isSimilar(item, shop.getItem())) {
+        Shop shop = holder.getShop();
+        if (item == null) {
+            return;
+        }
+        if (ShopUtils.isSimilar(item, shop.getItem())) {
             return;
         }
 
-        if (item.getItemMeta().displayName() != null) {
-            return;
-        }
         ItemContainer newData = ItemContainer.create(plugin, event.getInventory().getItem(13));
         newData.remove("action");
         shop.setShopItem(item);
@@ -75,11 +75,11 @@ public class InventoryCloseListener implements Listener {
         Inventory inventory = event.getInventory();
         InventoryHolder invHolder = inventory.getHolder();
 
-        Location invLocation = inventory.getLocation();
-        if (invHolder.getInventory() == null || invHolder.getInventory().getLocation() == null) {
+        if (invHolder == null || invHolder.getInventory() == null || invHolder.getInventory().getLocation() == null) {
             return;
         }
 
+        Location invLocation = inventory.getLocation();
         Shop shop = Shop.getShop(invLocation);
         if (shop == null || !invLocation.getWorld().isChunkLoaded(invLocation.getBlockX() >> 4, invLocation.getBlockZ() >> 4)) {
             return;
