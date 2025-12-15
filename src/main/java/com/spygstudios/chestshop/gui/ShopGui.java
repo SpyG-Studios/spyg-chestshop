@@ -100,7 +100,9 @@ public class ShopGui {
             Material material = Material.getMaterial(amountSection.getString(key + ".material", "GRAY_STAINED_GLASS_PANE"));
             List<Float> modelFloats = amountSection.getFloatList(key + ".model-data.floats");
             List<String> modelStrings = amountSection.getStringList(key + ".model-data.strings");
-            addItemToInventory(plugin, inventory, slot, material, title, lore, modelFloats, modelStrings, amount);
+            if (shopItem.getMaxStackSize() > Math.abs(amount)) {
+                addItemToInventory(plugin, inventory, slot, material, title, lore, modelFloats, modelStrings, amount);
+            }
         });
 
         PageUtil.setFillItems(inventory, "shop");
