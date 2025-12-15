@@ -158,10 +158,11 @@ public class YamlShopFile extends YamlManager {
             plugin.getLogger().info("Shops loaded!");
             return;
         }
-        int loadedShops = 0;
         File[] files = shopsFolder.listFiles();
         plugin.getServer().getScheduler().runTask(plugin, () -> {
+            int loadedShops = 0;
             for (File file : files) {
+                loadedShops++;
                 processShopFile(plugin, file);
             }
             plugin.getLogger().info("Shops loaded: " + loadedShops);
