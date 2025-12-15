@@ -129,12 +129,19 @@ public class ShopTransactions {
             shop.setSaved(false);
         });
 
-        Message.SHOP_SOLD_TO.send(seller, Map.of("%price%", String.valueOf(itemsPrice), "%item%", shop.getItemName(), "%items-sold%", String.valueOf(soldItems)));
+        Message.SHOP_SOLD_TO.send(seller, Map.of(
+                "%price%", String.valueOf(itemsPrice),
+                "%item%", shop.getItemName(),
+                "%items-sold%", String.valueOf(soldItems)));
 
         Player owner = Bukkit.getPlayer(shop.getOwnerId());
         if (shop.isNotify() && owner != null) {
             Message.SHOP_BOUGHT_FROM.send(owner,
-                    Map.of("%price%", String.valueOf(itemsPrice), "%item%", shop.getItemName(), "%player-name%", seller.getName(), "%items-bought%", String.valueOf(soldItems)));
+                    Map.of(
+                            "%price%", String.valueOf(itemsPrice),
+                            "%item%", shop.getItemName(),
+                            "%player-name%", seller.getName(),
+                            "%items-bought%", String.valueOf(soldItems)));
         }
     }
 
