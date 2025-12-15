@@ -41,7 +41,7 @@ public class ShopListAdmin {
         }
         final int currentPage = page;
         DataManager dataManager = plugin.getDataManager();
-        dataManager.getPlayerShops(player.getUniqueId()).thenAccept(shops -> {
+        dataManager.getPlayerShops(target.getUniqueId()).thenAccept(shops -> {
             if (shops == null || shops.isEmpty()) {
                 Message.SHOP_NO_SHOPS.send(player);
                 return;
