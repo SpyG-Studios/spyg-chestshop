@@ -415,97 +415,78 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         Runnable saveTask = () -> {
-            String selectSql = "SELECT 1 FROM shops WHERE owner_uuid = ? AND shop_name = ?";
-            try (PreparedStatement selectStmt = connection.prepareStatement(selectSql)) {
-                selectStmt.setString(1, shop.getOwnerId().toString());
-                selectStmt.setString(2, shop.getName());
+            String sql = """
+                    INSERT INTO shops
+                    (owner_uuid, shop_name, sell_price, buy_price, item, world, x, y, z,
+                     created_at, do_notify, sold_items, bought_items, money_spent,
+                     money_earned, can_buy, can_sell)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE
+                        sell_price = VALUES(sell_price),
+                        buy_price = VALUES(buy_price),
+                        item = VALUES(item),
+                        world = VALUES(world),
+                        x = VALUES(x),
+                        y = VALUES(y),
+                        z = VALUES(z),
+                        do_notify = VALUES(do_notify),
+                        sold_items = VALUES(sold_items),
+                        bought_items = VALUES(bought_items),
+                        money_spent = VALUES(money_spent),
+                        money_earned = VALUES(money_earned),
+                        can_buy = VALUES(can_buy),
+                        can_sell = VALUES(can_sell)
+                    """;
 
-                try (ResultSet rs = selectStmt.executeQuery()) {
-                    boolean exists = rs.next();
-                    String sql;
-                    PreparedStatement stmt;
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                int index = 1;
 
-                    byte[] itemData = shop.getItem() != null ? shop.getItem().serializeAsBytes() : null;
-                    int index = 1;
+                byte[] itemData = shop.getItem() != null
+                        ? shop.getItem().serializeAsBytes()
+                        : null;
 
-                    if (exists) {
-                        sql = """
-                                UPDATE shops SET
-                                sell_price = ?,
-                                buy_price = ?,
-                                item = ?,
-                                world = ?, x = ?, y = ?, z = ?,
-                                created_at = ?,
-                                do_notify = ?,
-                                sold_items = ?,
-                                bought_items = ?,
-                                money_spent = ?,
-                                money_earned = ?,
-                                can_buy = ?,
-                                can_sell = ?
-                                WHERE owner_uuid = ?
-                                AND shop_name = ?
-                                        """;
-                        stmt = connection.prepareStatement(sql);
-                        stmt.setDouble(index++, shop.getSellPrice());
-                        stmt.setDouble(index++, shop.getBuyPrice());
-                        stmt.setBytes(index++, itemData);
-                        stmt.setString(index++, shop.getChestLocation().getWorld().getName());
-                        stmt.setInt(index++, shop.getChestLocation().getBlockX());
-                        stmt.setInt(index++, shop.getChestLocation().getBlockY());
-                        stmt.setInt(index++, shop.getChestLocation().getBlockZ());
-                        stmt.setString(index++, shop.getCreatedAt());
-                        stmt.setBoolean(index++, shop.isNotify());
-                        stmt.setInt(index++, shop.getSoldItems());
-                        stmt.setInt(index++, shop.getBoughtItems());
-                        stmt.setDouble(index++, shop.getMoneySpent());
-                        stmt.setDouble(index++, shop.getMoneyEarned());
-                        stmt.setBoolean(index++, shop.acceptsCustomerSales());
-                        stmt.setBoolean(index++, shop.acceptsCustomerPurchases());
-                        stmt.setString(index++, shop.getOwnerId().toString());
-                        stmt.setString(index++, shop.getName());
+                stmt.setString(index++, shop.getOwnerId().toString());
+                stmt.setString(index++, shop.getName());
+                stmt.setDouble(index++, shop.getSellPrice());
+                stmt.setDouble(index++, shop.getBuyPrice());
+                stmt.setBytes(index++, itemData);
 
-                    } else {
-                        sql = """
-                                INSERT INTO shops
-                                (owner_uuid, shop_name, sell_price, buy_price, item, world, x, y, z, created_at, do_notify, sold_items, bought_items, money_spent, money_earned, can_buy, can_sell)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                                        """;
-                        stmt = connection.prepareStatement(sql);
-                        stmt.setString(index++, shop.getOwnerId().toString());
-                        stmt.setString(index++, shop.getName());
-                        stmt.setDouble(index++, shop.getSellPrice());
-                        stmt.setDouble(index++, shop.getBuyPrice());
-                        stmt.setBytes(index++, itemData);
-                        stmt.setString(index++, shop.getChestLocation().getWorld().getName());
-                        stmt.setInt(index++, shop.getChestLocation().getBlockX());
-                        stmt.setInt(index++, shop.getChestLocation().getBlockY());
-                        stmt.setInt(index++, shop.getChestLocation().getBlockZ());
-                        stmt.setString(index++, shop.getCreatedAt());
-                        stmt.setBoolean(index++, shop.isNotify());
-                        stmt.setInt(index++, shop.getSoldItems());
-                        stmt.setInt(index++, shop.getBoughtItems());
-                        stmt.setDouble(index++, shop.getMoneySpent());
-                        stmt.setDouble(index++, shop.getMoneyEarned());
-                        stmt.setBoolean(index++, shop.acceptsCustomerPurchases());
-                        stmt.setBoolean(index++, shop.acceptsCustomerSales());
-                    }
+                stmt.setString(index++, shop.getChestLocation().getWorld().getName());
+                stmt.setInt(index++, shop.getChestLocation().getBlockX());
+                stmt.setInt(index++, shop.getChestLocation().getBlockY());
+                stmt.setInt(index++, shop.getChestLocation().getBlockZ());
 
-                    int rowsAffected = stmt.executeUpdate();
-                    boolean success = rowsAffected > 0;
-                    if (!success) {
-                        plugin.getLogger().severe("Failed to save shop: " + shop.getName() + " for owner: " + shop.getOwnerId());
-                    }
-                    future.complete(success);
+                stmt.setString(index++, shop.getCreatedAt());
+                stmt.setBoolean(index++, shop.isNotify());
+                stmt.setInt(index++, shop.getSoldItems());
+                stmt.setInt(index++, shop.getBoughtItems());
+                stmt.setDouble(index++, shop.getMoneySpent());
+                stmt.setDouble(index++, shop.getMoneyEarned());
+                stmt.setBoolean(index++, shop.acceptsCustomerPurchases());
+                stmt.setBoolean(index++, shop.acceptsCustomerSales());
+
+                boolean success = stmt.executeUpdate() > 0;
+                if (!success) {
+                    plugin.getLogger().severe(
+                            "Failed to save shop: " + shop.getName() +
+                                    " for owner: " + shop.getOwnerId());
                 }
+
+                future.complete(success);
             } catch (SQLException e) {
-                plugin.getLogger().severe("Failed to save shop: " + shop.getName() + " for owner: " + shop.getOwnerId() + ": " + e.getMessage());
+                plugin.getLogger().severe(
+                        "Failed to save shop: " + shop.getName() +
+                                " for owner: " + shop.getOwnerId() +
+                                ": " + e.getMessage());
+                future.completeExceptionally(e);
             }
         };
+
         if (!plugin.isEnabled()) {
             saveTask.run();
             return future;
         }
+
         Bukkit.getScheduler().runTaskAsynchronously(plugin, saveTask);
         return future;
     }
@@ -661,6 +642,9 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
 
     @Override
     public void startSaveScheduler() {
+        if (!plugin.isEnabled()) {
+            return;
+        }
         long interval = plugin.getConf().getInt("shops.save-interval", 60);
         if (interval <= 0) {
             interval = 60;
