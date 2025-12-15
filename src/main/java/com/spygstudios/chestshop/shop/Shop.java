@@ -24,7 +24,6 @@ import com.spygstudios.spyglib.hologram.HologramItemRow;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 
 @Getter
 public class Shop {
@@ -87,8 +86,8 @@ public class Shop {
             return plugin.getConf().getString("shops.unknown.item");
         }
         Component displayName = item.getItemMeta().displayName();
-        if (displayName != null && !displayName.equals(Component.empty())) {
-            return ((TextComponent) displayName).content();
+        if (displayName != null) {
+            return plugin.extractContent(displayName);
         }
         return item.getType().name();
     }

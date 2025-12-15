@@ -50,6 +50,8 @@ import com.spygstudios.spyglib.version.VersionChecker;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.milkbowl.vault.economy.Economy;
 
 @Getter
@@ -235,6 +237,20 @@ public class ChestShop extends JavaPlugin {
     public String getDateString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return LocalDateTime.now().format(formatter);
+    }
+
+    public String extractContent(Component component) {
+        StringBuilder sb = new StringBuilder();
+
+        if (component instanceof TextComponent text) {
+            sb.append(text.content());
+        }
+
+        for (Component child : component.children()) {
+            sb.append(extractContent(child));
+        }
+
+        return sb.toString();
     }
 
 }
