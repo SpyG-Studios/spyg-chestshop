@@ -32,177 +32,237 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class DashboardGui {
-        private static GuiConfig guiConfig;
 
-        public static void open(ChestShop plugin, Player player, Shop shop) {
-                guiConfig = plugin.getGuiConfig();
-                Inventory inventory = player.getServer().createInventory(new DashboardHolder(player, shop), 27,
-                                TranslateColor.translate(guiConfig.getString("chestshop.title")
-                                                .replace("%shop-name%", shop.getName())
-                                                .replace("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName())));
-                setShopItems(plugin, shop, inventory);
-                PageUtil.setFillItems(inventory, "chestshop");
-                player.openInventory(inventory);
+    private static GuiConfig guiConfig;
+
+    public static void open(ChestShop plugin, Player player, Shop shop) {
+        guiConfig = plugin.getGuiConfig();
+
+        Inventory inventory = Bukkit.createInventory(
+                new DashboardHolder(player, shop),
+                27,
+                TranslateColor.translate(
+                        guiConfig.getString("chestshop.title")
+                                .replace("%shop-name%", shop.getName())
+                                .replace("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName())));
+
+        setShopItems(plugin, shop, inventory);
+        PageUtil.setFillItems(inventory, "chestshop");
+        player.openInventory(inventory);
+    }
+
+    private static void setShopItems(ChestShop plugin, Shop shop, Inventory inventory) {
+        Config config = plugin.getConf();
+
+        setMainItem(plugin, shop, inventory);
+        setInfoItem(config, shop, inventory);
+        setNotifyItem(plugin, shop, inventory);
+        setMoneyItem(plugin, shop, inventory);
+        setInventoryItem(plugin, inventory);
+        setBuySellToggleItem(plugin, shop, inventory);
+        setPlayerItem(plugin, shop, inventory);
+    }
+
+    private static void setMainItem(ChestShop plugin, Shop shop, Inventory inventory) {
+        ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.item");
+
+        ItemStack item = shop.getItem() != null
+                ? shop.getItem()
+                : ItemUtils.create(
+                        Material.getMaterial(section.getString("not-set", "BARRIER")),
+                        section.getString("title"),
+                        section.getStringList("lore"),
+                        section.getFloatList("model-data.floats"),
+                        section.getStringList("model-data.strings"));
+
+        inventory.setItem(section.getInt("slot"), item);
+        ItemContainer.create(plugin, item).set("action", GuiAction.SET_ITEM.name());
+    }
+
+    private static void setInfoItem(Config config, Shop shop, Inventory inventory) {
+        ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.info");
+        Material material = Material.getMaterial(section.getString("material", "WRITABLE_BOOK"));
+        if (material.equals(Material.AIR)) {
+            return;
         }
 
-        private static void setShopItems(ChestShop plugin, Shop shop, Inventory inventory) {
-                Config config = plugin.getConf();
-                ConfigurationSection guiShopItemSection = guiConfig.getConfigurationSection("chestshop.item");
-                ItemStack shopMaterial = shop.getItem() != null
-                                ? shop.getItem()
-                                : ItemUtils.create(
-                                                Material.getMaterial(guiShopItemSection.getString("not-set", "BARRIER")),
-                                                guiShopItemSection.getString("title"),
-                                                guiShopItemSection.getStringList("lore"),
-                                                guiShopItemSection.getFloatList("model-data.floats"),
-                                                guiShopItemSection.getStringList("model-data.strings"));
-                inventory.setItem(guiShopItemSection.getInt("slot"), shopMaterial);
-                ItemContainer materialData = ItemContainer.create(plugin, shopMaterial);
-                materialData.set("action", GuiAction.SET_ITEM.name());
+        String buyPrice = config.getString("shops.price-format.buy")
+                .replace("%price%", String.valueOf(shop.getCustomerPurchasePrice()));
 
-                // info item
-                String buyPrice = config.getString("shops.price-format.buy")
-                                .replace("%price%", String.valueOf(shop.getCustomerPurchasePrice()));
-                String sellPrice = config.getString("shops.price-format.sell")
-                                .replace("%price%", String.valueOf(shop.getCustomerSalePrice()));
-                Material infoMaterial = Material.getMaterial(config.getString("chestshop.info.material", "WRITABLE_BOOK"));
-                String priceDisplay = "";
-                if (shop.acceptsCustomerPurchases() && shop.acceptsCustomerSales()) {
-                        priceDisplay = config.getString("shops.price-format.combined")
-                                        .replace("%sell-price%", sellPrice)
-                                        .replace("%buy-price%", buyPrice);
-                } else if (shop.acceptsCustomerPurchases()) {
-                        priceDisplay = buyPrice;
-                } else if (shop.acceptsCustomerSales()) {
-                        priceDisplay = sellPrice;
-                } else {
-                        priceDisplay = config.getString("shops.unknown.mode");
-                }
+        String sellPrice = config.getString("shops.price-format.sell")
+                .replace("%price%", String.valueOf(shop.getCustomerSalePrice()));
 
-                ConfigurationSection infoSection = guiConfig.getConfigurationSection("chestshop.info");
-                ItemStack infoItem = ItemUtils.create(
-                                infoMaterial,
-                                infoSection.getString("title"),
-                                ParseListPlaceholder.parse(infoSection.getStringList("lore"), Map.of(
-                                                "%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName(),
-                                                "%item%", shop.getItem() == null ? "AIR" : shop.getItemName(),
-                                                "%price%", priceDisplay,
-                                                "%created%", shop.getCreatedAt(),
-                                                "%location%", shop.getChestLocationString(),
-                                                "%sold-items%", String.valueOf(shop.getSoldItems()),
-                                                "%money-earned%", String.valueOf(shop.getMoneyEarned()),
-                                                "%bought-items%", String.valueOf(shop.getBoughtItems()),
-                                                "%money-spent%", String.valueOf(shop.getMoneySpent()))),
-                                infoSection.getFloatList("model-data.floats"),
-                                infoSection.getStringList("model-data.strings"));
-
-                inventory.setItem(infoSection.getInt("slot"), infoItem);
-
-                // notify item
-                ConfigurationSection notifySection = guiConfig.getConfigurationSection("chestshop.notify");
-                Material notifyMaterial = Material.getMaterial(notifySection.getString("material", "BELL"));
-                ItemStack notifyItem = ItemUtils.create(
-                                notifyMaterial,
-                                notifySection.getString("title"),
-                                Arrays.asList(shop.isNotify()
-                                                ? notifySection.getString("on")
-                                                : notifySection.getString("off")),
-                                notifySection.getFloatList("model-data.floats"),
-                                notifySection.getStringList("model-data.strings"));
-                ItemContainer notifyData = ItemContainer.create(plugin, notifyItem);
-                notifyData.set("action", GuiAction.TOGGLE_NOTIFY.name());
-                inventory.setItem(notifySection.getInt("slot"), notifyItem);
-
-                // money item
-                ConfigurationSection moneySection = guiConfig.getConfigurationSection("chestshop.money");
-                Material moneyMaterial = Material.getMaterial(moneySection.getString("material", "GOLD_INGOT"));
-                List<String> moneyLore = new ArrayList<>();
-                for (String string : moneySection.getStringList("lore")) {
-                        moneyLore.add(string
-                                        .replace("%sell-price%", String.valueOf(shop.getCustomerPurchasePrice()))
-                                        .replace("%buy-price%", String.valueOf(shop.getCustomerSalePrice())));
-                }
-
-                ItemStack moneyItem = ItemUtils.create(
-                                moneyMaterial,
-                                moneySection.getString("title"),
-                                moneyLore,
-                                moneySection.getFloatList("model-data.floats"),
-                                moneySection.getStringList("model-data.strings"));
-                ItemContainer moneyData = ItemContainer.create(plugin, moneyItem);
-                moneyData.set("action", GuiAction.SET_SHOP_BUY_PRICE.name());
-                inventory.setItem(moneySection.getInt("slot"), moneyItem);
-
-                // inventory item
-                ConfigurationSection inventorySection = guiConfig.getConfigurationSection("chestshop.inventory");
-                Material inventoryMaterial = Material.getMaterial(inventorySection.getString("material", "CHEST"));
-                ItemStack inventoryItem = ItemUtils.create(
-                                inventoryMaterial,
-                                inventorySection.getString("title"),
-                                inventorySection.getStringList("lore"),
-                                inventorySection.getFloatList("model-data.floats"),
-                                inventorySection.getStringList("model-data.strings"));
-                ItemContainer inventoryData = ItemContainer.create(plugin, inventoryItem);
-                inventoryData.set("action", GuiAction.OPEN_SHOP_INVENTORY.name());
-                inventory.setItem(inventorySection.getInt("slot"), inventoryItem);
-
-                // buy/sell toggle item
-                ConfigurationSection buySellSection = guiConfig.getConfigurationSection("chestshop.buysell");
-                Material buySellMaterial = Material.getMaterial(buySellSection.getString("material", "COMPARATOR"));
-                List<String> buySellLore = new ArrayList<>();
-                String sellStatus = shop.acceptsCustomerPurchases()
-                                ? buySellSection.getString("sell.enabled", "&aEnabled")
-                                : buySellSection.getString("sell.disabled", "&cDisabled");
-                String buyStatus = shop.acceptsCustomerSales()
-                                ? buySellSection.getString("buy.enabled", "&aEnabled")
-                                : buySellSection.getString("buy.disabled", "&cDisabled");
-                buySellLore.add(buySellSection.getString("sell.line", "&7Selling: %status%").replace("%status%", sellStatus));
-                buySellLore.add(buySellSection.getString("buy.line", "&7Buying: %status%").replace("%status%", buyStatus));
-                buySellLore.addAll(buySellSection.getStringList("lore"));
-                ItemStack buySellItem = ItemUtils.create(
-                                buySellMaterial,
-                                buySellSection.getString("title"),
-                                buySellLore,
-                                buySellSection.getFloatList("model-data.floats"),
-                                buySellSection.getStringList("model-data.strings"));
-                ItemContainer buySellData = ItemContainer.create(plugin, buySellItem);
-                buySellData.set("action", GuiAction.TOGGLE_SELLING.name());
-                inventory.setItem(buySellSection.getInt("slot"), buySellItem);
-
-                // player item
-                ConfigurationSection playerSection = guiConfig.getConfigurationSection("chestshop.player");
-                OfflinePlayer owner = Bukkit.getOfflinePlayer(shop.getOwnerId());
-                ItemStack playrItem = owner.isOnline() ? PlayerHeads.getOnlinePlayerHead(owner.getUniqueId()) : PlayerHeads.getOfflinePlayerHead(owner.getUniqueId());
-                ItemMeta playrMeta = playrItem.getItemMeta();
-                playrMeta.displayName(TranslateColor.translate(playerSection.getString("title").replace("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName())));
-                playrMeta.lore(TranslateColor.translate(playerSection.getStringList("lore")));
-                playrItem.setItemMeta(playrMeta);
-                ItemContainer playerData = ItemContainer.create(plugin, playrItem);
-                playerData.set("action", GuiAction.OPEN_PLAYERS.name());
-                inventory.setItem(playerSection.getInt("slot"), playrItem);
+        String priceDisplay;
+        if (shop.acceptsCustomerPurchases() && shop.acceptsCustomerSales()) {
+            priceDisplay = config.getString("shops.price-format.combined")
+                    .replace("%sell-price%", sellPrice)
+                    .replace("%buy-price%", buyPrice);
+        } else if (shop.acceptsCustomerPurchases()) {
+            priceDisplay = buyPrice;
+        } else if (shop.acceptsCustomerSales()) {
+            priceDisplay = sellPrice;
+        } else {
+            priceDisplay = config.getString("shops.unknown.mode");
         }
 
-        public static class DashboardHolder implements InventoryHolder {
+        ItemStack infoItem = ItemUtils.create(
+                material,
+                section.getString("title"),
+                ParseListPlaceholder.parse(
+                        section.getStringList("lore"),
+                        Map.of(
+                                "%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName(),
+                                "%item%", shop.getItem() == null ? "AIR" : shop.getItemName(),
+                                "%price%", priceDisplay,
+                                "%created%", shop.getCreatedAt(),
+                                "%location%", shop.getChestLocationString(),
+                                "%sold-items%", String.valueOf(shop.getSoldItems()),
+                                "%money-earned%", String.valueOf(shop.getMoneyEarned()),
+                                "%bought-items%", String.valueOf(shop.getBoughtItems()),
+                                "%money-spent%", String.valueOf(shop.getMoneySpent()))),
+                section.getFloatList("model-data.floats"),
+                section.getStringList("model-data.strings"));
 
-                @Getter
-                private final Player player;
+        inventory.setItem(section.getInt("slot"), infoItem);
+    }
 
-                @Getter
-                private final ItemStack item;
-
-                @Getter
-                private final Shop shop;
-
-                public DashboardHolder(Player player, Shop shop) {
-                        this.player = player;
-                        this.item = shop.getItem() == null ? new ItemStack(Material.AIR) : shop.getItem();
-                        this.shop = shop;
-                }
-
-                @Override
-                public Inventory getInventory() {
-                        return null;
-                }
-
+    private static void setNotifyItem(ChestShop plugin, Shop shop, Inventory inventory) {
+        ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.notify");
+        Material material = Material.getMaterial(section.getString("material", "BELL"));
+        if (material.equals(Material.AIR)) {
+            return;
         }
+        ItemStack item = ItemUtils.create(
+                material,
+                section.getString("title"),
+                Arrays.asList(shop.isNotify() ? section.getString("on") : section.getString("off")),
+                section.getFloatList("model-data.floats"),
+                section.getStringList("model-data.strings"));
+
+        ItemContainer.create(plugin, item).set("action", GuiAction.TOGGLE_NOTIFY.name());
+        inventory.setItem(section.getInt("slot"), item);
+    }
+
+    private static void setMoneyItem(ChestShop plugin, Shop shop, Inventory inventory) {
+        ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.money");
+        Material material = Material.getMaterial(section.getString("material", "GOLD_INGOT"));
+        if (material.equals(Material.AIR)) {
+            return;
+        }
+        List<String> lore = new ArrayList<>();
+        for (String line : section.getStringList("lore")) {
+            lore.add(
+                    line.replace("%sell-price%", String.valueOf(shop.getCustomerPurchasePrice()))
+                            .replace("%buy-price%", String.valueOf(shop.getCustomerSalePrice())));
+        }
+
+        ItemStack item = ItemUtils.create(
+                material,
+                section.getString("title"),
+                lore,
+                section.getFloatList("model-data.floats"),
+                section.getStringList("model-data.strings"));
+
+        ItemContainer.create(plugin, item).set("action", GuiAction.SET_SHOP_BUY_PRICE.name());
+        inventory.setItem(section.getInt("slot"), item);
+    }
+
+    private static void setInventoryItem(ChestShop plugin, Inventory inventory) {
+        ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.inventory");
+        Material material = Material.getMaterial(section.getString("material", "CHEST"));
+        if (material.equals(Material.AIR)) {
+            return;
+        }
+        ItemStack item = ItemUtils.create(
+                material,
+                section.getString("title"),
+                section.getStringList("lore"),
+                section.getFloatList("model-data.floats"),
+                section.getStringList("model-data.strings"));
+
+        ItemContainer.create(plugin, item).set("action", GuiAction.OPEN_SHOP_INVENTORY.name());
+        inventory.setItem(section.getInt("slot"), item);
+    }
+
+    private static void setBuySellToggleItem(ChestShop plugin, Shop shop, Inventory inventory) {
+        ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.buysell");
+        Material material = Material.getMaterial(section.getString("material", "LEVER"));
+        if (material.equals(Material.AIR)) {
+            return;
+        }
+        String sellStatus = shop.acceptsCustomerPurchases()
+                ? section.getString("sell.enabled", "&aEnabled")
+                : section.getString("sell.disabled", "&cDisabled");
+
+        String buyStatus = shop.acceptsCustomerSales()
+                ? section.getString("buy.enabled", "&aEnabled")
+                : section.getString("buy.disabled", "&cDisabled");
+
+        List<String> lore = new ArrayList<>();
+        lore.add(section.getString("sell.line").replace("%status%", sellStatus));
+        lore.add(section.getString("buy.line").replace("%status%", buyStatus));
+        lore.addAll(section.getStringList("lore"));
+
+        ItemStack item = ItemUtils.create(
+                material,
+                section.getString("title"),
+                lore,
+                section.getFloatList("model-data.floats"),
+                section.getStringList("model-data.strings"));
+
+        ItemContainer.create(plugin, item).set("action", GuiAction.TOGGLE_SELLING.name());
+        inventory.setItem(section.getInt("slot"), item);
+    }
+
+    private static void setPlayerItem(ChestShop plugin, Shop shop, Inventory inventory) {
+        ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.player");
+        Material material = Material.getMaterial(section.getString("material", "PLAYER_HEAD"));
+        if (material.equals(Material.AIR)) {
+            return;
+        }
+        ItemStack item = null;
+        if (material.equals(Material.PLAYER_HEAD)) {
+            OfflinePlayer owner = Bukkit.getOfflinePlayer(shop.getOwnerId());
+            item = owner.isOnline()
+                    ? PlayerHeads.getOnlinePlayerHead(owner.getUniqueId())
+                    : PlayerHeads.getOfflinePlayerHead(owner.getUniqueId());
+            ItemMeta meta = item.getItemMeta();
+            meta.displayName(
+                    TranslateColor.translate(section.getString("title")
+                            .replace("%player-name%", owner.getName())));
+            meta.lore(TranslateColor.translate(section.getStringList("lore")));
+            item.setItemMeta(meta);
+        } else {
+            item = ItemUtils.create(
+                    material,
+                    section.getString("title").replace("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName()),
+                    section.getStringList("lore"),
+                    section.getFloatList("model-data.floats"),
+                    section.getStringList("model-data.strings"));
+        }
+
+        ItemContainer.create(plugin, item).set("action", GuiAction.OPEN_PLAYERS.name());
+        inventory.setItem(section.getInt("slot"), item);
+    }
+
+    public static class DashboardHolder implements InventoryHolder {
+
+        @Getter
+        private final Player player;
+        @Getter
+        private final ItemStack item;
+        @Getter
+        private final Shop shop;
+
+        public DashboardHolder(Player player, Shop shop) {
+            this.player = player;
+            this.shop = shop;
+            this.item = shop.getItem() == null ? new ItemStack(Material.AIR) : shop.getItem();
+        }
+
+        @Override
+        public Inventory getInventory() {
+            return null;
+        }
+    }
 }
