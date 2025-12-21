@@ -1,5 +1,6 @@
 package com.spygstudios.chestshop.commands.admin;
 
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.OfflinePlayer;
@@ -47,7 +48,8 @@ public class ShopListAdmin {
                 return;
             }
             Message.SHOP_LIST_HEAD.send(player);
-            for (Shop shop : shops) {
+            List<Shop> limitedShops = shops.stream().skip((currentPage - 1) * 10).limit(10).toList();
+            for (Shop shop : limitedShops) {
                 Component hoverMessage = ComponentUtils.replaceComponent(Message.SHOP_LIST_SHOPS_HOVER.get(), Map.of(
                         "%shop-name%", shop.getName(),
                         "%item%", shop.getItemName(),
