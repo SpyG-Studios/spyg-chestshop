@@ -8,7 +8,7 @@ public enum GuiAction {
     TOGGLE_SELLING,
     TOGGLE_BUYING,
     TOGGLE_MODE,
-    SET_MATERIAL,
+    SET_ITEM,
     OPEN_PLAYERS,
     OPEN_SHOP_INVENTORY,
     REMOVE_PLAYER,

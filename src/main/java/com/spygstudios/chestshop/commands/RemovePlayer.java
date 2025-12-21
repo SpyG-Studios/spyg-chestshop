@@ -27,6 +27,7 @@ public class RemovePlayer {
     }
 
     @Execute
+    @Permission("spygchestshop.*")
     @Permission("spygchestshop.use")
     public void onRemove(@Context Player sender, @Arg Shop shop, @Async @Arg OfflinePlayer player) {
         if (sender.getUniqueId().equals(player.getUniqueId())) {

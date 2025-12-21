@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
@@ -20,7 +21,7 @@ import com.spygstudios.chestshop.gui.PlayersGui;
 import com.spygstudios.chestshop.shop.AmountHandler;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.spyglib.color.TranslateColor;
-import com.spygstudios.spyglib.persistentdata.PersistentData;
+import com.spygstudios.spyglib.datacontainer.ItemContainer;
 
 public class DashboardGuiHandler implements Listener {
 
@@ -44,7 +45,7 @@ public class DashboardGuiHandler implements Listener {
         }
         event.setCancelled(true);
         if (event.getSlot() == 13) {
-            changeShopMaterial(event);
+            changeShopItem(event);
             return;
         }
 
@@ -67,7 +68,7 @@ public class DashboardGuiHandler implements Listener {
 
     private void chestShopGui(InventoryClickEvent event) {
         ItemStack clickedItem = event.getCurrentItem();
-        PersistentData data = new PersistentData(plugin, clickedItem);
+        ItemContainer data = ItemContainer.create(plugin, clickedItem);
         String action = data.getString("action");
         if (action == null) {
             return;
@@ -77,8 +78,8 @@ public class DashboardGuiHandler implements Listener {
         Shop shop = holder.getShop();
         GuiAction guiAction = GuiAction.valueOf(action);
         switch (guiAction) {
-            case SET_MATERIAL:
-                changeShopMaterial(event);
+            case SET_ITEM:
+                changeShopItem(event);
                 break;
             case TOGGLE_NOTIFY:
                 shop.setNotify(!shop.isNotify());
@@ -112,13 +113,22 @@ public class DashboardGuiHandler implements Listener {
         }
     }
 
-    private void changeShopMaterial(InventoryClickEvent event) {
+    private void changeShopItem(InventoryClickEvent event) {
         if (event.getCursor() == null || event.getCursor().getType().isAir()) {
             return;
         }
-        event.getInventory().setItem(13, new ItemStack(event.getCursor().getType()));
-        PersistentData newData = new PersistentData(plugin, event.getInventory().getItem(13));
-        newData.set("action", GuiAction.SET_MATERIAL.name());
+
+        ItemStack item = event.getCursor();
+        item = item.clone();
+        item.setAmount(1);
+        ItemMeta meta = item.getItemMeta();
+        if (meta instanceof Damageable damageable) {
+            damageable.setDamage(0);
+            item.setItemMeta(meta);
+        }
+        event.getInventory().setItem(13, item);
+        ItemContainer newData = ItemContainer.create(plugin, event.getInventory().getItem(13));
+        newData.set("action", GuiAction.SET_ITEM.name());
     }
 
     private void handlePriceSetting(InventoryClickEvent event) {

@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map.Entry;
@@ -23,44 +26,49 @@ import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.config.MessageConfig;
+import com.spygstudios.chestshop.database.yaml.YamlStorage;
 import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
+import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.listeners.BreakListener;
 import com.spygstudios.chestshop.listeners.BuildListener;
 import com.spygstudios.chestshop.listeners.ChatListener;
+import com.spygstudios.chestshop.listeners.ChunkLoadListener;
+import com.spygstudios.chestshop.listeners.ChunkUnloadListener;
 import com.spygstudios.chestshop.listeners.ExplosionListener;
 import com.spygstudios.chestshop.listeners.HopperListener;
 import com.spygstudios.chestshop.listeners.InteractListener;
 import com.spygstudios.chestshop.listeners.PlayerJoinListener;
+import com.spygstudios.chestshop.listeners.PlayerQuitListener;
 import com.spygstudios.chestshop.listeners.gui.DashboardGuiHandler;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
 import com.spygstudios.chestshop.listeners.gui.PlayerGuiHandler;
 import com.spygstudios.chestshop.listeners.gui.ShopGuiHandler;
-import com.spygstudios.chestshop.shop.ShopFile;
 import com.spygstudios.spyglib.hologram.HologramManager;
 import com.spygstudios.spyglib.version.VersionChecker;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.milkbowl.vault.economy.Economy;
 
+@Getter
 public class ChestShop extends JavaPlugin {
     @Getter
     private static ChestShop instance;
-    @Getter
     private Economy economy;
-    @Getter
     private Config conf;
-    @Getter
     private GuiConfig guiConfig;
-    @Getter
     private HologramManager hologramManager;
-    @Getter
     private CommandHandler commandHandler;
-    @Getter
     @Setter
     private MessageConfig messageConfig;
+    @Setter
+    private DataManager dataManager;
+    private boolean latestVersion = true;
+    private String currentVersion;
     private static final String API_URL = "https://hangar.papermc.io/api/v1/projects/Spyg-ChestShop/latestrelease";
 
     public ChestShop() {
@@ -74,8 +82,8 @@ public class ChestShop extends JavaPlugin {
         messageConfig = new MessageConfig(this, conf.getString("locale"));
         Message.init(messageConfig);
 
-        hologramManager = HologramManager.getManager(instance);
-        commandHandler = new CommandHandler(instance);
+        hologramManager = HologramManager.getManager(this);
+        commandHandler = new CommandHandler(this);
         new InteractListener(this);
         new BreakListener(this);
         new BuildListener(this);
@@ -86,9 +94,14 @@ public class ChestShop extends JavaPlugin {
         new ExplosionListener(instance);
         new ChatListener(instance);
         new HopperListener(instance);
-        Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+        new PlayerJoinListener(this);
+        new PlayerQuitListener(this);
+        new ChunkLoadListener(this);
+        new ChunkUnloadListener(this);
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             Entry<String, Boolean> versionInfo = VersionChecker.isLatestVersion(API_URL, getPluginMeta().getVersion());
-            new PlayerJoinListener(instance, versionInfo.getKey(), versionInfo.getValue());
+            this.currentVersion = versionInfo.getKey();
+            this.latestVersion = versionInfo.getValue();
         });
 
         loadLocalizations();
@@ -99,7 +112,7 @@ public class ChestShop extends JavaPlugin {
         } catch (Exception e) {
         }
 
-        getLogger().info("Loading economy plugin...");
+        getLogger().info("Looking for economy plugin...");
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
             getLogger().severe("Vault or economy plugin (e.g. Essentials) not found! Disabling plugin...");
@@ -107,13 +120,57 @@ public class ChestShop extends JavaPlugin {
             return;
         }
         economy = rsp.getProvider();
-        getLogger().info("Loaded economy plugin: " + economy.getName());
+        getLogger().info("Found economy plugin: " + economy.getName());
 
-        ShopFile.loadShopFiles(instance);
+        String storageType = conf.getString("storage-type");
+        getLogger().info("Using " + storageType + " storage type.");
+        this.dataManager = createDataManager(storageType);
+        if (dataManager == null) {
+            getLogger().severe("Invalid storage type in config! Disabling plugin...");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            dataManager.initialize().thenAccept(success -> {
+                if (!success) {
+                    getLogger().severe("Failed to initialize data manager! Disabling plugin...");
+                    getServer().getPluginManager().disablePlugin(this);
+                    return;
+                }
+            }).join();
+            dataManager.startSaveScheduler();
+        });
 
-        ShopFile.startSaveScheduler(instance);
         String info = String.format("%s v. %s plugin has been enabled!", getName(), getPluginMeta().getVersion());
         getLogger().info(info);
+    }
+
+    public DataManager createDataManager(String type) {
+        DataManager dataManager = new YamlStorage(this);
+        // switch (type) {
+        // case "yaml":
+        // dataManager = new YamlStorage(this);
+        // break;
+        // case "mysql":
+        // String host = conf.getString("mysql.host");
+        // int port = conf.getInt("mysql.port");
+        // String database = conf.getString("mysql.database");
+        // String username = conf.getString("mysql.username");
+        // String password = conf.getString("mysql.password");
+        // if (host == null || database == null || username == null || password == null)
+        // {
+        // getLogger().severe("MySQL configuration is incomplete! Disabling plugin...");
+        // getServer().getPluginManager().disablePlugin(this);
+        // return null;
+        // }
+        // dataManager = new MysqlStorage(this, host, port, database, username,
+        // password);
+        // break;
+        // case "sqlite":
+        // dataManager = new SqliteStorage(this);
+        // break;
+        // }
+        return dataManager;
     }
 
     @Override
@@ -121,7 +178,7 @@ public class ChestShop extends JavaPlugin {
         if (commandHandler != null) {
             commandHandler.unregister();
         }
-        ShopFile.saveShops();
+        dataManager.close();
 
         List<Object> guis = Arrays.asList(DashboardHolder.class, PlayersHolder.class, ShopHolder.class);
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -162,4 +219,38 @@ public class ChestShop extends JavaPlugin {
             e.printStackTrace();
         }
     }
+
+    public String bytesToString(byte[] bytes) {
+        if (bytes == null) {
+            return null;
+        }
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    public byte[] stringToBytes(String str) {
+        if (str == null) {
+            return null;
+        }
+        return Base64.getDecoder().decode(str);
+    }
+
+    public String getDateString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return LocalDateTime.now().format(formatter);
+    }
+
+    public String extractContent(Component component) {
+        StringBuilder sb = new StringBuilder();
+
+        if (component instanceof TextComponent text) {
+            sb.append(text.content());
+        }
+
+        for (Component child : component.children()) {
+            sb.append(extractContent(child));
+        }
+
+        return sb.toString();
+    }
+
 }

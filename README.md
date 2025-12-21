@@ -62,7 +62,7 @@ Add a `model-data` field to the relevant item section in your `guis.yml` (or equ
   inventory:
     title: '&cShopInventory'
     slot: 18
-    material: CHEST
+    item: item_stack as bytearray
     model-data: # You can define custom model as follows, it can be a list of integers/strings. You don't need to use both types, just one is enough.
       floats: [123, 456]  # Add an integer (or float) identifier
       strings: ['custom_chest', 'custom_chest_2']  # Add a string identifier
@@ -74,7 +74,7 @@ Add a `model-data` field to the relevant item section in your `guis.yml` (or equ
   inventory:
     title: '&cShopInventory'
     slot: 18
-    material: CHEST
+    item: item_stack as bytearray
     model-data:
       strings: ['custom_chest']  # Add a string identifier
     lore:

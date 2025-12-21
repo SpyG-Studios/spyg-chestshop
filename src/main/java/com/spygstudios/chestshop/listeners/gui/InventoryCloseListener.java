@@ -16,10 +16,12 @@ import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.chestshop.shop.ShopUtils;
+import com.spygstudios.spyglib.datacontainer.ItemContainer;
 
 public class InventoryCloseListener implements Listener {
 
-    ChestShop plugin;
+    final ChestShop plugin;
 
     public InventoryCloseListener(ChestShop plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -35,7 +37,7 @@ public class InventoryCloseListener implements Listener {
             Location invLocation = inventory.getLocation();
             Shop shop = Shop.getShop(invLocation);
             if (plugin.getConf().getBoolean("shops.barrier-when-empty")) {
-                if (shop == null || !invLocation.getWorld().getChunkAt(invLocation).isLoaded()) {
+                if (shop == null || !invLocation.getWorld().isChunkLoaded(invLocation.getBlockX() >> 4, invLocation.getBlockZ() >> 4)) {
                     return;
                 }
                 shop.getHologram().updateHologramRows();
@@ -52,17 +54,37 @@ public class InventoryCloseListener implements Listener {
         }
     }
 
-    private void itemAdding(InventoryCloseEvent event, DashboardHolder holdder) {
+    private void itemAdding(InventoryCloseEvent event, DashboardHolder holder) {
         ItemStack item = event.getInventory().getItem(13);
-        Shop shop = holdder.getShop();
-        if (item == null || item.getType().equals(shop.getMaterial())) {
+        Shop shop = holder.getShop();
+        if (item == null) {
+            return;
+        }
+        if (ShopUtils.isSimilar(item, shop.getItem())) {
             return;
         }
 
-        if (item.getItemMeta().displayName() != null) {
+        ItemContainer newData = ItemContainer.create(plugin, event.getInventory().getItem(13));
+        newData.remove("action");
+        shop.setShopItem(item);
+        shop.getHologram().updateHologramRows();
+    }
+
+    @EventHandler
+    public void onShopContainerClosed(InventoryCloseEvent event) {
+        Inventory inventory = event.getInventory();
+        InventoryHolder invHolder = inventory.getHolder();
+
+        if (invHolder == null || invHolder.getInventory() == null || invHolder.getInventory().getLocation() == null) {
             return;
         }
-        shop.setMaterial(item.getType());
+
+        Location invLocation = inventory.getLocation();
+        Shop shop = Shop.getShop(invLocation);
+        if (shop == null || !invLocation.getWorld().isChunkLoaded(invLocation.getBlockX() >> 4, invLocation.getBlockZ() >> 4)) {
+            return;
+        }
+        shop.getHologram().updateHologramRows();
     }
 
 }

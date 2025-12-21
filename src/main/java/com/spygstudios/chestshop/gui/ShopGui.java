@@ -14,14 +14,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.PageUtil;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.enums.ShopMode;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.chestshop.utils.PageUtil;
 import com.spygstudios.spyglib.color.TranslateColor;
+import com.spygstudios.spyglib.datacontainer.ItemContainer;
 import com.spygstudios.spyglib.item.ItemUtils;
-import com.spygstudios.spyglib.persistentdata.PersistentData;
 
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -52,12 +52,12 @@ public class ShopGui {
                     ? config.getStringList("shop.mode.buying.lore")
                     : config.getStringList("shop.mode.selling.lore");
             ItemStack modeItem = ItemUtils.create(modeMaterial, modeTitle, modeLore);
-            PersistentData modeData = new PersistentData(plugin, modeItem);
+            ItemContainer modeData = ItemContainer.create(plugin, modeItem);
             modeData.set("action", GuiAction.TOGGLE_MODE.name());
             inventory.setItem(4, modeItem);
         }
 
-        ItemStack shopItem = new ItemStack(shop.getMaterial());
+        ItemStack shopItem = shop.getItem();
         ItemMeta shopMeta = shopItem.getItemMeta();
 
         String titleKey = mode == ShopMode.CUSTOMER_PURCHASING
@@ -67,7 +67,7 @@ public class ShopGui {
                 ? "shop.item-to-buy.lore"
                 : "shop.item-to-sell.lore";
 
-        shopMeta.displayName(TranslateColor.translate(config.getString(titleKey, "&e%material%").replace("%material%", shop.getMaterial().name())));
+        shopMeta.displayName(TranslateColor.translate(config.getString(titleKey, "&e%item%").replace("%item%", shop.getItemName())));
         double priceForMode = mode == ShopMode.CUSTOMER_PURCHASING
                 ? shop.getCustomerPurchasePrice()
                 : shop.getCustomerSalePrice();
@@ -76,7 +76,7 @@ public class ShopGui {
         shopMeta.lore(translatedLore);
         shopItem.setItemMeta(shopMeta);
 
-        PersistentData data = new PersistentData(plugin, shopItem);
+        ItemContainer data = ItemContainer.create(plugin, shopItem);
         data.set("action", mode == ShopMode.CUSTOMER_PURCHASING
                 ? GuiAction.BUY.name()
                 : GuiAction.SELL.name());
@@ -86,7 +86,7 @@ public class ShopGui {
         if (shop.getAddedPlayers().contains(player.getUniqueId())) {
             Material inventoryMaterial = Material.getMaterial(config.getString("chestshop.inventory.material", "CHEST"));
             ItemStack inventoryItem = ItemUtils.create(inventoryMaterial, config.getString("chestshop.inventory.title"), config.getStringList("chestshop.inventory.lore"));
-            PersistentData inventoryData = new PersistentData(plugin, inventoryItem);
+            ItemContainer inventoryData = ItemContainer.create(plugin, inventoryItem);
             inventoryData.set("action", GuiAction.OPEN_SHOP_INVENTORY.name());
             inventory.setItem(18, inventoryItem);
         }
@@ -100,7 +100,9 @@ public class ShopGui {
             Material material = Material.getMaterial(amountSection.getString(key + ".material", "GRAY_STAINED_GLASS_PANE"));
             List<Float> modelFloats = amountSection.getFloatList(key + ".model-data.floats");
             List<String> modelStrings = amountSection.getStringList(key + ".model-data.strings");
-            addItemToInventory(plugin, inventory, slot, material, title, lore, modelFloats, modelStrings, amount);
+            if (shopItem.getMaxStackSize() > Math.abs(amount)) {
+                addItemToInventory(plugin, inventory, slot, material, title, lore, modelFloats, modelStrings, amount);
+            }
         });
 
         PageUtil.setFillItems(inventory, "shop");
@@ -111,7 +113,7 @@ public class ShopGui {
     private void addItemToInventory(ChestShop plugin, Inventory inventory, int slot, Material material, String title, List<String> lore, List<Float> modelFloats, List<String> modelStrings,
             int amount) {
         ItemStack item = ItemUtils.create(material, title, lore, modelFloats, modelStrings, Math.abs(amount));
-        PersistentData data = new PersistentData(plugin, item);
+        ItemContainer data = ItemContainer.create(plugin, item);
         data.set("action", GuiAction.SET_ITEM_AMOUNT.name());
         data.set("amount", amount);
         inventory.setItem(slot, item);

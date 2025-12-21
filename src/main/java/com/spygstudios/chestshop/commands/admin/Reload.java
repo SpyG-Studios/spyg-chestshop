@@ -33,6 +33,8 @@ public class Reload {
     }
 
     @Execute
+    @Permission("spygchestshop.*")
+    @Permission("spygchestshop.admin.*")
     @Permission("spygchestshop.admin.reload")
     @Permission("spygchestshop.admin.*")
     public void onReload(@Context CommandSender sender) {

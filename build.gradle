@@ -1,0 +1,131 @@
+plugins {
+    id 'java'
+    id("com.gradleup.shadow") version("9.0.0-beta15")
+}
+
+group = 'com.spygstudios'
+version = '1.8.1'
+ext.shouldCopy = true
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    withSourcesJar()
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url = uri('https://repo.ikoli.hu/') }
+    maven { url = uri('https://repo.papermc.io/repository/maven-public/') }
+    maven { url = uri('https://jitpack.io') }
+}
+
+ext {
+    sqliteVersion = '3.50.2.0'
+    mysqlVersion = '9.4.0'
+    bstatsVersion = '3.1.0'
+    spyglibVersion = '1.4.6'
+    lombokVersion = '1.18.38'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    // Paper API + Vault as provided/compileOnly
+    compileOnly "io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT"
+    compileOnly ("com.github.MilkBowl:VaultAPI:1.7"){
+        transitive = false
+    }
+
+    // Project libs provided by server
+    compileOnly "com.spygstudios:spyglib:${spyglibVersion}"
+    compileOnly "org.xerial:sqlite-jdbc:${sqliteVersion}"
+    compileOnly "com.mysql:mysql-connector-j:${mysqlVersion}"
+
+    // Lombok
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    // Bundled + relocated
+    implementation "org.bstats:bstats-bukkit:${bstatsVersion}"
+}
+
+tasks.withType(JavaCompile).configureEach { t ->
+    options.encoding = 'UTF-8' 
+    options.compilerArgs += ['-parameters']
+}
+
+// Replace tokens in plugin.yml to mirror Maven resource filtering
+tasks.processResources {
+    filesMatching('plugin.yml') {
+        expand(
+            [
+                project: [version: project.version],
+                spyglib: [version: spyglibVersion],
+                sqlite : [version: sqliteVersion],
+                mysql  : [version: mysqlVersion]
+            ]
+        )
+    }
+
+}
+
+afterEvaluate {
+    if (project.hasProperty('shouldCopy') && project.shouldCopy) {
+        def destEnvProvider = providers.environmentVariable('LOCAL_SERVER_PLUGINS_PATH_SPYG')
+        def destinations = destEnvProvider.map { s ->
+            (s ?: '')
+                .split(';')
+                .collect { it.trim() }
+                .findAll { it }
+        }.getOrElse([])
+
+        if (!destinations.isEmpty()) {
+            def aggregate = tasks.register('copyShadowJarMulti')
+            def shadowTaskProvider = tasks.named('shadowJar')
+            destinations.eachWithIndex { String destPath, int idx ->
+                def copyTask = tasks.register("copyShadowJar_${idx}", Copy) { t ->
+                    t.dependsOn(shadowTaskProvider)
+                    t.from(shadowTaskProvider.flatMap { it.archiveFile })
+                    t.into(file(destPath))
+                }
+
+                aggregate.configure { dependsOn(copyTask) }
+                shadowTaskProvider.configure { finalizedBy(aggregate) }
+            }
+        }
+    }
+}
+
+
+// Produce a shaded artifact named like Maven's finalName
+tasks.jar {
+    enabled = false
+}
+
+tasks.shadowJar {
+    archiveBaseName.set('SpygChestShop')
+    archiveVersion.set(project.version.toString())
+    archiveClassifier.set('') // no "-all" suffix
+
+    relocate 'org.bstats', 'com.spygstudios.bstats'
+
+    // Avoid duplicate META-INF directory entries on Gradle 9
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    // Exclude only signature files; keep other META-INF resources as needed
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+
+    // Enable ZIP64 just in case dependencies grow
+    zip64 true
+}
+
+tasks.build {
+    dependsOn tasks.shadowJar
+}

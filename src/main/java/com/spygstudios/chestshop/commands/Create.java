@@ -14,9 +14,9 @@ import org.bukkit.inventory.ItemStack;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.Message;
-import com.spygstudios.chestshop.events.ShopCreateEvent;
+import com.spygstudios.chestshop.events.ShopCreatedEvent;
+import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.shop.Shop;
-import com.spygstudios.chestshop.shop.ShopFile;
 import com.spygstudios.chestshop.shop.ShopUtils;
 
 import dev.rollczi.litecommands.annotations.argument.Arg;
@@ -29,8 +29,15 @@ import net.milkbowl.vault.economy.Economy;
 @Command(name = "spygchestshop create", aliases = { "spcs create", "chestshop create", "scs create" })
 public class Create {
 
+    private final ChestShop plugin;
+
+    public Create(ChestShop plugin) {
+        this.plugin = plugin;
+    }
+
     @Execute
     @Permission("spygchestshop.use")
+    @Permission("spygchestshop.*")
     public void onCreate(@Context Player player, @Arg String name) {
         Block targetBlock = player.getTargetBlock((Set<Material>) null, 4);
         if (targetBlock == null || targetBlock.getType() != Material.CHEST) {
@@ -57,10 +64,8 @@ public class Create {
             return;
         }
 
-        ShopFile file = ShopFile.getShopFile(player);
-        if (file == null) {
-            file = new ShopFile(ChestShop.getInstance(), player);
-        } else if (file.getPlayerShops().contains(name)) {
+        DataManager dataManager = plugin.getDataManager();
+        if (Shop.getShop(player.getUniqueId(), name) != null) {
             Message.SHOP_ALREADY_EXISTS.send(player, Map.of("%shop-name%", name));
             return;
         }
@@ -71,7 +76,7 @@ public class Create {
         }
 
         int maxShops = ShopUtils.getMaxShops(player);
-        if (maxShops != -1 && file.getPlayerShops().size() >= maxShops) {
+        if (maxShops != -1 && dataManager.getPlayerShops(player.getUniqueId()).join().size() >= maxShops) {
             Message.SHOP_LIMIT_REACHED.send(player, Map.of("%shop-limit%", String.valueOf(maxShops)));
             return;
         }
@@ -87,15 +92,18 @@ public class Create {
             Message.SHOP_NAME_LENGTH.send(player, Map.of("%min-length%", minLength + "", "%max-length%", maxLength + ""));
             return;
         }
-        Shop shop = new Shop(player, name, targetBlock.getLocation(), file);
-        ShopCreateEvent shopCreateEvent = new ShopCreateEvent(shop);
-        Bukkit.getPluginManager().callEvent(shopCreateEvent);
 
-        if (shopPrice > 0) {
-            economy.withdrawPlayer(player, shopPrice);
-            Message.SHOP_CREATED_PRICE.send(player, Map.of("%shop-name%", name, "%price%", String.valueOf(shopPrice)));
-            return;
-        }
-        Message.SHOP_CREATED.send(player, Map.of("%shop-name%", name));
+        DataManager shopData = plugin.getDataManager();
+        shopData.createShop(player.getUniqueId(), name, targetBlock.getLocation()).thenAccept(shop -> {
+            if (shop == null) {
+                plugin.getLogger().warning("Failed to create shop for " + player.getName() + " at " + targetBlock.getLocation());
+                return;
+            }
+
+            ShopCreatedEvent shopCreateEvent = new ShopCreatedEvent(shop);
+            Bukkit.getPluginManager().callEvent(shopCreateEvent);
+            Message.SHOP_CREATED.send(player, Map.of("%shop-name%", name));
+        });
+
     }
 }

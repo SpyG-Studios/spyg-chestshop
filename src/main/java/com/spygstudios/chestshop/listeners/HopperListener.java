@@ -1,5 +1,6 @@
 package com.spygstudios.chestshop.listeners;
 
+import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
@@ -23,12 +24,25 @@ public class HopperListener implements Listener {
         if (!config.getBoolean("shops.hopper-protection")) {
             return;
         }
+        if (event.getSource() == null || event.getSource().getLocation() == null) {
+            return;
+        }
         if (ShopUtils.isDisabledWorld(event.getSource().getLocation().getWorld().getName())) {
             return;
         }
 
         if (Shop.getShop(event.getSource().getLocation()) != null) {
             event.setCancelled(true);
+            return;
+        }
+        Block shopBlock = event.getSource().getLocation().getBlock();
+        if (ShopUtils.isDoubleChest(shopBlock)) {
+            Block adj = ShopUtils.getAdjacentChest(shopBlock);
+            Shop shop = Shop.getShop(adj.getLocation());
+            if (shop != null) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 

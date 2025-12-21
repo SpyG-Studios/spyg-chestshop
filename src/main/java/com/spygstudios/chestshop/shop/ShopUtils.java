@@ -114,15 +114,32 @@ public class ShopUtils {
         return maxShops;
     }
 
-    public static int countDurableItemsInInventory(Inventory inventory, Material material) {
-        int itemCount = InventoryUtils.countItems(inventory, item -> {
-            if (!item.getType().equals(material)) {
+    public static int getSellableItemCount(Inventory inventory, ItemStack item) {
+        int itemCount = InventoryUtils.countItems(inventory, i -> {
+            if (!ShopUtils.isSimilar(item, i)) {
                 return false;
             }
-            return isDurabilitySufficient(item);
+            return isDurabilitySufficient(i);
         });
 
         return itemCount;
+    }
+
+    public static boolean isSimilar(ItemStack item1, ItemStack item2) {
+        if (item1 == null || item2 == null) {
+            return false;
+        }
+        if (item1.getItemMeta() instanceof Damageable d1 && item2.getItemMeta() instanceof Damageable d2) {
+            ItemStack copy1 = item1.clone();
+            ItemStack copy2 = item2.clone();
+
+            d1.setDamage(0);
+            d2.setDamage(0);
+            copy1.setItemMeta(d1);
+            copy2.setItemMeta(d2);
+            return copy1.isSimilar(copy2);
+        }
+        return item1.isSimilar(item2);
     }
 
     private static boolean isDurabilitySufficient(ItemStack item) {
@@ -130,7 +147,7 @@ public class ShopUtils {
             short maxDurability = item.getType().getMaxDurability();
             int damageInPercent = (int) (Math.ceil((double) damageable.getDamage() / maxDurability * 100));
             int durabilityInPercent = 100 - damageInPercent;
-            int minDurabilityPercent = plugin.getConfig().getInt("shops.minimum-durability");
+            int minDurabilityPercent = plugin.getConf().getInt("shops.minimum-durability");
             if (minDurabilityPercent > durabilityInPercent) {
                 return false;
             }
@@ -138,13 +155,13 @@ public class ShopUtils {
         return true;
     }
 
-    public static int extractItems(Inventory fromInventory, Inventory toInventory, Material material, int itemCount) {
+    public static int extractItems(Inventory fromInventory, Inventory toInventory, ItemStack item, int itemCount) {
         int extractedItems = 0;
         for (ItemStack chestItem : fromInventory.getContents()) {
             if (itemCount <= 0)
                 break;
 
-            if (chestItem != null && chestItem.getType() == material) {
+            if (chestItem != null && ShopUtils.isSimilar(chestItem, item)) {
                 if (!isDurabilitySufficient(chestItem)) {
                     continue;
                 }

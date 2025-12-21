@@ -1,4 +1,4 @@
-package com.spygstudios.chestshop;
+package com.spygstudios.chestshop.utils;
 
 import java.util.List;
 import java.util.Map;
@@ -8,6 +8,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.spyglib.color.TranslateColor;
@@ -41,7 +42,7 @@ public class PageUtil {
         }
 
         if (pages == 1) {
-            return pagesComponent.build(); // Csak egy oldal van
+            return pagesComponent.build();
         } else if (page < pages && page == 1) {
             return Component.text().append(pagesComponent.build()).append(next).build();
         } else if (page < pages) {
@@ -66,10 +67,6 @@ public class PageUtil {
                 int slot = Integer.parseInt(s);
                 if (slot < 0 || slot >= inventory.getSize()) {
                     ChestShop.getInstance().getLogger().warning("Invalid slot in " + configPath + " fill-items: " + s);
-                    continue;
-                }
-                if (inventory.getItem(slot) != null) {
-                    ChestShop.getInstance().getLogger().warning("Slot " + slot + " is already occupied in " + configPath + " fill-items.");
                     continue;
                 }
                 ItemMeta glassMeta = fillerItem.getItemMeta();

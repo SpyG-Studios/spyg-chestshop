@@ -30,6 +30,7 @@ public class DependencyLoader implements PluginLoader {
         }
 
         resolver.addRepository(new RemoteRepository.Builder("ikoli", "default", "https://repo.ikoli.hu/").build());
+        resolver.addRepository(new RemoteRepository.Builder("central", "default", "https://maven-central-eu.storage-download.googleapis.com/maven2/").build());
 
         classpathBuilder.addLibrary(resolver);
     }

@@ -56,7 +56,7 @@ public class InteractListener implements Listener {
         }
 
         // Customer interaction
-        if (shop.getMaterial() == null) {
+        if (shop.getItem() == null) {
             Message.SHOP_SETUP_NEEDED.send(player);
             return;
         }

@@ -21,7 +21,7 @@ import com.spygstudios.chestshop.gui.ShopGui;
 import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.shop.ShopUtils;
 import com.spygstudios.spyglib.color.TranslateColor;
-import com.spygstudios.spyglib.persistentdata.PersistentData;
+import com.spygstudios.spyglib.datacontainer.ItemContainer;
 
 import net.kyori.adventure.text.Component;
 
@@ -46,7 +46,7 @@ public class ShopGuiHandler implements Listener {
             return;
         }
         event.setCancelled(true);
-        PersistentData data = new PersistentData(plugin, clickedItem);
+        ItemContainer data = ItemContainer.create(plugin, clickedItem);
         String action = data.getString("action");
         if (action == null) {
             return;
@@ -69,9 +69,10 @@ public class ShopGuiHandler implements Listener {
                     int itemsLeft = holder.getShop().getItemsLeft();
                     max = Math.min(item.getMaxStackSize(), itemsLeft);
                 } else {
-                    int playerItems = ShopUtils.countDurableItemsInInventory(player.getInventory(), holder.getShop().getMaterial());
+                    int playerItems = ShopUtils.getSellableItemCount(player.getInventory(), holder.getShop().getItem());
                     max = Math.min(item.getMaxStackSize(), playerItems);
                 }
+                max = Math.max(1, max);
                 int min = 1;
                 int modifier = data.getInt("amount");
                 int currentAmount = item.getAmount();
