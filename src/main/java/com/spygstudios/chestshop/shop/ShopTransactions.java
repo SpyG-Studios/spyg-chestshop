@@ -89,17 +89,17 @@ public class ShopTransactions {
         Chest chest = (Chest) shop.getChestLocation().getBlock().getState();
         if (!hasChestSpace(chest, item, amount)) {
             Message.SHOP_CHEST_FULL.send(seller);
-            if (!shop.isNotify()) {
-                return;
+            if (shop.isNotify()) {
+                Player owner = Bukkit.getPlayer(shop.getOwnerId());
+                if (owner != null) {
+                    Message.SHOP_CHEST_FULL_OWNER.send(owner, Map.of(
+                            "%player-name%", seller.getName(),
+                            "%item%", shop.getName(),
+                            "%amount%", String.valueOf(amount),
+                            "%shop-name%", shop.getName()));
+                }
             }
-            Player owner = Bukkit.getPlayer(shop.getOwnerId());
-            if (owner != null) {
-                Message.SHOP_CHEST_FULL_OWNER.send(owner, Map.of(
-                        "%player-name%", seller.getName(),
-                        "%item%", shop.getName(),
-                        "%amount%", String.valueOf(amount),
-                        "%shop-name%", shop.getName()));
-            }
+            return;
         }
 
         double itemsPrice = amount * shop.getCustomerSalePrice();
@@ -108,14 +108,15 @@ public class ShopTransactions {
 
         if (!response.transactionSuccess()) {
             Message.SHOP_OWNER_NO_MONEY.send(seller);
-            if (!shop.isNotify()) {
-                return;
+            if (shop.isNotify()) {
+                Player owner = Bukkit.getPlayer(shop.getOwnerId());
+                if (owner != null) {
+                    Message.SHOP_OWNER_NO_MONEY_OWNER.send(owner, Map.of("%player-name%", seller.getName(), "%item%", shop.getName(), "%price%", String.valueOf(itemsPrice)));
+                }
             }
-            Player owner = Bukkit.getPlayer(shop.getOwnerId());
-            if (owner != null) {
-                Message.SHOP_OWNER_NO_MONEY_OWNER.send(owner, Map.of("%player-name%", seller.getName(), "%item%", shop.getName(), "%price%", String.valueOf(itemsPrice)));
-            }
+            return;
         }
+
         Inventory chestInventory = chest.getInventory();
         int soldItems = ShopUtils.extractItems(seller.getInventory(), chestInventory, item, amount);
 
