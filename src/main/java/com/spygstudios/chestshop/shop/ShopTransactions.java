@@ -94,7 +94,7 @@ public class ShopTransactions {
                 if (owner != null) {
                     Message.SHOP_CHEST_FULL_OWNER.send(owner, Map.of(
                             "%player-name%", seller.getName(),
-                            "%item%", shop.getName(),
+                            "%item%", shop.getItemName(),
                             "%amount%", String.valueOf(amount),
                             "%shop-name%", shop.getName()));
                 }
