@@ -100,8 +100,9 @@ public class ShopTransactions {
 
         double itemsPrice = amount * shop.getCustomerSalePrice();
         Economy economy = plugin.getEconomy();
+        EconomyResponse response = economy.withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwnerId()), itemsPrice);
 
-        if (economy.getBalance(Bukkit.getOfflinePlayer(shop.getOwnerId())) < itemsPrice) {
+        if (!response.transactionSuccess()) {
             Message.SHOP_OWNER_NO_MONEY.send(seller);
             if (!shop.isNotify()) {
                 return;
@@ -114,10 +115,7 @@ public class ShopTransactions {
         Inventory chestInventory = chest.getInventory();
         int soldItems = ShopUtils.extractItems(seller.getInventory(), chestInventory, item, amount);
 
-        EconomyResponse withdrawResponse = economy.withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwnerId()), itemsPrice);
-        if (withdrawResponse.transactionSuccess()) {
-            economy.depositPlayer(seller, itemsPrice);
-        }
+        economy.depositPlayer(seller, itemsPrice);
 
         plugin.getDataManager().updateShopBuyStats(shop.getOwnerId(), shop.getName(), amount, itemsPrice).thenAccept(success -> {
             if (!success) {
