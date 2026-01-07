@@ -120,26 +120,32 @@ public class ShopGui {
     }
 
     private static ShopMode getPlayerMode(Player player, Shop shop) {
-        ShopMode mode = PLAYER_MODES.get(player.getUniqueId());
+        UUID uuid = player.getUniqueId();
 
-        if (mode == null) {
-            if (shop.acceptsCustomerPurchases()) {
-                mode = ShopMode.CUSTOMER_PURCHASING;
-            } else if (shop.acceptsCustomerSales()) {
-                mode = ShopMode.CUSTOMER_SELLING;
-            }
-        }
+        boolean canBuy = shop.acceptsCustomerPurchases();
+        boolean canSell = shop.acceptsCustomerSales();
+        boolean hasItems = shop.getItemsLeft() > 0;
 
-        if (shop.getItemsLeft() == 0 && shop.acceptsCustomerSales()) {
+        if (!hasItems && canSell) {
+            PLAYER_MODES.put(uuid, ShopMode.CUSTOMER_SELLING);
             return ShopMode.CUSTOMER_SELLING;
         }
 
-        if ((mode == ShopMode.CUSTOMER_SELLING && !shop.acceptsCustomerSales()) ||
-                (mode == ShopMode.CUSTOMER_PURCHASING && !shop.acceptsCustomerPurchases())) {
-            mode = shop.acceptsCustomerSales()
-                    ? ShopMode.CUSTOMER_SELLING
-                    : ShopMode.CUSTOMER_PURCHASING;
+        ShopMode mode = PLAYER_MODES.get(uuid);
+
+        if (mode == null) {
+            mode = canBuy ? ShopMode.CUSTOMER_PURCHASING : ShopMode.CUSTOMER_SELLING;
+            PLAYER_MODES.put(uuid, mode);
+            return mode;
         }
+
+        if (mode == ShopMode.CUSTOMER_PURCHASING && !canBuy) {
+            mode = ShopMode.CUSTOMER_SELLING;
+        } else if (mode == ShopMode.CUSTOMER_SELLING && !canSell) {
+            mode = ShopMode.CUSTOMER_PURCHASING;
+        }
+
+        PLAYER_MODES.put(uuid, mode);
         return mode;
     }
 
