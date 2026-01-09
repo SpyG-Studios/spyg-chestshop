@@ -43,6 +43,7 @@ import com.spygstudios.chestshop.listeners.PlayerJoinListener;
 import com.spygstudios.chestshop.listeners.PlayerQuitListener;
 import com.spygstudios.chestshop.listeners.gui.DashboardGuiHandler;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
+import com.spygstudios.chestshop.listeners.gui.InventoryDragListener;
 import com.spygstudios.chestshop.listeners.gui.PlayerGuiHandler;
 import com.spygstudios.chestshop.listeners.gui.ShopGuiHandler;
 import com.spygstudios.spyglib.hologram.HologramManager;
@@ -98,6 +99,7 @@ public class ChestShop extends JavaPlugin {
         new PlayerQuitListener(this);
         new ChunkLoadListener(this);
         new ChunkUnloadListener(this);
+        new InventoryDragListener(this);
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             Entry<String, Boolean> versionInfo = VersionChecker.isLatestVersion(API_URL, getPluginMeta().getVersion());
             this.currentVersion = versionInfo.getKey();
