@@ -180,7 +180,9 @@ public class ChestShop extends JavaPlugin {
         if (commandHandler != null) {
             commandHandler.unregister();
         }
-        dataManager.close();
+        if (dataManager != null) {
+            dataManager.close();
+        }
 
         List<Object> guis = Arrays.asList(DashboardHolder.class, PlayersHolder.class, ShopHolder.class);
         for (Player player : Bukkit.getOnlinePlayers()) {
