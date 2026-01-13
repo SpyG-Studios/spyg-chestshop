@@ -25,6 +25,7 @@ import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.execute.Execute;
 import dev.rollczi.litecommands.annotations.permission.Permission;
 import net.milkbowl.vault.economy.Economy;
+import com.spygstudios.chestshop.hooks.WorldGuardHook;
 
 @Command(name = "spygchestshop create", aliases = { "spcs create", "chestshop create", "scs create" })
 public class Create {
@@ -44,9 +45,18 @@ public class Create {
             Message.SHOP_NO_CHEST.send(player);
             return;
         }
+        boolean isDisabledWorld = ShopUtils.isDisabledWorld(player.getWorld().getName());
+        boolean onlyAreasEnabled = plugin.getConf().getBoolean("shops.only-in-regions");
+        boolean canCreateShopOnLocation = WorldGuardHook.isShopCreationAllowed(player, targetBlock.getLocation());
 
-        if (ShopUtils.isDisabledWorld(player.getWorld().getName())) {
+        if (onlyAreasEnabled && !canCreateShopOnLocation) {
+            Message.SHOP_CREATION_NOT_ALLOWED.send(player);
+            return;
+        } else if (isDisabledWorld) {
             Message.SHOP_DISABLED_WORLD.send(player);
+            return;
+        } else if (!canCreateShopOnLocation) {
+            Message.SHOP_CREATION_NOT_ALLOWED.send(player);
             return;
         }
 

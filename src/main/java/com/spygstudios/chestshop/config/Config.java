@@ -37,6 +37,7 @@ public class Config extends YamlManager {
         setOrDefault("shops.name.min-length", 3);
         setOrDefault("shops.blacklisted-names", Arrays.asList("stupid"));
         setOrDefault("shops.disabled-worlds", Arrays.asList("disabled_world"));
+        setOrDefault("shops.only-in-regions", false, Arrays.asList("Players can only create shops in specified WorldGuard regions."));
         setOrDefault("shops.unknown.item", "-", Arrays.asList("The text to use when the item is unknown."));
         setOrDefault("shops.unknown.mode", "&cOffline", Arrays.asList("The text to use when the shop mode is not set."));
         setOrDefault("shops.unknown.owner", "Unknown Owner", Arrays.asList("The text to use when the shop owner is unknown."));

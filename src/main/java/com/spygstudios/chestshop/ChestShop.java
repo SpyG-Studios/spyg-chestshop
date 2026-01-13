@@ -43,7 +43,6 @@ import com.spygstudios.chestshop.listeners.PlayerJoinListener;
 import com.spygstudios.chestshop.listeners.PlayerQuitListener;
 import com.spygstudios.chestshop.listeners.gui.DashboardGuiHandler;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
-import com.spygstudios.chestshop.listeners.gui.InventoryDragListener;
 import com.spygstudios.chestshop.listeners.gui.PlayerGuiHandler;
 import com.spygstudios.chestshop.listeners.gui.ShopGuiHandler;
 import com.spygstudios.spyglib.hologram.HologramManager;
@@ -54,6 +53,7 @@ import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.milkbowl.vault.economy.Economy;
+import com.spygstudios.chestshop.hooks.WorldGuardHook;
 
 @Getter
 public class ChestShop extends JavaPlugin {
@@ -77,11 +77,17 @@ public class ChestShop extends JavaPlugin {
     }
 
     @Override
+    public void onLoad() {
+        WorldGuardHook.onLoad(this);
+    }
+
+    @Override
     public void onEnable() {
         conf = new Config(this);
         guiConfig = new GuiConfig(this);
         messageConfig = new MessageConfig(this, conf.getString("locale"));
         Message.init(messageConfig);
+        WorldGuardHook.onEnable(this);
 
         hologramManager = HologramManager.getManager(this);
         commandHandler = new CommandHandler(this);
@@ -99,7 +105,6 @@ public class ChestShop extends JavaPlugin {
         new PlayerQuitListener(this);
         new ChunkLoadListener(this);
         new ChunkUnloadListener(this);
-        new InventoryDragListener(this);
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             Entry<String, Boolean> versionInfo = VersionChecker.isLatestVersion(API_URL, getPluginMeta().getVersion());
             this.currentVersion = versionInfo.getKey();
@@ -180,9 +185,7 @@ public class ChestShop extends JavaPlugin {
         if (commandHandler != null) {
             commandHandler.unregister();
         }
-        if (dataManager != null) {
-            dataManager.close();
-        }
+        dataManager.close();
 
         List<Object> guis = Arrays.asList(DashboardHolder.class, PlayersHolder.class, ShopHolder.class);
         for (Player player : Bukkit.getOnlinePlayers()) {
