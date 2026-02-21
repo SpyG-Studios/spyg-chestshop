@@ -20,6 +20,7 @@ import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.chestshop.utils.FormatUtils;
 import com.spygstudios.chestshop.utils.PageUtil;
 import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.datacontainer.ItemContainer;
@@ -87,10 +88,10 @@ public class DashboardGui {
         }
 
         String buyPrice = config.getString("shops.price-format.buy")
-                .replace("%price%", String.valueOf(shop.getCustomerPurchasePrice()));
+                .replace("%price%", FormatUtils.formatNumber(shop.getCustomerPurchasePrice()));
 
         String sellPrice = config.getString("shops.price-format.sell")
-                .replace("%price%", String.valueOf(shop.getCustomerSalePrice()));
+                .replace("%price%", FormatUtils.formatNumber(shop.getCustomerSalePrice()));
 
         String priceDisplay;
         if (shop.acceptsCustomerPurchases() && shop.acceptsCustomerSales()) {
@@ -117,9 +118,9 @@ public class DashboardGui {
                                 "%created%", shop.getCreatedAt(),
                                 "%location%", shop.getChestLocationString(),
                                 "%sold-items%", String.valueOf(shop.getSoldItems()),
-                                "%money-earned%", String.valueOf(shop.getMoneyEarned()),
+                                "%money-earned%", FormatUtils.formatNumber(shop.getMoneyEarned()),
                                 "%bought-items%", String.valueOf(shop.getBoughtItems()),
-                                "%money-spent%", String.valueOf(shop.getMoneySpent()))),
+                                "%money-spent%", FormatUtils.formatNumber(shop.getMoneySpent()))),
                 section.getFloatList("model-data.floats"),
                 section.getStringList("model-data.strings"));
 
@@ -152,8 +153,8 @@ public class DashboardGui {
         List<String> lore = new ArrayList<>();
         for (String line : section.getStringList("lore")) {
             lore.add(
-                    line.replace("%sell-price%", String.valueOf(shop.getCustomerPurchasePrice()))
-                            .replace("%buy-price%", String.valueOf(shop.getCustomerSalePrice())));
+                    line.replace("%sell-price%", FormatUtils.formatNumber(shop.getCustomerPurchasePrice()))
+                            .replace("%buy-price%", FormatUtils.formatNumber(shop.getCustomerSalePrice())));
         }
 
         ItemStack item = ItemUtils.create(

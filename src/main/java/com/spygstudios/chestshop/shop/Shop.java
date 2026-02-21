@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.enums.ShopRemoveCause;
+import com.spygstudios.chestshop.utils.FormatUtils;
 import com.spygstudios.chestshop.events.ShopRemoveEvent;
 import com.spygstudios.spyglib.hologram.HologramItemRow;
 
@@ -100,11 +101,11 @@ public class Shop {
     }
 
     public double getSellPrice() {
-        return ShopUtils.parsePrice(this.sellPrice);
+        return FormatUtils.parsePrice(this.sellPrice);
     }
 
     public double getBuyPrice() {
-        return ShopUtils.parsePrice(this.buyPrice);
+        return FormatUtils.parsePrice(this.buyPrice);
     }
 
     public boolean acceptsCustomerPurchases() {
@@ -208,7 +209,7 @@ public class Shop {
     }
 
     public void setBuyPrice(double buyPrice) {
-        double parsedPrice = ShopUtils.parsePrice(buyPrice);
+        double parsedPrice = FormatUtils.parsePrice(buyPrice);
         plugin.getDataManager().updateShopBuyPrice(ownerId, name, parsedPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop price for " + name);
@@ -221,7 +222,7 @@ public class Shop {
     }
 
     public void setSellPrice(double sellPrice) {
-        double parsedPrice = ShopUtils.parsePrice(sellPrice);
+        double parsedPrice = FormatUtils.parsePrice(sellPrice);
         plugin.getDataManager().updateShopSellPrice(ownerId, name, parsedPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop price for " + name);
