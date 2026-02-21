@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.chestshop.utils.FormatUtils;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
 
 import net.milkbowl.vault.economy.Economy;
@@ -42,7 +43,7 @@ public class ShopTransactions {
         EconomyResponse response = economy.withdrawPlayer(buyer, itemsPrice);
 
         if (!response.transactionSuccess()) {
-            Message.NOT_ENOUGH_MONEY.send(buyer, Map.of("%price%", String.valueOf(itemsPrice)));
+            Message.NOT_ENOUGH_MONEY.send(buyer, Map.of("%price%", FormatUtils.formatNumber(itemsPrice)));
             return;
         }
 
@@ -52,7 +53,7 @@ public class ShopTransactions {
         itemsLeft = itemsLeft - itemCount;
 
         Message.SHOP_BOUGHT.send(buyer,
-                Map.of("%price%", String.valueOf(itemsPrice), "%item%", shop.getItemName(), "%items-left%", String.valueOf(itemsLeft), "%items-bought%", String.valueOf(soldItems)));
+                Map.of("%price%", FormatUtils.formatNumber(itemsPrice), "%item%", shop.getItemName(), "%items-left%", String.valueOf(itemsLeft), "%items-bought%", String.valueOf(soldItems)));
         plugin.getDataManager().updateShopSellStats(shop.getOwnerId(), shop.getName(), itemCount, itemsPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop stats for " + shop.getName() + " owned by " + shop.getOwnerId());
@@ -65,7 +66,7 @@ public class ShopTransactions {
         Player owner = Bukkit.getPlayer(shop.getOwnerId());
         if (shop.isNotify() && owner != null) {
             Message.SHOP_SOLD.send(owner, Map.of(
-                    "%price%", String.valueOf(itemsPrice),
+                    "%price%", FormatUtils.formatNumber(itemsPrice),
                     "%item%", shop.getItemName(),
                     "%player-name%", buyer.getName(),
                     "%items-left%", String.valueOf(itemsLeft),
@@ -111,7 +112,7 @@ public class ShopTransactions {
             if (shop.isNotify()) {
                 Player owner = Bukkit.getPlayer(shop.getOwnerId());
                 if (owner != null) {
-                    Message.SHOP_OWNER_NO_MONEY_OWNER.send(owner, Map.of("%player-name%", seller.getName(), "%item%", shop.getName(), "%price%", String.valueOf(itemsPrice)));
+                    Message.SHOP_OWNER_NO_MONEY_OWNER.send(owner, Map.of("%player-name%", seller.getName(), "%item%", shop.getName(), "%price%", FormatUtils.formatNumber(itemsPrice)));
                 }
             }
             return;
@@ -133,7 +134,7 @@ public class ShopTransactions {
         });
 
         Message.SHOP_SOLD_TO.send(seller, Map.of(
-                "%price%", String.valueOf(itemsPrice),
+                "%price%", FormatUtils.formatNumber(itemsPrice),
                 "%item%", shop.getItemName(),
                 "%items-sold%", String.valueOf(soldItems)));
 
@@ -141,7 +142,7 @@ public class ShopTransactions {
         if (shop.isNotify() && owner != null) {
             Message.SHOP_BOUGHT_FROM.send(owner,
                     Map.of(
-                            "%price%", String.valueOf(itemsPrice),
+                            "%price%", FormatUtils.formatNumber(itemsPrice),
                             "%item%", shop.getItemName(),
                             "%player-name%", seller.getName(),
                             "%items-bought%", String.valueOf(soldItems)));

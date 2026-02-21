@@ -71,8 +71,14 @@ public class ShopGui {
         double priceForMode = mode == ShopMode.CUSTOMER_PURCHASING
                 ? shop.getCustomerPurchasePrice()
                 : shop.getCustomerSalePrice();
-        List<Component> translatedLore = plugin.getGuiConfig().getStringList(loreKey).stream()
-                .map(line -> TranslateColor.translate(line.replace("%price%", String.valueOf(priceForMode)))).toList();
+        List<Component> translatedLore = new java.util.ArrayList<>(plugin.getGuiConfig().getStringList(loreKey).stream()
+                .map(line -> TranslateColor.translate(line.replace("%price%", com.spygstudios.chestshop.utils.FormatUtils.formatNumber(priceForMode)))).toList());
+
+        if (shopItem.getType().name().contains("SHULKER_BOX")) {
+            translatedLore.add(Component.empty());
+            translatedLore.add(TranslateColor.translate("&7Right-click to inspect contents"));
+        }
+
         shopMeta.lore(translatedLore);
         shopItem.setItemMeta(shopMeta);
 
@@ -100,7 +106,7 @@ public class ShopGui {
             Material material = Material.getMaterial(amountSection.getString(key + ".material", "GRAY_STAINED_GLASS_PANE"));
             List<Float> modelFloats = amountSection.getFloatList(key + ".model-data.floats");
             List<String> modelStrings = amountSection.getStringList(key + ".model-data.strings");
-            if (shopItem.getMaxStackSize() > Math.abs(amount)) {
+            if (shopItem.getMaxStackSize() >= Math.abs(amount)) {
                 addItemToInventory(plugin, inventory, slot, material, title, lore, modelFloats, modelStrings, amount);
             }
         });

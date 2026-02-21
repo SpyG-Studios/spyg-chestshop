@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.event.inventory.ClickType;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
@@ -22,6 +23,10 @@ import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
 import com.spygstudios.chestshop.shop.ShopUtils;
 import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.datacontainer.ItemContainer;
+import org.bukkit.block.ShulkerBox;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.meta.BlockStateMeta;
+import com.spygstudios.chestshop.listeners.gui.ShulkerPreviewHandler.ShulkerPreviewHolder;
 
 import net.kyori.adventure.text.Component;
 
@@ -29,6 +34,7 @@ public class ShopGuiHandler implements Listener {
 
     private final ChestShop plugin;
     private final Map<UUID, Long> lastAmountClick;
+    private final Map<UUID, Inventory> cachedPreviews = new HashMap<>();
 
     public ShopGuiHandler(ChestShop plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -94,6 +100,10 @@ public class ShopGuiHandler implements Listener {
                 item.setItemMeta(shopMeta);
                 break;
             case BUY:
+                if (event.getClick() == ClickType.RIGHT) {
+                    handleShulkerPreview(player, holder.getShop().getItem());
+                    return;
+                }
                 ItemStack shopItem = event.getInventory().getItem(13);
                 int amount = shopItem.getAmount();
                 holder.getShop().getShopTransactions().sell(player, amount);
@@ -104,6 +114,10 @@ public class ShopGuiHandler implements Listener {
                 }
                 break;
             case SELL:
+                if (event.getClick() == ClickType.RIGHT) {
+                    handleShulkerPreview(player, holder.getShop().getItem());
+                    return;
+                }
                 ItemStack sellItem = event.getInventory().getItem(13);
                 int sellAmount = sellItem.getAmount();
                 holder.getShop().getShopTransactions().buy(player, sellAmount);
@@ -122,6 +136,25 @@ public class ShopGuiHandler implements Listener {
                 break;
             default:
                 break;
+        }
+    }
+
+    private void handleShulkerPreview(Player player, ItemStack item) {
+        if (item == null || !item.getType().name().contains("SHULKER_BOX")) {
+            return;
+        }
+
+        UUID uuid = player.getUniqueId();
+        if (cachedPreviews.containsKey(uuid)) {
+            player.openInventory(cachedPreviews.get(uuid));
+        } else {
+            if (item.getItemMeta() instanceof BlockStateMeta bsm && bsm.getBlockState() instanceof ShulkerBox shulker) {
+                Inventory preview = plugin.getServer().createInventory(new ShulkerPreviewHolder(), 27, TranslateColor.translate("&8Shulker Preview"));
+                preview.setContents(shulker.getInventory().getContents());
+                
+                cachedPreviews.put(uuid, preview);
+                player.openInventory(preview);
+            }
         }
     }
 

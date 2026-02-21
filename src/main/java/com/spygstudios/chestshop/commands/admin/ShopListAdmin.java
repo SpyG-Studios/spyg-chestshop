@@ -10,6 +10,7 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.chestshop.utils.FormatUtils;
 import com.spygstudios.chestshop.utils.PageUtil;
 import com.spygstudios.spyglib.components.ComponentUtils;
 
@@ -53,8 +54,8 @@ public class ShopListAdmin {
                 Component hoverMessage = ComponentUtils.replaceComponent(Message.SHOP_LIST_SHOPS_HOVER.get(), Map.of(
                         "%shop-name%", shop.getName(),
                         "%item%", shop.getItemName(),
-                        "%sell-price%", String.format("%.2f", shop.getCustomerPurchasePrice()),
-                        "%buy-price%", String.format("%.2f", shop.getCustomerSalePrice()),
+                        "%sell-price%", FormatUtils.formatNumber(shop.getCustomerPurchasePrice()),
+                        "%buy-price%", FormatUtils.formatNumber(shop.getCustomerSalePrice()),
                         "%items-left%", shop.getItemsLeft() + "",
                         "%location%", shop.getChestLocationString(),
                         "%created%", shop.getCreatedAt()));
