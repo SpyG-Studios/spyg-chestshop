@@ -33,12 +33,10 @@ import net.kyori.adventure.text.Component;
 public class ShopGuiHandler implements Listener {
 
     private final ChestShop plugin;
-    private final Map<UUID, Long> lastAmountClick;
-    private final Map<UUID, Inventory> cachedPreviews = new HashMap<>();
+    private final Map<UUID, Long> lastAmountClick = new HashMap<>();
 
     public ShopGuiHandler(ChestShop plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        this.lastAmountClick = new HashMap<>();
         this.plugin = plugin;
     }
 
@@ -144,17 +142,10 @@ public class ShopGuiHandler implements Listener {
             return;
         }
 
-        UUID uuid = player.getUniqueId();
-        if (cachedPreviews.containsKey(uuid)) {
-            player.openInventory(cachedPreviews.get(uuid));
-        } else {
-            if (item.getItemMeta() instanceof BlockStateMeta bsm && bsm.getBlockState() instanceof ShulkerBox shulker) {
-                Inventory preview = plugin.getServer().createInventory(new ShulkerPreviewHolder(), 27, TranslateColor.translate(Message.SHOP_SHULKER_PREVIEW_TITLE.getRaw()));
-                preview.setContents(shulker.getInventory().getContents());
-                
-                cachedPreviews.put(uuid, preview);
-                player.openInventory(preview);
-            }
+        if (item.getItemMeta() instanceof BlockStateMeta bsm && bsm.getBlockState() instanceof ShulkerBox shulker) {
+            Inventory preview = plugin.getServer().createInventory(new ShulkerPreviewHolder(), 27, TranslateColor.translate(Message.SHOP_SHULKER_PREVIEW_TITLE.getRaw()));
+            preview.setContents(shulker.getInventory().getContents());
+            player.openInventory(preview);
         }
     }
 
