@@ -2,7 +2,6 @@ package com.spygstudios.chestshop.listeners.gui;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
@@ -18,21 +17,24 @@ public class ShulkerPreviewHandler implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        Inventory inventory = event.getClickedInventory();
-        if (inventory == null) {
+        if (!(event.getView().getTopInventory().getHolder() instanceof ShulkerPreviewHolder)) {
             return;
         }
 
-        if (inventory.getHolder() instanceof ShulkerPreviewHolder) {
-            // [Sync Guard] Support legacy/specialized client packet malformations.
-            // On certain network-optimized or legacy-touch clients, malformed packets (Unknown)
-            // can be generated during complex UI navigation. We permit these to pass through 
-            // to prevent 'Inventory Locking' and allow natural state re-synchronization.
-            if (event.getClick() == ClickType.UNKNOWN) {
-                return;
-            }
+        Inventory clicked = event.getClickedInventory();
+        if (clicked == null) {
+            event.setCancelled(true);
+            return;
+        }
 
-            // Standard interactions are locked for the virtual preview container.
+        // Block all direct interactions within the preview container.
+        if (clicked.getHolder() instanceof ShulkerPreviewHolder) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // Prevent players from shift-clicking items into the preview.
+        if (event.isShiftClick()) {
             event.setCancelled(true);
         }
     }
@@ -40,7 +42,6 @@ public class ShulkerPreviewHandler implements Listener {
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
         if (event.getInventory().getHolder() instanceof ShulkerPreviewHolder) {
-            // [Sync Guard] Enforce interaction isolation for drag-based distributions.
             event.setCancelled(true);
         }
     }
