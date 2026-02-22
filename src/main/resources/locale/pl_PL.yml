@@ -55,7 +55,10 @@ shop:
   removed: '%prefix% &cSklep &f%shop-name% &cusunięty!'  # Wiadomość, gdy sklep został usunięty.
   setup-needed: '%prefix% &cTen sklep nie jest poprawnie skonfigurowany!'  # Wiadomość, gdy sklep nie jest poprawnie skonfigurowany.
   sold: '%prefix% &aSprzedałeś &7x%items-bought% &f%material% &a za &f$%price%&a, do &f%player-name%&a! &7(&8%items-left%&7)'  # Wiadomość po sprzedaży przedmiotu z jednego sklepu do drugiego gracza.
-  renamed: '%prefix% &aSklep &f%old-name% &azmieniony na &f%new-name%'  # Wiadomość po zmianie nazwy sklepu.
+  renamed: '%prefix% &aSklep &f%old-name% &azostał przemianowany na &f%new-name%!'
+  shulker-preview: '&7Kliknij prawym, aby sprawdzić zawartość'
+  shulker-preview-title: '&8Podgląd Shulkera'
+  # Wiadomość po zmianie nazwy sklepu.
   sold-to: '%prefix% &aSprzedałeś &7x%items-sold% &f%material% &a za &f$%price%&a do gracza!'  # Wiadomość po sprzedaży przedmiotu do innego gracza.
   bought-from: '%prefix% &aKupiłeś &7x%items-bought% &f%material% &a za &f$%price%&a od gracza &f%player-name%&a!'  # Wiadomość po zakupie przedmiotu od innego gracza.
   chest-full: '%prefix% &cSkrzynia sklepu jest pełna!'  # Wiadomość, gdy skrzynia sklepu jest pełna.

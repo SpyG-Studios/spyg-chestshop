@@ -71,6 +71,8 @@ shop:
   setup-needed: '%prefix% &cEz a bolt nincs megfelelően beállítva!'
   sold: '%prefix% &aSikeresen eladt ál &7x%items-bought% &f%item% &af$%price% &aértékben &f%player-name% &ajátékosnak! &7(&8%items-left%&7)'
   renamed: '%prefix% &f%old-name% &aúj neve: &f%new-name%!'
+  shulker-preview: '&7Jobb klikk a tartalom megtekintéséhez'
+  shulker-preview-title: '&8Shulker Előnézet'
 admin:
   shop:
     list:

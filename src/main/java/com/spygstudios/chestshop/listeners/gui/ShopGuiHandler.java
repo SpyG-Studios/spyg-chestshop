@@ -149,7 +149,7 @@ public class ShopGuiHandler implements Listener {
             player.openInventory(cachedPreviews.get(uuid));
         } else {
             if (item.getItemMeta() instanceof BlockStateMeta bsm && bsm.getBlockState() instanceof ShulkerBox shulker) {
-                Inventory preview = plugin.getServer().createInventory(new ShulkerPreviewHolder(), 27, TranslateColor.translate("&8Shulker Preview"));
+                Inventory preview = plugin.getServer().createInventory(new ShulkerPreviewHolder(), 27, TranslateColor.translate(Message.SHOP_SHULKER_PREVIEW_TITLE.getRaw()));
                 preview.setContents(shulker.getInventory().getContents());
                 
                 cachedPreviews.put(uuid, preview);
