@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.GuiConfig;
+import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.enums.ShopMode;
 import com.spygstudios.chestshop.shop.Shop;
@@ -76,7 +77,7 @@ public class ShopGui {
 
         if (shopItem.getType().name().contains("SHULKER_BOX")) {
             translatedLore.add(Component.empty());
-            translatedLore.add(TranslateColor.translate("&7Right-click to inspect contents"));
+            translatedLore.add(TranslateColor.translate(Message.SHOP_SHULKER_PREVIEW.getRaw()));
         }
 
         shopMeta.lore(translatedLore);

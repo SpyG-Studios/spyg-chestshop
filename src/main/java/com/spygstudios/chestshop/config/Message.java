@@ -107,7 +107,10 @@ public enum Message {
     MIGRATE_NEW_STORAGE("migrate.new-storage", "%prefix% &aNew storage type: &f%storage-type%"),
     MIGRATE_CRITICAL_ERROR("migrate.critical-error", "%prefix% &cCritical error occurred during migration!"),
     MIGRATE_MYSQL_CONFIG_INCOMPLETE("migrate.mysql-config-incomplete", "%prefix% &cMySQL configuration is incomplete!"),
-    MIGRATE_ERROR_LOADING("migrate.error-loading", "%prefix% &cError occurred while loading shops!");
+    MIGRATE_ERROR_LOADING("migrate.error-loading", "%prefix% &cError occurred while loading shops!"),
+    
+    SHOP_SHULKER_PREVIEW("shop.shulker-preview", "&7Right-click to inspect contents"),
+    SHOP_SHULKER_PREVIEW_TITLE("shop.shulker-preview-title", "&8Shulker Preview");
 
     private String node;
     private String defaultMessage;

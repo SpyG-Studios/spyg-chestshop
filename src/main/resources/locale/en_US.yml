@@ -71,6 +71,8 @@ shop:
   setup-needed: '%prefix% &cThis shop is not set up properly!'
   sold: '%prefix% &aYou sold &7x%items-bought% &f%item% &afor &f$%price%&a, to &f%player-name%&a! &7(&8%items-left%&7)'
   renamed: '%prefix% &aShop &f%old-name% &arenamed to &f%new-name%!'
+  shulker-preview: '&7Right-click to inspect contents'
+  shulker-preview-title: '&8Shulker Preview'
 admin:
   shop:
     list:
