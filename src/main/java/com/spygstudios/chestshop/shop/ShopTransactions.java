@@ -40,6 +40,12 @@ public class ShopTransactions {
 
         double itemsPrice = itemCount * shop.getCustomerPurchasePrice();
         Economy economy = plugin.getEconomy();
+
+        if (!economy.has(buyer, itemsPrice)) {
+            Message.NOT_ENOUGH_MONEY.send(buyer, Map.of("%price%", String.valueOf(itemsPrice)));
+            return;
+        }
+
         EconomyResponse response = economy.withdrawPlayer(buyer, itemsPrice);
 
         if (!response.transactionSuccess()) {
@@ -105,9 +111,8 @@ public class ShopTransactions {
 
         double itemsPrice = amount * shop.getCustomerSalePrice();
         Economy economy = plugin.getEconomy();
-        EconomyResponse response = economy.withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwnerId()), itemsPrice);
 
-        if (!response.transactionSuccess()) {
+        if (!economy.has(Bukkit.getOfflinePlayer(shop.getOwnerId()), itemsPrice)) {
             Message.SHOP_OWNER_NO_MONEY.send(seller);
             if (shop.isNotify()) {
                 Player owner = Bukkit.getPlayer(shop.getOwnerId());
@@ -115,6 +120,11 @@ public class ShopTransactions {
                     Message.SHOP_OWNER_NO_MONEY_OWNER.send(owner, Map.of("%player-name%", seller.getName(), "%item%", shop.getName(), "%price%", FormatUtils.formatNumber(itemsPrice)));
                 }
             }
+            return;
+        }
+        EconomyResponse response = economy.withdrawPlayer(Bukkit.getOfflinePlayer(shop.getOwnerId()), itemsPrice);
+        if (!response.transactionSuccess()) {
+            plugin.getLogger().warning("Failed to withdraw money from shop owner " + shop.getOwnerId() + " for shop " + shop.getName() + ": " + response.errorMessage);
             return;
         }
 

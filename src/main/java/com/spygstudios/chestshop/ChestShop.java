@@ -30,6 +30,7 @@ import com.spygstudios.chestshop.database.yaml.YamlStorage;
 import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
 import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
 import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
+import com.spygstudios.chestshop.hooks.WorldGuardHook;
 import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.listeners.BreakListener;
 import com.spygstudios.chestshop.listeners.BuildListener;
@@ -71,9 +72,23 @@ public class ChestShop extends JavaPlugin {
     private boolean latestVersion = true;
     private String currentVersion;
     private static final String API_URL = "https://hangar.papermc.io/api/v1/projects/Spyg-ChestShop/latestrelease";
+    @Getter
+    private WorldGuardHook worldGuardHook = null;
 
     public ChestShop() {
+        if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
+            this.worldGuardHook = new WorldGuardHook();
+        } else {
+            Bukkit.getLogger().info("WorldGuard not detected, skipping WorldGuard integration.");
+        }
         instance = this;
+    }
+
+    @Override
+    public void onLoad() {
+        if (this.worldGuardHook != null) {
+            this.worldGuardHook.onLoad(this);
+        }
     }
 
     @Override
@@ -82,6 +97,9 @@ public class ChestShop extends JavaPlugin {
         guiConfig = new GuiConfig(this);
         messageConfig = new MessageConfig(this, conf.getString("locale"));
         Message.init(messageConfig);
+        if (this.worldGuardHook != null) {
+            this.worldGuardHook.onEnable(this);
+        }
 
         hologramManager = HologramManager.getManager(this);
         commandHandler = new CommandHandler(this);

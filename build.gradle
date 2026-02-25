@@ -17,6 +17,7 @@ java {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven { url = uri('https://maven.enginehub.org/repo/') }
     maven { url = uri('https://repo.ikoli.hu/') }
     maven { url = uri('https://repo.papermc.io/repository/maven-public/') }
     maven { url = uri('https://jitpack.io') }
@@ -28,6 +29,7 @@ ext {
     bstatsVersion = '3.1.0'
     spyglibVersion = '1.4.6'
     lombokVersion = '1.18.38'
+    worldguardVersion = '7.0.14'
 }
 
 configurations {
@@ -47,6 +49,7 @@ dependencies {
     compileOnly "com.spygstudios:spyglib:${spyglibVersion}"
     compileOnly "org.xerial:sqlite-jdbc:${sqliteVersion}"
     compileOnly "com.mysql:mysql-connector-j:${mysqlVersion}"
+    compileOnly "com.sk89q.worldguard:worldguard-bukkit:${worldguardVersion}"
 
     // Lombok
     compileOnly "org.projectlombok:lombok:${lombokVersion}"

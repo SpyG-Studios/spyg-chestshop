@@ -53,6 +53,7 @@ public enum Message {
     SHOP_CREATED("shop.created.basic", "%prefix% &aShop &f%shop-name% &acreated!"),
     SHOP_CREATED_PRICE("shop.created.with-price", "%prefix% &aShop &f%shop-name% &acreated for &f$%price%&a!"),
     SHOP_DISABLED_WORLD("shop.disabled-world", "%prefix% &cShops are disabled in this world!"),
+    SHOP_CREATION_NOT_ALLOWED("shop.creation-not-allowed", "%prefix% &cYou can only create shops in regions where &f/rg flag <region> allow-shop allow&c."),
     SHOP_INVALID_PAGE("shop.invalid-page", "%prefix% &cInvalid page! &7(&8%page%&7)"),
     SHOP_LIMIT_REACHED("shop.limit-reached", "%prefix% &cYou have reached the shop limit! (&e%shop-limit%&c)"),
     SHOP_PLAYER_LIMIT_REACHED("shop.player-limit-reached", "%prefix% &cYou have reached the player limit! (&e%max-players%&c)"),

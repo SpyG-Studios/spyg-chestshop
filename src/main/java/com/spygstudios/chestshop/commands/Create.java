@@ -15,6 +15,7 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.events.ShopCreatedEvent;
+import com.spygstudios.chestshop.hooks.WorldGuardHook;
 import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.shop.ShopUtils;
@@ -44,9 +45,19 @@ public class Create {
             Message.SHOP_NO_CHEST.send(player);
             return;
         }
+        boolean isDisabledWorld = ShopUtils.isDisabledWorld(player.getWorld().getName());
+        boolean onlyAreasEnabled = plugin.getConf().getBoolean("shops.only-in-regions");
+        WorldGuardHook wgHook = plugin.getWorldGuardHook();
+        boolean canCreateShopOnLocation = wgHook != null ? wgHook.isShopCreationAllowed(player, targetBlock.getLocation()) : true;
 
-        if (ShopUtils.isDisabledWorld(player.getWorld().getName())) {
+        if (onlyAreasEnabled && !canCreateShopOnLocation) {
+            Message.SHOP_CREATION_NOT_ALLOWED.send(player);
+            return;
+        } else if (isDisabledWorld) {
             Message.SHOP_DISABLED_WORLD.send(player);
+            return;
+        } else if (!canCreateShopOnLocation) {
+            Message.SHOP_CREATION_NOT_ALLOWED.send(player);
             return;
         }
 
