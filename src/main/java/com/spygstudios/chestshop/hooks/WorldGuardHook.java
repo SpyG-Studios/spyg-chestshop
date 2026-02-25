@@ -1,14 +1,11 @@
 package com.spygstudios.chestshop.hooks;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -23,57 +20,40 @@ import com.spygstudios.chestshop.ChestShop;
 import lombok.Getter;
 
 @Getter
-public final class WorldGuardHook {
+public class WorldGuardHook {
 
-    private static final String FLAG_NAME_ALLOW_SHOP = "allow-shop";
+    private final String FLAG_NAME_ALLOW_SHOP = "allow-shop";
+    private boolean available = false;
 
-    private static volatile boolean available = false;
-    private static volatile StateFlag allowShopFlag = null;
-
-    private WorldGuardHook() {
-    }
-
-    public static void onLoad(ChestShop plugin) {
-        Plugin wg = Bukkit.getPluginManager().getPlugin("WorldGuard");
-        if (!(wg instanceof WorldGuardPlugin)) {
-            return;
-        }
-
+    public void onLoad(ChestShop plugin) {
         try {
             FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
             StateFlag flag = new StateFlag(FLAG_NAME_ALLOW_SHOP, false);
             registry.register(flag);
-            allowShopFlag = flag;
             plugin.getLogger().info("Registered WorldGuard flag: " + FLAG_NAME_ALLOW_SHOP);
         } catch (FlagConflictException conflict) {
             Flag<?> existing = WorldGuard.getInstance().getFlagRegistry().get(FLAG_NAME_ALLOW_SHOP);
-            if (existing instanceof StateFlag stateFlag) {
-                allowShopFlag = stateFlag;
+            if (existing instanceof StateFlag) {
                 plugin.getLogger().info("Reusing existing WorldGuard flag: " + FLAG_NAME_ALLOW_SHOP);
             } else {
                 plugin.getLogger().warning("WorldGuard flag name conflict for '" + FLAG_NAME_ALLOW_SHOP
                         + "' (existing type: " + (existing == null ? "null" : existing.getClass().getName()) + "). "
                         + "ChestShop WorldGuard integration will be disabled.");
-                allowShopFlag = null;
             }
         } catch (Throwable t) {
             plugin.getLogger().warning("Failed to register WorldGuard flag '" + FLAG_NAME_ALLOW_SHOP
                     + "'. ChestShop WorldGuard integration will be disabled. Error: "
                     + t.getClass().getSimpleName() + ": " + t.getMessage());
-            allowShopFlag = null;
         }
     }
 
-    public static void onEnable(JavaPlugin plugin) {
-        available = Bukkit.getPluginManager().isPluginEnabled("WorldGuard") && allowShopFlag != null;
-        if (available) {
+    public void onEnable(JavaPlugin plugin) {
+        if (getShopFlag() != null) {
             plugin.getLogger().info("WorldGuard integration enabled (flag: " + FLAG_NAME_ALLOW_SHOP + ").");
-        } else if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
-            plugin.getLogger().warning("WorldGuard detected, but ChestShop WorldGuard integration is not active (flag unavailable).");
         }
     }
 
-    public static boolean isShopCreationAllowed(Player player, Location location) {
+    public boolean isShopCreationAllowed(Player player, Location location) {
         if (!available || player.hasPermission("spygchestshop.bypass.worldguard")) {
             return true;
         }
@@ -91,18 +71,21 @@ public final class WorldGuardHook {
             return true;
         }
 
-        for (ProtectedRegion region : set) {
-            State state = region.getFlag(allowShopFlag);
-            if (state == State.ALLOW) {
-                return true;
-            } else if (state == State.DENY) {
-                return false;
+        StateFlag allowShopFlag = getShopFlag();
+        if (allowShopFlag != null) {
+            for (ProtectedRegion region : set) {
+                State state = region.getFlag(allowShopFlag);
+                if (state == State.ALLOW) {
+                    return true;
+                } else if (state == State.DENY) {
+                    return false;
+                }
             }
         }
         return true;
     }
 
-    private static ApplicableRegionSet getApplicableRegions(Location location) {
+    private ApplicableRegionSet getApplicableRegions(Location location) {
         try {
             RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionQuery query = container.createQuery();
@@ -110,5 +93,13 @@ public final class WorldGuardHook {
         } catch (Throwable t) {
             return null;
         }
+    }
+
+    private StateFlag getShopFlag() {
+        Flag<?> flag = WorldGuard.getInstance().getFlagRegistry().get(FLAG_NAME_ALLOW_SHOP);
+        if (flag instanceof StateFlag) {
+            return (StateFlag) flag;
+        }
+        return null;
     }
 }

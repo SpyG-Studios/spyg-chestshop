@@ -15,6 +15,7 @@ import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.events.ShopCreatedEvent;
+import com.spygstudios.chestshop.hooks.WorldGuardHook;
 import com.spygstudios.chestshop.interfaces.DataManager;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.shop.ShopUtils;
@@ -25,7 +26,6 @@ import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.execute.Execute;
 import dev.rollczi.litecommands.annotations.permission.Permission;
 import net.milkbowl.vault.economy.Economy;
-import com.spygstudios.chestshop.hooks.WorldGuardHook;
 
 @Command(name = "spygchestshop create", aliases = { "spcs create", "chestshop create", "scs create" })
 public class Create {
@@ -47,7 +47,8 @@ public class Create {
         }
         boolean isDisabledWorld = ShopUtils.isDisabledWorld(player.getWorld().getName());
         boolean onlyAreasEnabled = plugin.getConf().getBoolean("shops.only-in-regions");
-        boolean canCreateShopOnLocation = WorldGuardHook.isShopCreationAllowed(player, targetBlock.getLocation());
+        WorldGuardHook wgHook = plugin.getWorldGuardHook();
+        boolean canCreateShopOnLocation = wgHook != null ? wgHook.isShopCreationAllowed(player, targetBlock.getLocation()) : true;
 
         if (onlyAreasEnabled && !canCreateShopOnLocation) {
             Message.SHOP_CREATION_NOT_ALLOWED.send(player);
