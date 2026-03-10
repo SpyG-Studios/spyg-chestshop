@@ -18,12 +18,12 @@ public enum Message {
     NEW_VERSION("new-version", "%prefix% &aA new version of SpygChestShop is available! Current version: &#e80000%old-version% &aNew version: &#00bf0d%new-version% &7&o(Click to download)"),
 
     ENTER_AMOUNT_CANCELLED("enter-amount.cancelled", "%prefix% &cAmount entering cancelled!"),
-    ENTER_AMOUNT("enter.amount.prompt", "%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel)"),
-    ENTER_AMOUNT_SUCCESS("enter.amount.success", "%prefix% &aAmount set successfully!"),
-    ENTER_SELL_PRICE("enter.sell-price.prompt", "%prefix% &aEnter the sell price &7&o(Enter a &f%cancel%&7&o to cancel)"),
-    ENTER_BUY_PRICE("enter.buy-price.prompt", "%prefix% &aEnter the buy price &7&o(Enter a &f%cancel%&7&o to cancel)"),
-    ENTER_SELL_PRICE_SUCCESS("enter.sell-price.success", "%prefix% &aSell price set successfully!"),
-    ENTER_BUY_PRICE_SUCCESS("enter.buy-price.success", "%prefix% &aBuy price set successfully!"),
+    ENTER_AMOUNT("enter-amount.prompt", "%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel)"),
+    ENTER_AMOUNT_SUCCESS("enter-amount.success", "%prefix% &aAmount set successfully!"),
+    ENTER_SELL_PRICE("enter-sell-price.prompt", "%prefix% &aEnter the sell price &7&o(Enter a &f%cancel%&7&o to cancel)"),
+    ENTER_BUY_PRICE("enter-buy-price.prompt", "%prefix% &aEnter the buy price &7&o(Enter a &f%cancel%&7&o to cancel)"),
+    ENTER_SELL_PRICE_SUCCESS("enter-sell-price.success", "%prefix% &aSell price set successfully!"),
+    ENTER_BUY_PRICE_SUCCESS("enter-buy-price.success", "%prefix% &aBuy price set successfully!"),
 
     INVALID_NUMBER("invalid-number", "%prefix% &cInvalid number! (&e%entered%&c)"),
 
