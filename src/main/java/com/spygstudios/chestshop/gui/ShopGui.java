@@ -59,6 +59,7 @@ public class ShopGui {
         }
 
         ItemStack shopItem = shop.getItem();
+        shopItem.setAmount(shop.getQuantity());
         ItemMeta shopMeta = shopItem.getItemMeta();
 
         String titleKey = mode == ShopMode.CUSTOMER_PURCHASING
@@ -102,13 +103,15 @@ public class ShopGui {
         amountSection.getKeys(false).forEach(key -> {
             int slot = amountSection.getInt(key + ".slot");
             int amount = amountSection.getInt(key + ".amount");
-            String title = amountSection.getString(key + ".title").replace("%amount%", String.valueOf(amount).replace("-", ""));
+            int effectiveStep = Math.abs(amount) * shop.getQuantity();
+            String title = amountSection.getString(key + ".title").replace("%amount%", String.valueOf(effectiveStep));
             List<String> lore = amountSection.getStringList(key + ".lore");
             Material material = Material.getMaterial(amountSection.getString(key + ".material", "GRAY_STAINED_GLASS_PANE"));
             List<Float> modelFloats = amountSection.getFloatList(key + ".model-data.floats");
             List<String> modelStrings = amountSection.getStringList(key + ".model-data.strings");
             if (shopItem.getMaxStackSize() >= Math.abs(amount)) {
-                addItemToInventory(plugin, inventory, slot, material, title, lore, modelFloats, modelStrings, amount);
+                addItemToInventory(plugin, inventory, slot, material, title, lore, modelFloats, modelStrings, amount,
+                        Math.min(effectiveStep, shopItem.getMaxStackSize()));
             }
         });
 
@@ -118,8 +121,8 @@ public class ShopGui {
     }
 
     private void addItemToInventory(ChestShop plugin, Inventory inventory, int slot, Material material, String title, List<String> lore, List<Float> modelFloats, List<String> modelStrings,
-            int amount) {
-        ItemStack item = ItemUtils.create(material, title, lore, modelFloats, modelStrings, Math.abs(amount));
+            int amount, int displayAmount) {
+        ItemStack item = ItemUtils.create(material, title, lore, modelFloats, modelStrings, displayAmount);
         ItemContainer data = ItemContainer.create(plugin, item);
         data.set("action", GuiAction.SET_ITEM_AMOUNT.name());
         data.set("amount", amount);

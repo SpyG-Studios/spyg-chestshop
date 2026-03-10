@@ -97,6 +97,7 @@ public class YamlShopFile extends YamlManager {
             setOrDefault(shopPath + ".sold-items", 0);
             setOrDefault(shopPath + ".money-earned", 0);
             setOrDefault(shopPath + ".created", plugin.getDateString());
+            setOrDefault(shopPath + ".quantity", 1);
             isSaved = false;
         }
     }
@@ -108,6 +109,7 @@ public class YamlShopFile extends YamlManager {
         setOrDefault(getPath(shop.getName(), ".do-notify"), false);
         setOrDefault(getPath(shop.getName(), ".created"), plugin.getDateString());
         setOrDefault(getPath(shop.getName(), ".added-players"), new ArrayList<String>());
+        setOrDefault(getPath(shop.getName(), ".quantity"), 1);
         isSaved = false;
     }
 
@@ -143,6 +145,11 @@ public class YamlShopFile extends YamlManager {
 
     public void setCanSell(String shopName, boolean canSell) {
         set(getPath(shopName, ".can-sell"), canSell);
+        isSaved = false;
+    }
+
+    public void setQuantity(String shopName, int quantity) {
+        set(getPath(shopName, ".quantity"), quantity);
         isSaved = false;
     }
 
@@ -211,7 +218,8 @@ public class YamlShopFile extends YamlManager {
         boolean isNotify = shopFile.getBoolean("shops." + shopName + ".do-notify");
         boolean canSell = shopFile.getBoolean("shops." + shopName + ".can-sell", true);
         boolean canBuy = shopFile.getBoolean("shops." + shopName + ".can-buy", false);
-        return new Shop(shopFile.getOwnerId(), shopName, sellPrice, buyPrice, item, location, createdAt, isNotify, canSell, canBuy, shopFile.getAddedUuids(shopName));
+        int quantity = shopFile.getInt("shops." + shopName + ".quantity", 1);
+        return new Shop(shopFile.getOwnerId(), shopName, sellPrice, buyPrice, item, location, createdAt, isNotify, canSell, canBuy, shopFile.getAddedUuids(shopName), quantity);
     }
 
     public static YamlShopFile getShopFile(UUID ownerId) {

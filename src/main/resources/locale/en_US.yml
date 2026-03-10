@@ -11,6 +11,10 @@ enter-sell-price:
 enter-buy-price:
   prompt: '%prefix% &aEnter the buy price &7&o(Enter a &f%cancel%&7&o to cancel)'
   success: '%prefix% &aBuy price set successfully!'
+enter-quantity:
+  prompt: '%prefix% &aEnter the quantity &7&o(Enter a &f%cancel%&7&o to cancel)'
+  success: '%prefix% &aQuantity set successfully!'
+  invalid: '%prefix% &cQuantity must be a whole number of at least &e1&c!'
 invalid-number: '%prefix% &cInvalid number! (&e%entered%&c)'
 cant-add-yourself: '%prefix% &cYou can''t add yourself to the shop!'
 cant-remove-yourself: '%prefix% &cYou can''t remove yourself from the shop!'
@@ -71,6 +75,8 @@ shop:
   setup-needed: '%prefix% &cThis shop is not set up properly!'
   sold: '%prefix% &aYou sold &7x%items-bought% &f%item% &afor &f$%price%&a, to &f%player-name%&a! &7(&8%items-left%&7)'
   renamed: '%prefix% &aShop &f%old-name% &arenamed to &f%new-name%!'
+  minimum-purchase: '%prefix% &cMinimum purchase is &e%quantity% &citems!'
+  minimum-sale: '%prefix% &cMinimum sale is &e%quantity% &citems!'
   shulker-preview: '&7Right-click to inspect contents'
   shulker-preview-title: '&8Shulker Preview'
 admin:

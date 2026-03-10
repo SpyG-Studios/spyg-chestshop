@@ -4,6 +4,11 @@ new-version: '%prefix% &aDostępna jest nowa wersja SpygChestShop! Aktualna wers
 enter-amount.cancelled: '%prefix% &cWprowadzanie kwoty anulowane!'  # Wiadomość, gdy proces wprowadzania kwoty zostanie anulowany.
 enter.amount.prompt: '%prefix% &aWprowadź kwotę &7&o(Wprowadź&f%cancel%&7&o aby anulować)'  # Komunikat wyświetlający prośbę o wpisanie kwoty, z możliwością anulowania.
 enter.amount.success: '%prefix% &aKwota ustawiona pomyślnie!'  # Wiadomość, gdy kwota została ustawiona pomyślnie.
+enter.quantity.prompt: '%prefix% &aWprowadź ilość &7&o(Wprowadź &f%cancel%&7&o aby anulować)'
+enter.quantity.success: '%prefix% &aIlość ustawiona pomyślnie!'
+enter.quantity.invalid: '%prefix% &cIlość musi być liczbą całkowitą wynoszącą co najmniej &e1&c!'
+shop.minimum-purchase: '%prefix% &cMinimalna ilość zakupu to &e%quantity% &cprzedmiotów!'
+shop.minimum-sale: '%prefix% &cMinimalna ilość sprzedaży to &e%quantity% &cprzedmiotów!'
 invalid-number: '%prefix% &cNieprawidłowy numer!(&e%entered%&c)'  # Wiadomość, gdy wpisany numer jest nieprawidłowy.
 cant-add-yourself: '%prefix% &cNie możesz dodać siebie do sklepu!'  # Wiadomość, gdy gracz próbuje dodać siebie do swojego sklepu.
 cant-create-shop-here: '%prefix% &cNie możesz utworzyć sklepu tutaj!'  # Wiadomość, gdy sklep nie może zostać stworzony w danym miejscu.

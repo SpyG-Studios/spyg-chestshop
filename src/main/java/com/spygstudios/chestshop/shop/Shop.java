@@ -46,21 +46,27 @@ public class Shop {
     private ShopHologram hologram;
     @Setter
     private boolean isSaved = false;
+    private int quantity = 1;
     private ShopTransactions shopTransactions;
 
     private static final List<Shop> SHOPS = new ArrayList<>();
     private static ChestShop plugin = ChestShop.getInstance();
 
     public Shop(Player owner, String shopName, Location chestLocation, String createdAt) {
-        this(owner.getUniqueId(), shopName, 0, 0, null, chestLocation, createdAt, false, true, false, new ArrayList<>());
+        this(owner.getUniqueId(), shopName, 0, 0, null, chestLocation, createdAt, false, true, false, new ArrayList<>(), 1);
     }
 
     public Shop(UUID ownerId, String shopName, Location chestLocation, String createdAt) {
-        this(ownerId, shopName, 0, 0, null, chestLocation, createdAt, false, true, false, new ArrayList<>());
+        this(ownerId, shopName, 0, 0, null, chestLocation, createdAt, false, true, false, new ArrayList<>(), 1);
     }
 
     public Shop(UUID ownerId, String shopName, double sellPrice, double buyPrice, ItemStack item, Location chestLocation, String createdAt, boolean isNotify, boolean canSell, boolean canBuy,
             List<UUID> addedPlayers) {
+        this(ownerId, shopName, sellPrice, buyPrice, item, chestLocation, createdAt, isNotify, canSell, canBuy, addedPlayers, 1);
+    }
+
+    public Shop(UUID ownerId, String shopName, double sellPrice, double buyPrice, ItemStack item, Location chestLocation, String createdAt, boolean isNotify, boolean canSell, boolean canBuy,
+            List<UUID> addedPlayers, int quantity) {
         synchronized (SHOPS) {
             if (Shop.getShop(ownerId, shopName) != null) {
                 return;
@@ -78,6 +84,7 @@ public class Shop {
         this.canSellToPlayers = canSell;
         this.canBuyFromPlayers = canBuy;
         this.addedPlayers = addedPlayers;
+        this.quantity = quantity;
         this.shopTransactions = new ShopTransactions(this);
         this.hologram = new ShopHologram(this, plugin);
     }
@@ -230,6 +237,17 @@ public class Shop {
             }
             this.sellPrice = parsedPrice;
             this.hologram.updateHologramRows();
+            this.isSaved = false;
+        });
+    }
+
+    public void setQuantity(int quantity) {
+        plugin.getDataManager().updateShopQuantity(ownerId, name, quantity).thenAccept(success -> {
+            if (!success) {
+                plugin.getLogger().warning("Failed to update shop quantity for " + name);
+                return;
+            }
+            this.quantity = quantity;
             this.isSaved = false;
         });
     }

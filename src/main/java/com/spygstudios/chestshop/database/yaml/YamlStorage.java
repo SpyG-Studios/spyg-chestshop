@@ -55,6 +55,13 @@ public class YamlStorage implements DataManager {
     }
 
     @Override
+    public CompletableFuture<Boolean> updateShopQuantity(UUID ownerId, String shopName, int quantity) {
+        YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
+        shopFile.setQuantity(shopName, quantity);
+        return CompletableFuture.completedFuture(true);
+    }
+
+    @Override
     public CompletableFuture<Boolean> updateShopBuyPrice(UUID ownerId, String shopName, double price) {
         YamlShopFile shopFile = YamlShopFile.getShopFile(ownerId);
         shopFile.setBuyPrice(shopName, price);
