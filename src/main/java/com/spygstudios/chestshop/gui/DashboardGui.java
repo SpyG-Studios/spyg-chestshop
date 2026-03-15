@@ -60,6 +60,7 @@ public class DashboardGui {
         setNotifyItem(plugin, shop, inventory);
         setMoneyItem(plugin, shop, inventory);
         setInventoryItem(plugin, inventory);
+        setQuantityItem(plugin, shop, inventory);
         setBuySellToggleItem(plugin, shop, inventory);
         setPlayerItem(plugin, shop, inventory);
     }
@@ -182,6 +183,28 @@ public class DashboardGui {
                 section.getStringList("model-data.strings"));
 
         ItemContainer.create(plugin, item).set("action", GuiAction.OPEN_SHOP_INVENTORY.name());
+        inventory.setItem(section.getInt("slot"), item);
+    }
+
+    private static void setQuantityItem(ChestShop plugin, Shop shop, Inventory inventory) {
+        ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.quantity");
+        Material material = Material.getMaterial(section.getString("material", "HOPPER"));
+        if (material.equals(Material.AIR)) {
+            return;
+        }
+        List<String> lore = new ArrayList<>();
+        for (String line : section.getStringList("lore")) {
+            lore.add(line.replace("%quantity%", String.valueOf(shop.getQuantity())));
+        }
+
+        ItemStack item = ItemUtils.create(
+                material,
+                section.getString("title"),
+                lore,
+                section.getFloatList("model-data.floats"),
+                section.getStringList("model-data.strings"));
+
+        ItemContainer.create(plugin, item).set("action", GuiAction.SET_SHOP_QUANTITY.name());
         inventory.setItem(section.getInt("slot"), item);
     }
 

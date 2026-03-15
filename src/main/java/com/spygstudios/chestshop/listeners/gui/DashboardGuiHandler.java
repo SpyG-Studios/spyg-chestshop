@@ -54,7 +54,7 @@ public class DashboardGuiHandler implements Listener {
             return;
         }
 
-        if (event.getSlot() == 15) {
+        if (event.getSlot() == 16) {
             handleBuySellToggle(event);
             return;
         }
@@ -93,6 +93,7 @@ public class DashboardGuiHandler implements Listener {
                 break;
             case SET_SHOP_SELL_PRICE:
             case SET_SHOP_BUY_PRICE:
+            case SET_SHOP_QUANTITY:
                 if (AmountHandler.getPendingAmount(player) != null) {
                     AmountHandler.getPendingAmount(player).cancel();
                 }

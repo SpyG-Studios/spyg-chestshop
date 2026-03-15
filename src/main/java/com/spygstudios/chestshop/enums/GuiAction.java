@@ -17,4 +17,5 @@ public enum GuiAction {
     CLOSE,
     BUY,
     SELL,
+    SET_SHOP_QUANTITY,
 }

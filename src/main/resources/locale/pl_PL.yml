@@ -4,6 +4,10 @@ new-version: '%prefix% &aDostępna jest nowa wersja SpygChestShop! Aktualna wers
 enter-amount.cancelled: '%prefix% &cWprowadzanie kwoty anulowane!'  # Wiadomość, gdy proces wprowadzania kwoty zostanie anulowany.
 enter.amount.prompt: '%prefix% &aWprowadź kwotę &7&o(Wprowadź&f%cancel%&7&o aby anulować)'  # Komunikat wyświetlający prośbę o wpisanie kwoty, z możliwością anulowania.
 enter.amount.success: '%prefix% &aKwota ustawiona pomyślnie!'  # Wiadomość, gdy kwota została ustawiona pomyślnie.
+enter-quantity:
+  prompt: '%prefix% &aWprowadź ilość &7&o(Wprowadź &f%cancel%&7&o aby anulować)'
+  success: '%prefix% &aIlość ustawiona pomyślnie!'
+  invalid: '%prefix% &cIlość musi być liczbą całkowitą wynoszącą co najmniej &e1&c!'
 invalid-number: '%prefix% &cNieprawidłowy numer!(&e%entered%&c)'  # Wiadomość, gdy wpisany numer jest nieprawidłowy.
 cant-add-yourself: '%prefix% &cNie możesz dodać siebie do sklepu!'  # Wiadomość, gdy gracz próbuje dodać siebie do swojego sklepu.
 cant-create-shop-here: '%prefix% &cNie możesz utworzyć sklepu tutaj!'  # Wiadomość, gdy sklep nie może zostać stworzony w danym miejscu.
@@ -58,6 +62,8 @@ shop:
   renamed: '%prefix% &aSklep &f%old-name% &azostał przemianowany na &f%new-name%!'
   shulker-preview: '&7Kliknij prawym, aby sprawdzić zawartość'
   shulker-preview-title: '&8Podgląd Shulkera'
+  minimum-purchase: '%prefix% &cMinimalna ilość zakupu to &e%quantity% &cprzedmiotów!'
+  minimum-sale: '%prefix% &cMinimalna ilość sprzedaży to &e%quantity% &cprzedmiotów!'
   # Wiadomość po zmianie nazwy sklepu.
   sold-to: '%prefix% &aSprzedałeś &7x%items-sold% &f%material% &a za &f$%price%&a do gracza!'  # Wiadomość po sprzedaży przedmiotu do innego gracza.
   bought-from: '%prefix% &aKupiłeś &7x%items-bought% &f%material% &a za &f$%price%&a od gracza &f%player-name%&a!'  # Wiadomość po zakupie przedmiotu od innego gracza.

@@ -18,6 +18,8 @@ public interface DataManager {
 
     CompletableFuture<Shop> getShop(UUID ownerId, String shopName);
 
+    CompletableFuture<Boolean> updateShopQuantity(UUID ownerId, String shopName, int quantity);
+
     CompletableFuture<Boolean> updateShopBuyPrice(UUID ownerId, String shopName, double price);
 
     CompletableFuture<Boolean> updateShopSellPrice(UUID ownerId, String shopName, double price);

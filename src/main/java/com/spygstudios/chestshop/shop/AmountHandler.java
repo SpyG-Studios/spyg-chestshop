@@ -42,6 +42,9 @@ public class AmountHandler {
             case SET_SHOP_BUY_PRICE:
                 Message.ENTER_BUY_PRICE.send(player, Map.of("%cancel%", cancelWord));
                 break;
+            case SET_SHOP_QUANTITY:
+                Message.ENTER_QUANTITY.send(player, Map.of("%cancel%", cancelWord));
+                break;
             default:
                 Message.ENTER_AMOUNT.send(player, Map.of("%cancel%", cancelWord));
                 break;
@@ -57,6 +60,15 @@ public class AmountHandler {
         } else if (type.equals(GuiAction.SET_SHOP_BUY_PRICE)) {
             shop.setBuyPrice(amount);
             Message.ENTER_BUY_PRICE_SUCCESS.send(player);
+        } else if (type.equals(GuiAction.SET_SHOP_QUANTITY)) {
+            int quantity = (int) amount;
+            if (amount % 1 != 0 || quantity < 1) {
+                Message.ENTER_QUANTITY_INVALID.send(player);
+                return;
+            }
+            shop.setQuantity(quantity);
+            ChestShop.getInstance().getDataManager().updateShopQuantity(shop.getOwnerId(), shop.getName(), quantity);
+            Message.ENTER_QUANTITY_SUCCESS.send(player);
         } else {
             Message.ENTER_AMOUNT_SUCCESS.send(player);
         }

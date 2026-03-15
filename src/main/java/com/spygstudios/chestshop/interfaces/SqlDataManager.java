@@ -29,6 +29,7 @@ public interface SqlDataManager extends DataManager {
             double moneyEarned,
             boolean canBuy,
             boolean canSell,
+            int quantity,
             List<UUID> playersWithAccess) {
     }
 

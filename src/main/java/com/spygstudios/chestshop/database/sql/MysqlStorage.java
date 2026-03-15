@@ -419,8 +419,8 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                     INSERT INTO shops
                     (owner_uuid, shop_name, sell_price, buy_price, item, world, x, y, z,
                      created_at, do_notify, sold_items, bought_items, money_spent,
-                     money_earned, can_buy, can_sell)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     money_earned, can_buy, can_sell, quantity)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON DUPLICATE KEY UPDATE
                         sell_price = VALUES(sell_price),
                         buy_price = VALUES(buy_price),
@@ -435,7 +435,8 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                         money_spent = VALUES(money_spent),
                         money_earned = VALUES(money_earned),
                         can_buy = VALUES(can_buy),
-                        can_sell = VALUES(can_sell)
+                        can_sell = VALUES(can_sell),
+                        quantity = VALUES(quantity)
                     """;
 
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -464,6 +465,7 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                 stmt.setDouble(index++, shop.getMoneyEarned());
                 stmt.setBoolean(index++, shop.acceptsCustomerPurchases());
                 stmt.setBoolean(index++, shop.acceptsCustomerSales());
+                stmt.setInt(index++, shop.getQuantity());
 
                 boolean success = stmt.executeUpdate() > 0;
                 if (!success) {
@@ -533,10 +535,13 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                                 money_earned DECIMAL(15,2) NOT NULL DEFAULT 0,
                                 can_buy BOOLEAN NOT NULL DEFAULT TRUE,
                                 can_sell BOOLEAN NOT NULL DEFAULT FALSE,
+                                quantity INT NOT NULL DEFAULT 1,
                                 UNIQUE KEY unique_shop (owner_uuid, shop_name),
                                 INDEX idx_owner (owner_uuid)
                         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
                     """);
+
+            stmt.execute("ALTER TABLE shops ADD COLUMN IF NOT EXISTS quantity INT NOT NULL DEFAULT 1");
 
             stmt.execute("""
                         CREATE TABLE IF NOT EXISTS shop_players (
@@ -580,6 +585,7 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                 rs.getDouble("money_earned"),
                 rs.getBoolean("can_buy"),
                 rs.getBoolean("can_sell"),
+                rs.getInt("quantity"),
                 new ArrayList<>());
     }
 
@@ -607,7 +613,8 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
                 data.doNotify(),
                 data.canSell(),
                 data.canBuy(),
-                data.playersWithAccess());
+                data.playersWithAccess(),
+                data.quantity());
     }
 
     private void loadShopPlayersData(Map<Integer, ShopRow> shopDataMap) throws SQLException {
@@ -828,6 +835,16 @@ public class MysqlStorage extends DatabaseHandler implements SqlDataManager {
         }
         String sql = "UPDATE shops SET can_sell = ? WHERE owner_uuid = ? AND shop_name = ?";
         return execute(sql, canSell, ownerId.toString(), shopName);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> updateShopQuantity(UUID ownerId, String shopName, int quantity) {
+        Shop shop = Shop.getShop(ownerId, shopName);
+        if (shop != null) {
+            return CompletableFuture.completedFuture(true);
+        }
+        String sql = "UPDATE shops SET quantity = ? WHERE owner_uuid = ? AND shop_name = ?";
+        return execute(sql, quantity, ownerId.toString(), shopName);
     }
 
     @Override
