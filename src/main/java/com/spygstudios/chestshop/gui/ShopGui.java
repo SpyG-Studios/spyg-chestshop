@@ -104,7 +104,7 @@ public class ShopGui {
             int slot = amountSection.getInt(key + ".slot");
             int amount = amountSection.getInt(key + ".amount");
             int effectiveStep = Math.abs(amount) * shop.getQuantity();
-            String title = amountSection.getString(key + ".title").replace("%amount%", String.valueOf(effectiveStep));
+            String title = amountSection.getString(key + ".title").replace("%amount%", String.valueOf(amount).replace("-", ""));
             List<String> lore = amountSection.getStringList(key + ".lore");
             Material material = Material.getMaterial(amountSection.getString(key + ".material", "GRAY_STAINED_GLASS_PANE"));
             List<Float> modelFloats = amountSection.getFloatList(key + ".model-data.floats");

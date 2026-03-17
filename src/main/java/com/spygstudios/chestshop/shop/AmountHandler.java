@@ -62,7 +62,7 @@ public class AmountHandler {
             Message.ENTER_BUY_PRICE_SUCCESS.send(player);
         } else if (type.equals(GuiAction.SET_SHOP_QUANTITY)) {
             int quantity = (int) amount;
-            if (amount % 1 != 0 || quantity < 1) {
+            if (amount % 1 != 0 || quantity < 1 || quantity > shop.getItem().getMaxStackSize()) {
                 Message.ENTER_QUANTITY_INVALID.send(player);
                 return;
             }

@@ -27,8 +27,8 @@ public class Config extends YamlManager {
 
         setOrDefault("shops.price", 0.0, Arrays.asList("Shop creation price. Set to 0 for free shops."));
         setOrDefault("shops.minimum-durability", 100, Arrays.asList("The minimum durability of the item to be used in a shop. (in percentage)"));
-        setOrDefault("shops.price-format.sell", "&4$&c%price%", Arrays.asList("The format to use for the sell price in the shop hologram. (%sell-price%)"));
-        setOrDefault("shops.price-format.buy", "&2$&a%price%", Arrays.asList("The format to use for the buy price in the shop hologram. (%buy-price%)"));
+        setOrDefault("shops.price-format.sell", "&4$&c%price% &7x %quantity%", Arrays.asList("The format to use for the sell price in the shop hologram. (%sell-price%, %quantity%)"));
+        setOrDefault("shops.price-format.buy", "&2$&a%price% &7x %quantity%", Arrays.asList("The format to use for the buy price in the shop hologram. (%buy-price%, %quantity%)"));
         setOrDefault("shops.price-format.combined", "%buy-price% &f- %sell-price%", Arrays.asList("The format to use for the combined price in the shop hologram. (%price%)"));
         setOrDefault("shops.decimals.enabled", false, Arrays.asList("Enable cents in the shops. This will allow prices to have decimal values (e.g. 1.99)."));
         setOrDefault("shops.decimals.max", 2, Arrays.asList("The maximum amount of decimal places allowed in the price."));

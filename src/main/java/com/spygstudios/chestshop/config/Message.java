@@ -26,7 +26,7 @@ public enum Message {
     ENTER_BUY_PRICE_SUCCESS("enter-buy-price.success", "%prefix% &aBuy price set successfully!"),
     ENTER_QUANTITY("enter-quantity.prompt", "%prefix% &aEnter the quantity &7&o(Enter a &f%cancel%&7&o to cancel)"),
     ENTER_QUANTITY_SUCCESS("enter-quantity.success", "%prefix% &aQuantity set successfully!"),
-    ENTER_QUANTITY_INVALID("enter-quantity.invalid", "%prefix% &cQuantity must be a whole number of at least &e1&c!"),
+    ENTER_QUANTITY_INVALID("enter-quantity.invalid", "%prefix% &cQuantity must be a whole number of at least &e1&c or maximum the stack size!"),
     SHOP_MINIMUM_PURCHASE("shop.minimum-purchase", "%prefix% &cMinimum purchase is &e%quantity% &citems!"),
     SHOP_MINIMUM_SALE("shop.minimum-sale", "%prefix% &cMinimum sale is &e%quantity% &citems!"),
 
