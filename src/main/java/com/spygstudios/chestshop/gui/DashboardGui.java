@@ -261,8 +261,8 @@ public class DashboardGui {
         } else {
             item = ItemUtils.create(
                     material,
-                    section.getString("title").replace("%player-name%",
-                            Bukkit.getOfflinePlayer(shop.getOwnerId()).getName()),
+                    section.getString("title")
+                            .replace("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName()),
                     section.getStringList("lore"),
                     section.getFloatList("model-data.floats"),
                     section.getStringList("model-data.strings"));
