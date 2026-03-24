@@ -248,6 +248,7 @@ public class Shop {
                 return;
             }
             this.quantity = quantity;
+            this.hologram.updateHologramRows();
             this.isSaved = false;
         });
     }

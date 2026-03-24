@@ -89,9 +89,11 @@ public class DashboardGui {
         }
 
         String buyPrice = config.getString("shops.price-format.buy")
+                .replace("%quantity%", FormatUtils.formatNumber(shop.getQuantity()))
                 .replace("%price%", FormatUtils.formatNumber(shop.getCustomerPurchasePrice()));
 
         String sellPrice = config.getString("shops.price-format.sell")
+                .replace("%quantity%", FormatUtils.formatNumber(shop.getQuantity()))
                 .replace("%price%", FormatUtils.formatNumber(shop.getCustomerSalePrice()));
 
         String priceDisplay;
