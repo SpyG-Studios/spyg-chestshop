@@ -8,7 +8,7 @@ import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.config.MessageConfig;
-import com.spygstudios.chestshop.gui.holder.BaseHolder;
+import com.spygstudios.chestshop.menu.holder.BaseHolder;
 import com.spygstudios.chestshop.shop.Shop;
 
 import dev.rollczi.litecommands.annotations.command.Command;

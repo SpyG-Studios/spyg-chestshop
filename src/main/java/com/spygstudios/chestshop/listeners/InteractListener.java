@@ -11,8 +11,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.commands.admin.CustomerMode;
 import com.spygstudios.chestshop.config.Message;
-import com.spygstudios.chestshop.gui.DashboardGui;
-import com.spygstudios.chestshop.gui.ShopGui;
 import com.spygstudios.chestshop.shop.Shop;
 import com.spygstudios.chestshop.shop.ShopUtils;
 import com.spygstudios.spyglib.item.ItemUtils;
@@ -51,7 +49,7 @@ public class InteractListener implements Listener {
         // Owner
         boolean isAdmin = (player.hasPermission("spygchestshop.admin") || player.hasPermission("spygchestshop.admin.edit")) && player.isSneaking();
         if ((shop.getOwnerId().equals(player.getUniqueId()) || isAdmin) && !CustomerMode.getCustomerMode().contains(player.getUniqueId())) {
-            DashboardGui.open(plugin, player, shop);
+            plugin.getDashboardGui().open(player, shop);
             return;
         }
 
@@ -74,7 +72,7 @@ public class InteractListener implements Listener {
             return;
         }
 
-        ShopGui.open(plugin, player, shop);
+        plugin.getShopGui().open(player, shop);
     }
 
 }

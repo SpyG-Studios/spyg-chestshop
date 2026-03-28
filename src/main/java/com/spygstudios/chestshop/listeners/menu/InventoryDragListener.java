@@ -1,11 +1,11 @@
-package com.spygstudios.chestshop.listeners.gui;
+package com.spygstudios.chestshop.listeners.menu;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryDragEvent;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.gui.holder.BaseHolder;
+import com.spygstudios.chestshop.menu.holder.BaseHolder;
 
 public class InventoryDragListener implements Listener {
 

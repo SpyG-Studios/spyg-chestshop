@@ -1,4 +1,4 @@
-package com.spygstudios.chestshop.gui.holder;
+package com.spygstudios.chestshop.menu.holder;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;

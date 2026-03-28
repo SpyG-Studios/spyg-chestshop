@@ -1,4 +1,4 @@
-package com.spygstudios.chestshop.gui;
+package com.spygstudios.chestshop.menu;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,16 +10,24 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.enums.GuiAction;
+import com.spygstudios.chestshop.menu.holder.BaseHolder;
+import com.spygstudios.chestshop.shop.AmountHandler;
 import com.spygstudios.chestshop.shop.Shop;
+import com.spygstudios.chestshop.shop.ShopUtils;
 import com.spygstudios.chestshop.utils.FormatUtils;
 import com.spygstudios.chestshop.utils.PageUtil;
 import com.spygstudios.spyglib.color.TranslateColor;
@@ -29,45 +37,44 @@ import com.spygstudios.spyglib.item.PlayerHeads;
 import com.spygstudios.spyglib.placeholder.ParseListPlaceholder;
 
 import lombok.Getter;
-import lombok.experimental.UtilityClass;
 
-@UtilityClass
-public class DashboardGui {
+public class DashboardMenu implements Listener {
 
-    private static GuiConfig guiConfig;
+    private final ChestShop plugin;
 
-    public static void open(ChestShop plugin, Player player, Shop shop) {
-        guiConfig = plugin.getGuiConfig();
+    public DashboardMenu(ChestShop plugin) {
+        this.plugin = plugin;
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
 
+    public void open(Player player, Shop shop) {
+        GuiConfig guiConfig = plugin.getGuiConfig();
         Inventory inventory = Bukkit.createInventory(
-                new DashboardHolder(player, shop),
-                27,
+                new DashboardHolder(player, shop), 27,
                 TranslateColor.translate(
                         guiConfig.getString("chestshop.title")
                                 .replace("%shop-name%", shop.getName())
                                 .replace("%player-name%", Bukkit.getOfflinePlayer(shop.getOwnerId()).getName())));
 
-        setShopItems(plugin, shop, inventory);
+        buildInventory(guiConfig, shop, inventory);
         PageUtil.setFillItems(inventory, "chestshop");
         player.openInventory(inventory);
     }
 
-    private static void setShopItems(ChestShop plugin, Shop shop, Inventory inventory) {
+    private void buildInventory(GuiConfig guiConfig, Shop shop, Inventory inventory) {
         Config config = plugin.getConf();
-
-        setMainItem(plugin, shop, inventory);
-        setInfoItem(config, shop, inventory);
-        setNotifyItem(plugin, shop, inventory);
-        setMoneyItem(plugin, shop, inventory);
-        setInventoryItem(plugin, inventory);
-        setQuantityItem(plugin, shop, inventory);
-        setBuySellToggleItem(plugin, shop, inventory);
-        setPlayerItem(plugin, shop, inventory);
+        setMainItem(guiConfig, shop, inventory);
+        setInfoItem(guiConfig, config, shop, inventory);
+        setNotifyItem(guiConfig, shop, inventory);
+        setMoneyItem(guiConfig, shop, inventory);
+        setInventoryItem(guiConfig, inventory);
+        setQuantityItem(guiConfig, shop, inventory);
+        setBuySellToggleItem(guiConfig, shop, inventory);
+        setPlayerItem(guiConfig, shop, inventory);
     }
 
-    private static void setMainItem(ChestShop plugin, Shop shop, Inventory inventory) {
+    private void setMainItem(GuiConfig guiConfig, Shop shop, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.item");
-
         ItemStack item = shop.getItem() != null
                 ? shop.getItem()
                 : ItemUtils.create(
@@ -77,11 +84,11 @@ public class DashboardGui {
                         section.getFloatList("model-data.floats"),
                         section.getStringList("model-data.strings"));
 
-        inventory.setItem(section.getInt("slot"), item);
         ItemContainer.create(plugin, item).set("action", GuiAction.SET_ITEM.name());
+        inventory.setItem(section.getInt("slot"), item);
     }
 
-    private static void setInfoItem(Config config, Shop shop, Inventory inventory) {
+    private void setInfoItem(GuiConfig guiConfig, Config config, Shop shop, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.info");
         Material material = Material.getMaterial(section.getString("material", "WRITABLE_BOOK"));
         if (material.equals(Material.AIR)) {
@@ -91,7 +98,6 @@ public class DashboardGui {
         String buyPrice = config.getString("shops.price-format.buy")
                 .replace("%quantity%", FormatUtils.formatNumber(shop.getQuantity()))
                 .replace("%price%", FormatUtils.formatNumber(shop.getCustomerPurchasePrice()));
-
         String sellPrice = config.getString("shops.price-format.sell")
                 .replace("%quantity%", FormatUtils.formatNumber(shop.getQuantity()))
                 .replace("%price%", FormatUtils.formatNumber(shop.getCustomerSalePrice()));
@@ -109,7 +115,7 @@ public class DashboardGui {
             priceDisplay = config.getString("shops.unknown.mode");
         }
 
-        ItemStack infoItem = ItemUtils.create(
+        ItemStack item = ItemUtils.create(
                 material,
                 section.getString("title"),
                 ParseListPlaceholder.parse(
@@ -127,10 +133,10 @@ public class DashboardGui {
                 section.getFloatList("model-data.floats"),
                 section.getStringList("model-data.strings"));
 
-        inventory.setItem(section.getInt("slot"), infoItem);
+        inventory.setItem(section.getInt("slot"), item);
     }
 
-    private static void setNotifyItem(ChestShop plugin, Shop shop, Inventory inventory) {
+    private void setNotifyItem(GuiConfig guiConfig, Shop shop, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.notify");
         Material material = Material.getMaterial(section.getString("material", "BELL"));
         if (material.equals(Material.AIR)) {
@@ -147,7 +153,7 @@ public class DashboardGui {
         inventory.setItem(section.getInt("slot"), item);
     }
 
-    private static void setMoneyItem(ChestShop plugin, Shop shop, Inventory inventory) {
+    private void setMoneyItem(GuiConfig guiConfig, Shop shop, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.money");
         Material material = Material.getMaterial(section.getString("material", "GOLD_INGOT"));
         if (material.equals(Material.AIR)) {
@@ -155,15 +161,12 @@ public class DashboardGui {
         }
         List<String> lore = new ArrayList<>();
         for (String line : section.getStringList("lore")) {
-            lore.add(
-                    line.replace("%sell-price%", FormatUtils.formatNumber(shop.getCustomerPurchasePrice()))
-                            .replace("%buy-price%", FormatUtils.formatNumber(shop.getCustomerSalePrice())));
+            lore.add(line.replace("%sell-price%", FormatUtils.formatNumber(shop.getCustomerPurchasePrice()))
+                    .replace("%buy-price%", FormatUtils.formatNumber(shop.getCustomerSalePrice())));
         }
 
         ItemStack item = ItemUtils.create(
-                material,
-                section.getString("title"),
-                lore,
+                material, section.getString("title"), lore,
                 section.getFloatList("model-data.floats"),
                 section.getStringList("model-data.strings"));
 
@@ -171,16 +174,14 @@ public class DashboardGui {
         inventory.setItem(section.getInt("slot"), item);
     }
 
-    private static void setInventoryItem(ChestShop plugin, Inventory inventory) {
+    private void setInventoryItem(GuiConfig guiConfig, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.inventory");
         Material material = Material.getMaterial(section.getString("material", "CHEST"));
         if (material.equals(Material.AIR)) {
             return;
         }
         ItemStack item = ItemUtils.create(
-                material,
-                section.getString("title"),
-                section.getStringList("lore"),
+                material, section.getString("title"), section.getStringList("lore"),
                 section.getFloatList("model-data.floats"),
                 section.getStringList("model-data.strings"));
 
@@ -188,7 +189,7 @@ public class DashboardGui {
         inventory.setItem(section.getInt("slot"), item);
     }
 
-    private static void setQuantityItem(ChestShop plugin, Shop shop, Inventory inventory) {
+    private void setQuantityItem(GuiConfig guiConfig, Shop shop, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.quantity");
         Material material = Material.getMaterial(section.getString("material", "HOPPER"));
         if (material.equals(Material.AIR)) {
@@ -200,9 +201,7 @@ public class DashboardGui {
         }
 
         ItemStack item = ItemUtils.create(
-                material,
-                section.getString("title"),
-                lore,
+                material, section.getString("title"), lore,
                 section.getFloatList("model-data.floats"),
                 section.getStringList("model-data.strings"));
 
@@ -210,29 +209,15 @@ public class DashboardGui {
         inventory.setItem(section.getInt("slot"), item);
     }
 
-    private static void setBuySellToggleItem(ChestShop plugin, Shop shop, Inventory inventory) {
+    private void setBuySellToggleItem(GuiConfig guiConfig, Shop shop, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.buysell");
         Material material = Material.getMaterial(section.getString("material", "LEVER"));
         if (material.equals(Material.AIR)) {
             return;
         }
-        String sellStatus = shop.acceptsCustomerPurchases()
-                ? section.getString("sell.enabled", "&aEnabled")
-                : section.getString("sell.disabled", "&cDisabled");
-
-        String buyStatus = shop.acceptsCustomerSales()
-                ? section.getString("buy.enabled", "&aEnabled")
-                : section.getString("buy.disabled", "&cDisabled");
-
-        List<String> lore = new ArrayList<>();
-        lore.add(section.getString("sell.line").replace("%status%", sellStatus));
-        lore.add(section.getString("buy.line").replace("%status%", buyStatus));
-        lore.addAll(section.getStringList("lore"));
 
         ItemStack item = ItemUtils.create(
-                material,
-                section.getString("title"),
-                lore,
+                material, section.getString("title"), buildBuySellLore(guiConfig, shop),
                 section.getFloatList("model-data.floats"),
                 section.getStringList("model-data.strings"));
 
@@ -240,22 +225,21 @@ public class DashboardGui {
         inventory.setItem(section.getInt("slot"), item);
     }
 
-    private static void setPlayerItem(ChestShop plugin, Shop shop, Inventory inventory) {
+    private void setPlayerItem(GuiConfig guiConfig, Shop shop, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.player");
         Material material = Material.getMaterial(section.getString("material", "PLAYER_HEAD"));
         if (material.equals(Material.AIR)) {
             return;
         }
-        ItemStack item = null;
+
+        ItemStack item;
         if (material.equals(Material.PLAYER_HEAD)) {
             OfflinePlayer owner = Bukkit.getOfflinePlayer(shop.getOwnerId());
             item = owner.isOnline()
                     ? PlayerHeads.getOnlinePlayerHead(owner.getUniqueId())
                     : PlayerHeads.getOfflinePlayerHead(owner.getUniqueId());
             ItemMeta meta = item.getItemMeta();
-            meta.displayName(
-                    TranslateColor.translate(section.getString("title")
-                            .replace("%player-name%", owner.getName())));
+            meta.displayName(TranslateColor.translate(section.getString("title").replace("%player-name%", owner.getName())));
             meta.lore(TranslateColor.translate(section.getStringList("lore")));
             item.setItemMeta(meta);
         } else {
@@ -271,7 +255,151 @@ public class DashboardGui {
         inventory.setItem(section.getInt("slot"), item);
     }
 
-    public static class DashboardHolder implements InventoryHolder {
+    private List<String> buildBuySellLore(GuiConfig guiConfig, Shop shop) {
+        String sellStatus = shop.acceptsCustomerPurchases()
+                ? guiConfig.getString("chestshop.buysell.sell.enabled", "&aEnabled")
+                : guiConfig.getString("chestshop.buysell.sell.disabled", "&cDisabled");
+        String buyStatus = shop.acceptsCustomerSales()
+                ? guiConfig.getString("chestshop.buysell.buy.enabled", "&aEnabled")
+                : guiConfig.getString("chestshop.buysell.buy.disabled", "&cDisabled");
+
+        List<String> lore = new ArrayList<>();
+        lore.add(guiConfig.getString("chestshop.buysell.sell.line").replace("%status%", sellStatus));
+        lore.add(guiConfig.getString("chestshop.buysell.buy.line").replace("%status%", buyStatus));
+        lore.addAll(guiConfig.getStringList("chestshop.buysell.lore"));
+        return lore;
+    }
+
+    @EventHandler
+    public void onClick(InventoryClickEvent event) {
+        if (!(event.getInventory().getHolder() instanceof DashboardHolder holder)) {
+            return;
+        }
+
+        if (event.getClickedInventory() == null || event.getClickedInventory().getType().equals(InventoryType.PLAYER)) {
+            if (event.getClick().isShiftClick()) {
+                event.setCancelled(true);
+            }
+            return;
+        }
+
+        event.setCancelled(true);
+
+        ItemStack clickedItem = event.getCurrentItem();
+        if (clickedItem == null) {
+            return;
+        }
+
+        ItemContainer data = ItemContainer.create(plugin, clickedItem);
+        String actionStr = data.getString("action");
+        if (actionStr == null) {
+            return;
+        }
+
+        Player player = holder.getPlayer();
+        Shop shop = holder.getShop();
+        GuiAction action = GuiAction.valueOf(actionStr);
+
+        switch (action) {
+            case SET_ITEM -> handleSetItem(event);
+            case TOGGLE_NOTIFY -> handleToggleNotify(shop, clickedItem, player);
+            case SET_SHOP_BUY_PRICE -> handlePriceSetting(event, player, shop);
+            case SET_SHOP_SELL_PRICE, SET_SHOP_QUANTITY -> {
+                cancelPendingAmountHandler(player);
+                new AmountHandler(player, shop, action);
+                event.getInventory().close();
+            }
+            case TOGGLE_SELLING -> handleBuySellToggle(event, shop, player);
+            case OPEN_PLAYERS -> plugin.getPlayersGui().open(player, shop);
+            case OPEN_SHOP_INVENTORY -> shop.openShopInventory(player);
+            case CLOSE -> player.closeInventory();
+            default -> {
+            }
+        }
+    }
+
+    private void handleSetItem(InventoryClickEvent event) {
+        if (event.getCursor() == null || event.getCursor().getType().isAir()) {
+            return;
+        }
+        ItemStack item = event.getCursor().clone();
+        item.setAmount(1);
+        ItemMeta meta = item.getItemMeta();
+        if (meta instanceof Damageable damageable) {
+            damageable.setDamage(0);
+            item.setItemMeta(meta);
+        }
+        event.getInventory().setItem(13, item);
+        ItemContainer.create(plugin, event.getInventory().getItem(13)).set("action", GuiAction.SET_ITEM.name());
+    }
+
+    private void handleToggleNotify(Shop shop, ItemStack clickedItem, Player player) {
+        shop.setNotify(!shop.isNotify());
+        ItemMeta meta = clickedItem.getItemMeta();
+        meta.lore(Arrays.asList(TranslateColor.translate(shop.isNotify()
+                ? plugin.getGuiConfig().getString("chestshop.notify.on")
+                : plugin.getGuiConfig().getString("chestshop.notify.off"))));
+        clickedItem.setItemMeta(meta);
+        player.updateInventory();
+    }
+
+    private void handlePriceSetting(InventoryClickEvent event, Player player, Shop shop) {
+        GuiAction priceAction = event.getClick().isLeftClick()
+                ? GuiAction.SET_SHOP_SELL_PRICE
+                : GuiAction.SET_SHOP_BUY_PRICE;
+        cancelPendingAmountHandler(player);
+        new AmountHandler(player, shop, priceAction);
+        event.getInventory().close();
+    }
+
+    private void handleBuySellToggle(InventoryClickEvent event, Shop shop, Player player) {
+        if (!shop.acceptsCustomerPurchases() && !shop.acceptsCustomerSales()) {
+            shop.setCanSellToPlayers(true);
+            shop.setCanBuyFromPlayers(true);
+        } else if (!shop.acceptsCustomerPurchases() && shop.acceptsCustomerSales()) {
+            shop.setCanSellToPlayers(false);
+            shop.setCanBuyFromPlayers(false);
+        } else if (shop.acceptsCustomerPurchases() && shop.acceptsCustomerSales()) {
+            shop.setCanSellToPlayers(true);
+            shop.setCanBuyFromPlayers(false);
+        } else {
+            shop.setCanSellToPlayers(false);
+            shop.setCanBuyFromPlayers(true);
+        }
+
+        ItemStack item = event.getCurrentItem();
+        ItemMeta meta = item.getItemMeta();
+        meta.lore(TranslateColor.translate(buildBuySellLore(plugin.getGuiConfig(), shop)));
+        item.setItemMeta(meta);
+        player.updateInventory();
+    }
+
+    private void cancelPendingAmountHandler(Player player) {
+        AmountHandler pending = AmountHandler.getPendingAmount(player);
+        if (pending != null) {
+            pending.cancel();
+        }
+    }
+
+    @EventHandler
+    public void onClose(InventoryCloseEvent event) {
+        if (!(event.getInventory().getHolder() instanceof DashboardHolder holder)) {
+            return;
+        }
+        saveItemIfChanged(event.getInventory(), holder);
+    }
+
+    private void saveItemIfChanged(Inventory inventory, DashboardHolder holder) {
+        ItemStack item = inventory.getItem(13);
+        Shop shop = holder.getShop();
+        if (item == null || ShopUtils.isSimilar(item, shop.getItem())) {
+            return;
+        }
+        ItemContainer newData = ItemContainer.create(plugin, item);
+        newData.remove("action");
+        shop.setShopItem(item);
+        shop.getHologram().updateHologramRows();
+    }
 
     @Getter
     public static class DashboardHolder extends BaseHolder {
