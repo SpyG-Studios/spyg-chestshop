@@ -21,7 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.spygstudios.chestshop.commands.handlers.CommandHandler;
 import com.spygstudios.chestshop.config.Config;
-import com.spygstudios.chestshop.config.GuiConfig;
+import com.spygstudios.chestshop.config.MenuConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.config.MessageConfig;
 import com.spygstudios.chestshop.database.yaml.YamlStorage;
@@ -58,7 +58,7 @@ public class ChestShop extends JavaPlugin {
     private static ChestShop instance;
     private Economy economy;
     private Config conf;
-    private GuiConfig guiConfig;
+    private MenuConfig guiConfig;
     private HologramManager hologramManager;
     private CommandHandler commandHandler;
     @Setter
@@ -93,7 +93,7 @@ public class ChestShop extends JavaPlugin {
     @Override
     public void onEnable() {
         conf = new Config(this);
-        guiConfig = new GuiConfig(this);
+        guiConfig = new MenuConfig(this);
         messageConfig = new MessageConfig(this, conf.getString("locale"));
         Message.init(messageConfig);
         if (this.worldGuardHook != null) {

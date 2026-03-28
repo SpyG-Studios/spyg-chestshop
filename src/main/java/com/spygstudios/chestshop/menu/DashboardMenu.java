@@ -22,7 +22,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
-import com.spygstudios.chestshop.config.GuiConfig;
+import com.spygstudios.chestshop.config.MenuConfig;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.menu.holder.BaseHolder;
 import com.spygstudios.chestshop.shop.AmountHandler;
@@ -48,7 +48,7 @@ public class DashboardMenu implements Listener {
     }
 
     public void open(Player player, Shop shop) {
-        GuiConfig guiConfig = plugin.getGuiConfig();
+        MenuConfig guiConfig = plugin.getGuiConfig();
         Inventory inventory = Bukkit.createInventory(
                 new DashboardHolder(player, shop), 27,
                 TranslateColor.translate(
@@ -61,7 +61,7 @@ public class DashboardMenu implements Listener {
         player.openInventory(inventory);
     }
 
-    private void buildInventory(GuiConfig guiConfig, Shop shop, Inventory inventory) {
+    private void buildInventory(MenuConfig guiConfig, Shop shop, Inventory inventory) {
         Config config = plugin.getConf();
         setMainItem(guiConfig, shop, inventory);
         setInfoItem(guiConfig, config, shop, inventory);
@@ -73,7 +73,7 @@ public class DashboardMenu implements Listener {
         setPlayerItem(guiConfig, shop, inventory);
     }
 
-    private void setMainItem(GuiConfig guiConfig, Shop shop, Inventory inventory) {
+    private void setMainItem(MenuConfig guiConfig, Shop shop, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.item");
         ItemStack item = shop.getItem() != null
                 ? shop.getItem()
@@ -88,7 +88,7 @@ public class DashboardMenu implements Listener {
         inventory.setItem(section.getInt("slot"), item);
     }
 
-    private void setInfoItem(GuiConfig guiConfig, Config config, Shop shop, Inventory inventory) {
+    private void setInfoItem(MenuConfig guiConfig, Config config, Shop shop, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.info");
         Material material = Material.getMaterial(section.getString("material", "WRITABLE_BOOK"));
         if (material.equals(Material.AIR)) {
@@ -136,7 +136,7 @@ public class DashboardMenu implements Listener {
         inventory.setItem(section.getInt("slot"), item);
     }
 
-    private void setNotifyItem(GuiConfig guiConfig, Shop shop, Inventory inventory) {
+    private void setNotifyItem(MenuConfig guiConfig, Shop shop, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.notify");
         Material material = Material.getMaterial(section.getString("material", "BELL"));
         if (material.equals(Material.AIR)) {
@@ -153,7 +153,7 @@ public class DashboardMenu implements Listener {
         inventory.setItem(section.getInt("slot"), item);
     }
 
-    private void setMoneyItem(GuiConfig guiConfig, Shop shop, Inventory inventory) {
+    private void setMoneyItem(MenuConfig guiConfig, Shop shop, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.money");
         Material material = Material.getMaterial(section.getString("material", "GOLD_INGOT"));
         if (material.equals(Material.AIR)) {
@@ -174,7 +174,7 @@ public class DashboardMenu implements Listener {
         inventory.setItem(section.getInt("slot"), item);
     }
 
-    private void setInventoryItem(GuiConfig guiConfig, Inventory inventory) {
+    private void setInventoryItem(MenuConfig guiConfig, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.inventory");
         Material material = Material.getMaterial(section.getString("material", "CHEST"));
         if (material.equals(Material.AIR)) {
@@ -189,7 +189,7 @@ public class DashboardMenu implements Listener {
         inventory.setItem(section.getInt("slot"), item);
     }
 
-    private void setQuantityItem(GuiConfig guiConfig, Shop shop, Inventory inventory) {
+    private void setQuantityItem(MenuConfig guiConfig, Shop shop, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.quantity");
         Material material = Material.getMaterial(section.getString("material", "HOPPER"));
         if (material.equals(Material.AIR)) {
@@ -209,7 +209,7 @@ public class DashboardMenu implements Listener {
         inventory.setItem(section.getInt("slot"), item);
     }
 
-    private void setBuySellToggleItem(GuiConfig guiConfig, Shop shop, Inventory inventory) {
+    private void setBuySellToggleItem(MenuConfig guiConfig, Shop shop, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.buysell");
         Material material = Material.getMaterial(section.getString("material", "LEVER"));
         if (material.equals(Material.AIR)) {
@@ -225,7 +225,7 @@ public class DashboardMenu implements Listener {
         inventory.setItem(section.getInt("slot"), item);
     }
 
-    private void setPlayerItem(GuiConfig guiConfig, Shop shop, Inventory inventory) {
+    private void setPlayerItem(MenuConfig guiConfig, Shop shop, Inventory inventory) {
         ConfigurationSection section = guiConfig.getConfigurationSection("chestshop.player");
         Material material = Material.getMaterial(section.getString("material", "PLAYER_HEAD"));
         if (material.equals(Material.AIR)) {
@@ -255,7 +255,7 @@ public class DashboardMenu implements Listener {
         inventory.setItem(section.getInt("slot"), item);
     }
 
-    private List<String> buildBuySellLore(GuiConfig guiConfig, Shop shop) {
+    private List<String> buildBuySellLore(MenuConfig guiConfig, Shop shop) {
         String sellStatus = shop.acceptsCustomerPurchases()
                 ? guiConfig.getString("chestshop.buysell.sell.enabled", "&aEnabled")
                 : guiConfig.getString("chestshop.buysell.sell.disabled", "&cDisabled");

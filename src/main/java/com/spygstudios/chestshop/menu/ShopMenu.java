@@ -22,7 +22,7 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.config.GuiConfig;
+import com.spygstudios.chestshop.config.MenuConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.enums.ShopMode;
@@ -53,7 +53,7 @@ public class ShopMenu implements Listener {
     }
 
     public void open(Player player, Shop shop, ShopMode mode) {
-        GuiConfig config = plugin.getGuiConfig();
+        MenuConfig config = plugin.getGuiConfig();
         Inventory inventory = player.getServer().createInventory(
                 new ShopHolder(player, shop), 27,
                 TranslateColor.translate(config.getString("shop.title").replace("%shop-name%", shop.getName())));
@@ -73,7 +73,7 @@ public class ShopMenu implements Listener {
         player.openInventory(inventory);
     }
 
-    private void addModeToggle(GuiConfig config, Inventory inventory, ShopMode mode) {
+    private void addModeToggle(MenuConfig config, Inventory inventory, ShopMode mode) {
         String prefix = mode == ShopMode.CUSTOMER_PURCHASING ? "shop.mode.buying" : "shop.mode.selling";
         Material material = Material.getMaterial(config.getString(prefix + ".material", "EMERALD"));
         String title = config.getString(prefix + ".title");
@@ -84,7 +84,7 @@ public class ShopMenu implements Listener {
         inventory.setItem(4, item);
     }
 
-    private void addShopItem(GuiConfig config, Shop shop, Inventory inventory, ShopMode mode) {
+    private void addShopItem(MenuConfig config, Shop shop, Inventory inventory, ShopMode mode) {
         ItemStack shopItem = shop.getItem();
         shopItem.setAmount(shop.getQuantity());
         ItemMeta meta = shopItem.getItemMeta();
@@ -112,14 +112,14 @@ public class ShopMenu implements Listener {
         inventory.setItem(13, shopItem);
     }
 
-    private void addInventoryButton(GuiConfig config, Inventory inventory) {
+    private void addInventoryButton(MenuConfig config, Inventory inventory) {
         Material material = Material.getMaterial(config.getString("chestshop.inventory.material", "CHEST"));
         ItemStack item = ItemUtils.create(material, config.getString("chestshop.inventory.title"), config.getStringList("chestshop.inventory.lore"));
         ItemContainer.create(plugin, item).set("action", GuiAction.OPEN_SHOP_INVENTORY.name());
         inventory.setItem(18, item);
     }
 
-    private void addAmountButtons(GuiConfig config, Shop shop, Inventory inventory) {
+    private void addAmountButtons(MenuConfig config, Shop shop, Inventory inventory) {
         ConfigurationSection section = config.getConfigurationSection("shop.amount.items");
         int quantity = shop.getQuantity();
         int maxStack = shop.getItem().getMaxStackSize();

@@ -17,7 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.config.GuiConfig;
+import com.spygstudios.chestshop.config.MenuConfig;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.menu.holder.BaseHolder;
 import com.spygstudios.chestshop.shop.Shop;
@@ -39,7 +39,7 @@ public class PlayersMenu implements Listener {
     }
 
     public void open(Player player, Shop shop) {
-        GuiConfig config = plugin.getGuiConfig();
+        MenuConfig config = plugin.getGuiConfig();
         PlayersHolder holder = new PlayersHolder(player, shop);
         Inventory inventory = player.getServer().createInventory(
                 holder, 27,
@@ -54,12 +54,12 @@ public class PlayersMenu implements Listener {
         if (!(inventory.getHolder() instanceof PlayersHolder holder)) {
             return;
         }
-        GuiConfig config = plugin.getGuiConfig();
+        MenuConfig config = plugin.getGuiConfig();
         PageUtil.setFillItems(inventory, "players");
         loadPlayerHeads(config, holder.getShop(), inventory, holder.getPage());
     }
 
-    private void loadPlayerHeads(GuiConfig config, Shop shop, Inventory inventory, int page) {
+    private void loadPlayerHeads(MenuConfig config, Shop shop, Inventory inventory, int page) {
         int headPerPage = 18;
         int maxPage = (int) Math.ceil((double) shop.getAddedPlayers().size() / headPerPage);
         List<UUID> addedPlayers = shop.getAddedPlayers().stream()
@@ -97,7 +97,7 @@ public class PlayersMenu implements Listener {
         }
     }
 
-    private void fetchOfflineHead(GuiConfig config, OfflinePlayer offlinePlayer, Inventory inventory, ItemStack placeholder, int index) {
+    private void fetchOfflineHead(MenuConfig config, OfflinePlayer offlinePlayer, Inventory inventory, ItemStack placeholder, int index) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             ItemStack head = PlayerHeads.getOfflinePlayerHead(offlinePlayer.getUniqueId());
             Bukkit.getScheduler().runTask(plugin, () -> {
@@ -111,7 +111,7 @@ public class PlayersMenu implements Listener {
         });
     }
 
-    private ItemStack createArrowItem(GuiConfig config, String configPath, GuiAction action) {
+    private ItemStack createArrowItem(MenuConfig config, String configPath, GuiAction action) {
         Material material = Material.getMaterial(config.getString(configPath + ".material", "ARROW"));
         ItemStack arrow = new ItemStack(material);
         ItemMeta meta = arrow.getItemMeta();
@@ -121,7 +121,7 @@ public class PlayersMenu implements Listener {
         return arrow;
     }
 
-    private SkullMeta createPlayerHeadMeta(GuiConfig config, ItemStack skull, OfflinePlayer offlinePlayer) {
+    private SkullMeta createPlayerHeadMeta(MenuConfig config, ItemStack skull, OfflinePlayer offlinePlayer) {
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
         meta.displayName(TranslateColor.translate(
                 config.getString("players.player.title").replace("%player-name%", offlinePlayer.getName())));

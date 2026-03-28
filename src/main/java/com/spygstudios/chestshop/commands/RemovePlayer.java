@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
-import com.spygstudios.chestshop.config.GuiConfig;
+import com.spygstudios.chestshop.config.MenuConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.shop.Shop;
 
@@ -19,7 +19,7 @@ import dev.rollczi.litecommands.annotations.permission.Permission;
 @Command(name = "spygchestshop remove", aliases = { "spcs remove", "chestshop remove", "scs remove" })
 public class RemovePlayer {
     Config config;
-    GuiConfig guiConfig;
+    MenuConfig guiConfig;
 
     public RemovePlayer(ChestShop plugin) {
         config = plugin.getConf();

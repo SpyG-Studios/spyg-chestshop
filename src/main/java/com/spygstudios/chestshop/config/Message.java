@@ -114,7 +114,7 @@ public enum Message {
     MIGRATE_CRITICAL_ERROR("migrate.critical-error", "%prefix% &cCritical error occurred during migration!"),
     MIGRATE_MYSQL_CONFIG_INCOMPLETE("migrate.mysql-config-incomplete", "%prefix% &cMySQL configuration is incomplete!"),
     MIGRATE_ERROR_LOADING("migrate.error-loading", "%prefix% &cError occurred while loading shops!"),
-    
+
     SHOP_SHULKER_PREVIEW("shop.shulker-preview", "&7Right-click to inspect contents"),
     SHOP_SHULKER_PREVIEW_TITLE("shop.shulker-preview-title", "&8Shulker Preview");
 

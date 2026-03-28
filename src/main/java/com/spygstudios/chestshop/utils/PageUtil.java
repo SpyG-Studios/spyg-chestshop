@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
-import com.spygstudios.chestshop.config.GuiConfig;
+import com.spygstudios.chestshop.config.MenuConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.components.ComponentUtils;
@@ -53,7 +53,7 @@ public class PageUtil {
     }
 
     public static void setFillItems(Inventory inventory, String configPath) {
-        GuiConfig config = ChestShop.getInstance().getGuiConfig();
+        MenuConfig config = ChestShop.getInstance().getGuiConfig();
         config.getConfigurationSection(configPath + ".fill-items").getKeys(false).forEach(key -> {
             String itemPath = configPath + ".fill-items." + key;
             Material material = Material.getMaterial(config.getString(itemPath + ".material"));

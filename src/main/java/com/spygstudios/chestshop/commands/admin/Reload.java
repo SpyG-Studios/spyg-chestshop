@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
-import com.spygstudios.chestshop.config.GuiConfig;
+import com.spygstudios.chestshop.config.MenuConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.config.MessageConfig;
 import com.spygstudios.chestshop.menu.holder.BaseHolder;
@@ -19,7 +19,7 @@ import dev.rollczi.litecommands.annotations.permission.Permission;
 @Command(name = "spygchestshop reload", aliases = { "spcs reload", "chestshop reload", "scs reload" })
 public class Reload {
     Config config;
-    GuiConfig guiConfig;
+    MenuConfig guiConfig;
     ChestShop plugin;
     MessageConfig messageConfig;
 

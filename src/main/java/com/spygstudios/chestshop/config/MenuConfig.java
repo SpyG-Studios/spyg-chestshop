@@ -5,9 +5,9 @@ import java.util.Arrays;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.spyglib.yamlmanager.YamlManager;
 
-public class GuiConfig extends YamlManager {
+public class MenuConfig extends YamlManager {
 
-    public GuiConfig(ChestShop plugin) {
+    public MenuConfig(ChestShop plugin) {
         super("guis.yml", plugin);
 
         setOrDefault("chestshop.title", "&c%shop-name% &8(%player-name%)");
