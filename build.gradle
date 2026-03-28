@@ -126,7 +126,7 @@ tasks.shadowJar {
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
 
     // Enable ZIP64 just in case dependencies grow
-    zip64 true
+    zip64 = true
 }
 
 tasks.build {

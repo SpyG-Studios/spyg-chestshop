@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.GuiConfig;
+import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.enums.GuiAction;
 import com.spygstudios.chestshop.enums.ShopMode;
 import com.spygstudios.chestshop.shop.Shop;
@@ -58,6 +59,7 @@ public class ShopGui {
         }
 
         ItemStack shopItem = shop.getItem();
+        shopItem.setAmount(shop.getQuantity());
         ItemMeta shopMeta = shopItem.getItemMeta();
 
         String titleKey = mode == ShopMode.CUSTOMER_PURCHASING
@@ -71,8 +73,14 @@ public class ShopGui {
         double priceForMode = mode == ShopMode.CUSTOMER_PURCHASING
                 ? shop.getCustomerPurchasePrice()
                 : shop.getCustomerSalePrice();
-        List<Component> translatedLore = plugin.getGuiConfig().getStringList(loreKey).stream()
-                .map(line -> TranslateColor.translate(line.replace("%price%", String.valueOf(priceForMode)))).toList();
+        List<Component> translatedLore = new java.util.ArrayList<>(plugin.getGuiConfig().getStringList(loreKey).stream()
+                .map(line -> TranslateColor.translate(line.replace("%price%", com.spygstudios.chestshop.utils.FormatUtils.formatNumber(priceForMode)))).toList());
+
+        if (shopItem.getType().name().contains("SHULKER_BOX")) {
+            translatedLore.add(Component.empty());
+            translatedLore.add(TranslateColor.translate(Message.SHOP_SHULKER_PREVIEW.getRaw()));
+        }
+
         shopMeta.lore(translatedLore);
         shopItem.setItemMeta(shopMeta);
 
@@ -95,13 +103,15 @@ public class ShopGui {
         amountSection.getKeys(false).forEach(key -> {
             int slot = amountSection.getInt(key + ".slot");
             int amount = amountSection.getInt(key + ".amount");
-            String title = amountSection.getString(key + ".title").replace("%amount%", String.valueOf(amount).replace("-", ""));
+            int effectiveStep = Math.abs(amount) * shop.getQuantity();
+            String title = amountSection.getString(key + ".title").replace("%amount%", String.valueOf(Math.min(effectiveStep, shopItem.getMaxStackSize())));
             List<String> lore = amountSection.getStringList(key + ".lore");
             Material material = Material.getMaterial(amountSection.getString(key + ".material", "GRAY_STAINED_GLASS_PANE"));
             List<Float> modelFloats = amountSection.getFloatList(key + ".model-data.floats");
             List<String> modelStrings = amountSection.getStringList(key + ".model-data.strings");
-            if (shopItem.getMaxStackSize() > Math.abs(amount)) {
-                addItemToInventory(plugin, inventory, slot, material, title, lore, modelFloats, modelStrings, amount);
+            if (shopItem.getMaxStackSize() >= Math.abs(amount)) {
+                addItemToInventory(plugin, inventory, slot, material, title, lore, modelFloats, modelStrings, amount,
+                        Math.min(effectiveStep, shopItem.getMaxStackSize()));
             }
         });
 
@@ -111,8 +121,8 @@ public class ShopGui {
     }
 
     private void addItemToInventory(ChestShop plugin, Inventory inventory, int slot, Material material, String title, List<String> lore, List<Float> modelFloats, List<String> modelStrings,
-            int amount) {
-        ItemStack item = ItemUtils.create(material, title, lore, modelFloats, modelStrings, Math.abs(amount));
+            int amount, int displayAmount) {
+        ItemStack item = ItemUtils.create(material, title, lore, modelFloats, modelStrings, displayAmount);
         ItemContainer data = ItemContainer.create(plugin, item);
         data.set("action", GuiAction.SET_ITEM_AMOUNT.name());
         data.set("amount", amount);

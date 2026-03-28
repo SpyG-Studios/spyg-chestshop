@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
+import com.spygstudios.chestshop.utils.FormatUtils;
 import com.spygstudios.spyglib.inventory.InventoryUtils;
 
 import net.milkbowl.vault.economy.Economy;
@@ -32,12 +33,20 @@ public class ShopTransactions {
 
         int itemsLeft = shop.getItemsLeft();
         int itemCount = itemsLeft < amount ? itemsLeft : amount;
+
+        int batches = itemCount / shop.getQuantity();
+        if (batches == 0) {
+            Message.SHOP_MINIMUM_PURCHASE.send(buyer, Map.of("%quantity%", String.valueOf(shop.getQuantity())));
+            return;
+        }
+        int effectiveItems = batches * shop.getQuantity();
+
         if (!InventoryUtils.hasFreeSlot(buyer)) {
             Message.SHOP_INVENTORY_FULL.send(buyer);
             return;
         }
 
-        double itemsPrice = itemCount * shop.getCustomerPurchasePrice();
+        double itemsPrice = batches * shop.getCustomerPurchasePrice();
         Economy economy = plugin.getEconomy();
 
         if (!economy.has(buyer, itemsPrice)) {
@@ -48,34 +57,34 @@ public class ShopTransactions {
         EconomyResponse response = economy.withdrawPlayer(buyer, itemsPrice);
 
         if (!response.transactionSuccess()) {
-
+            Message.NOT_ENOUGH_MONEY.send(buyer, Map.of("%price%", FormatUtils.formatNumber(itemsPrice)));
             return;
         }
 
         economy.depositPlayer(Bukkit.getOfflinePlayer(shop.getOwnerId()), itemsPrice);
         Inventory chestInventory = ((Chest) shop.getChestLocation().getBlock().getState()).getInventory();
-        int soldItems = ShopUtils.extractItems(chestInventory, buyer.getInventory(), shop.getItem(), itemCount);
-        itemsLeft = itemsLeft - itemCount;
+        int soldItems = ShopUtils.extractItems(chestInventory, buyer.getInventory(), shop.getItem(), effectiveItems);
+        itemsLeft = itemsLeft - effectiveItems;
 
         Message.SHOP_BOUGHT.send(buyer,
-                Map.of("%price%", String.valueOf(itemsPrice), "%item%", shop.getItemName(), "%items-left%", String.valueOf(itemsLeft), "%items-bought%", String.valueOf(soldItems)));
-        plugin.getDataManager().updateShopSellStats(shop.getOwnerId(), shop.getName(), itemCount, itemsPrice).thenAccept(success -> {
+                Map.of("%price%", FormatUtils.formatNumber(itemsPrice), "%item%", shop.getItemName(), "%items-left%", String.valueOf(itemsLeft), "%items-bought%", String.valueOf(soldItems)));
+        plugin.getDataManager().updateShopSellStats(shop.getOwnerId(), shop.getName(), effectiveItems, itemsPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop stats for " + shop.getName() + " owned by " + shop.getOwnerId());
                 return;
             }
-            shop.setSoldItems(shop.getSoldItems() + itemCount);
+            shop.setSoldItems(shop.getSoldItems() + effectiveItems);
             shop.setMoneyEarned(shop.getMoneyEarned() + itemsPrice);
             shop.setSaved(false);
         });
         Player owner = Bukkit.getPlayer(shop.getOwnerId());
         if (shop.isNotify() && owner != null) {
             Message.SHOP_SOLD.send(owner, Map.of(
-                    "%price%", String.valueOf(itemsPrice),
+                    "%price%", FormatUtils.formatNumber(itemsPrice),
                     "%item%", shop.getItemName(),
                     "%player-name%", buyer.getName(),
                     "%items-left%", String.valueOf(itemsLeft),
-                    "%items-bought%", String.valueOf(itemCount)));
+                    "%items-bought%", String.valueOf(effectiveItems)));
         }
     }
 
@@ -85,15 +94,23 @@ public class ShopTransactions {
         }
 
         ItemStack item = shop.getItem();
+
+        int batches = amount / shop.getQuantity();
+        if (batches == 0) {
+            Message.SHOP_MINIMUM_SALE.send(seller, Map.of("%quantity%", String.valueOf(shop.getQuantity())));
+            return;
+        }
+        int effectiveItems = batches * shop.getQuantity();
+
         int playerItemCount = ShopUtils.getSellableItemCount(seller.getInventory(), item);
-        if (playerItemCount < amount) {
-            Message.NOT_ENOUGH_ITEMS.send(seller, Map.of("%item%", shop.getItemName(), "%amount%", String.valueOf(amount)));
+        if (playerItemCount < effectiveItems) {
+            Message.NOT_ENOUGH_ITEMS.send(seller, Map.of("%item%", shop.getItemName(), "%amount%", String.valueOf(effectiveItems)));
             seller.closeInventory();
             return;
         }
 
         Chest chest = (Chest) shop.getChestLocation().getBlock().getState();
-        if (!hasChestSpace(chest, item, amount)) {
+        if (!hasChestSpace(chest, item, effectiveItems)) {
             Message.SHOP_CHEST_FULL.send(seller);
             if (shop.isNotify()) {
                 Player owner = Bukkit.getPlayer(shop.getOwnerId());
@@ -101,14 +118,14 @@ public class ShopTransactions {
                     Message.SHOP_CHEST_FULL_OWNER.send(owner, Map.of(
                             "%player-name%", seller.getName(),
                             "%item%", shop.getItemName(),
-                            "%amount%", String.valueOf(amount),
+                            "%amount%", String.valueOf(effectiveItems),
                             "%shop-name%", shop.getName()));
                 }
             }
             return;
         }
 
-        double itemsPrice = amount * shop.getCustomerSalePrice();
+        double itemsPrice = batches * shop.getCustomerSalePrice();
         Economy economy = plugin.getEconomy();
 
         if (!economy.has(Bukkit.getOfflinePlayer(shop.getOwnerId()), itemsPrice)) {
@@ -116,7 +133,7 @@ public class ShopTransactions {
             if (shop.isNotify()) {
                 Player owner = Bukkit.getPlayer(shop.getOwnerId());
                 if (owner != null) {
-                    Message.SHOP_OWNER_NO_MONEY_OWNER.send(owner, Map.of("%player-name%", seller.getName(), "%item%", shop.getName(), "%price%", String.valueOf(itemsPrice)));
+                    Message.SHOP_OWNER_NO_MONEY_OWNER.send(owner, Map.of("%player-name%", seller.getName(), "%item%", shop.getName(), "%price%", FormatUtils.formatNumber(itemsPrice)));
                 }
             }
             return;
@@ -128,22 +145,22 @@ public class ShopTransactions {
         }
 
         Inventory chestInventory = chest.getInventory();
-        int soldItems = ShopUtils.extractItems(seller.getInventory(), chestInventory, item, amount);
+        int soldItems = ShopUtils.extractItems(seller.getInventory(), chestInventory, item, effectiveItems);
 
         economy.depositPlayer(seller, itemsPrice);
 
-        plugin.getDataManager().updateShopBuyStats(shop.getOwnerId(), shop.getName(), amount, itemsPrice).thenAccept(success -> {
+        plugin.getDataManager().updateShopBuyStats(shop.getOwnerId(), shop.getName(), effectiveItems, itemsPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop stats for " + shop.getName() + " owned by " + shop.getOwnerId());
                 return;
             }
-            shop.setBoughtItems(shop.getBoughtItems() + amount);
+            shop.setBoughtItems(shop.getBoughtItems() + effectiveItems);
             shop.setMoneySpent(shop.getMoneySpent() + itemsPrice);
             shop.setSaved(false);
         });
 
         Message.SHOP_SOLD_TO.send(seller, Map.of(
-                "%price%", String.valueOf(itemsPrice),
+                "%price%", FormatUtils.formatNumber(itemsPrice),
                 "%item%", shop.getItemName(),
                 "%items-sold%", String.valueOf(soldItems)));
 
@@ -151,7 +168,7 @@ public class ShopTransactions {
         if (shop.isNotify() && owner != null) {
             Message.SHOP_BOUGHT_FROM.send(owner,
                     Map.of(
-                            "%price%", String.valueOf(itemsPrice),
+                            "%price%", FormatUtils.formatNumber(itemsPrice),
                             "%item%", shop.getItemName(),
                             "%player-name%", seller.getName(),
                             "%items-bought%", String.valueOf(soldItems)));

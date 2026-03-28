@@ -56,7 +56,7 @@ You can add custom model data ("model-data") to items in your GUIs for resource 
 
 **How to add model-data:**
 
-If the plugin supports it, add a `model-data` field to the relevant item section in your `guis.yml` (or equivalent GUI config). For example:
+Add a `model-data` field to the relevant item section in your `guis.yml` (or equivalent GUI config). For example:
 
 ```yaml
   inventory:
@@ -82,10 +82,8 @@ If the plugin supports it, add a `model-data` field to the relevant item section
 ```
 
 - The `model-data` field can contain either `floats` (integers) or `strings`, or both.
-- Not all items need this field; only add it where you want a custom model.
+- Not all items need this field, only add it where you want a custom model.
 - If you don't see the custom model in-game, make sure your resource pack is loaded and the item type supports custom model data.
-
-> **Note:** If you do not see the custom model, check that your plugin version supports the `model-data` field for GUI items. If not, you may need to update the plugin or request this feature from the developers.
 
 ### Localization
 Locale files are in `src/main/resources/locale/` (e.g., `en_US.yml`, `hu_HU.yml`, `pl_PL.yml`).

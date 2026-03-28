@@ -11,6 +11,10 @@ enter-sell-price:
 enter-buy-price:
   prompt: '%prefix% &aÍrd be a vásárlási árat &7&o(A megszakításhoz írd be: &f%cancel%&7&o)'
   success: '%prefix% &aVásárlási ár sikeresen beállítva!'
+enter-quantity:
+  prompt: '%prefix% &aÍrd be a mennyiséget &7&o(A megszakításhoz írd be: &f%cancel%&7&o)'
+  success: '%prefix% &aMennyiség sikeresen beállítva!'
+  invalid: '%prefix% &cA mennyiségnek legalább &e1&c egész számnak kell lennie!'
 invalid-number: '%prefix% &cÉrvénytelen szám! (&e%entered%&c)'
 cant-add-yourself: '%prefix% &cNem adhatod hozzá saját magad a bolthoz!'
 cant-remove-yourself: '%prefix% &cNem törölheted magad a boltból!'
@@ -71,6 +75,10 @@ shop:
   setup-needed: '%prefix% &cEz a bolt nincs megfelelően beállítva!'
   sold: '%prefix% &aSikeresen eladt ál &7x%items-bought% &f%item% &af$%price% &aértékben &f%player-name% &ajátékosnak! &7(&8%items-left%&7)'
   renamed: '%prefix% &f%old-name% &aúj neve: &f%new-name%!'
+  minimum-purchase: '%prefix% &cMinimum vásárlás &e%quantity% &ctárgy!'
+  minimum-sale: '%prefix% &cMinimum eladás &e%quantity% &ctárgy!'
+  shulker-preview: '&7Jobb klikk a tartalom megtekintéséhez'
+  shulker-preview-title: '&8Shulker Előnézet'
 admin:
   shop:
     list:

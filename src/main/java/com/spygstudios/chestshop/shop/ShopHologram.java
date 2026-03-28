@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Config;
+import com.spygstudios.chestshop.utils.FormatUtils;
 import com.spygstudios.spyglib.color.TranslateColor;
 import com.spygstudios.spyglib.hologram.Hologram;
 import com.spygstudios.spyglib.hologram.HologramItemRow;
@@ -79,9 +80,11 @@ public class ShopHologram {
 
     public Component getHologramLine(String owner, int index) {
         String buyPrice = config.getString("shops.price-format.buy")
-                .replace("%price%", String.valueOf(shop.getCustomerPurchasePrice()));
+                .replace("%quantity%", FormatUtils.formatNumber(shop.getQuantity()))
+                .replace("%price%", FormatUtils.formatNumber(shop.getCustomerPurchasePrice()));
         String sellPrice = config.getString("shops.price-format.sell")
-                .replace("%price%", String.valueOf(shop.getCustomerSalePrice()));
+                .replace("%quantity%", FormatUtils.formatNumber(shop.getQuantity()))
+                .replace("%price%", FormatUtils.formatNumber(shop.getCustomerSalePrice()));
 
         String priceDisplay = "";
         if (shop.acceptsCustomerPurchases() && shop.acceptsCustomerSales()) {

@@ -18,12 +18,17 @@ public enum Message {
     NEW_VERSION("new-version", "%prefix% &aA new version of SpygChestShop is available! Current version: &#e80000%old-version% &aNew version: &#00bf0d%new-version% &7&o(Click to download)"),
 
     ENTER_AMOUNT_CANCELLED("enter-amount.cancelled", "%prefix% &cAmount entering cancelled!"),
-    ENTER_AMOUNT("enter.amount.prompt", "%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel)"),
-    ENTER_AMOUNT_SUCCESS("enter.amount.success", "%prefix% &aAmount set successfully!"),
-    ENTER_SELL_PRICE("enter.sell-price.prompt", "%prefix% &aEnter the sell price &7&o(Enter a &f%cancel%&7&o to cancel)"),
-    ENTER_BUY_PRICE("enter.buy-price.prompt", "%prefix% &aEnter the buy price &7&o(Enter a &f%cancel%&7&o to cancel)"),
-    ENTER_SELL_PRICE_SUCCESS("enter.sell-price.success", "%prefix% &aSell price set successfully!"),
-    ENTER_BUY_PRICE_SUCCESS("enter.buy-price.success", "%prefix% &aBuy price set successfully!"),
+    ENTER_AMOUNT("enter-amount.prompt", "%prefix% &aEnter the amount &7&o(Enter a &f%cancel%&7&o to cancel)"),
+    ENTER_AMOUNT_SUCCESS("enter-amount.success", "%prefix% &aAmount set successfully!"),
+    ENTER_SELL_PRICE("enter-sell-price.prompt", "%prefix% &aEnter the sell price &7&o(Enter a &f%cancel%&7&o to cancel)"),
+    ENTER_BUY_PRICE("enter-buy-price.prompt", "%prefix% &aEnter the buy price &7&o(Enter a &f%cancel%&7&o to cancel)"),
+    ENTER_SELL_PRICE_SUCCESS("enter-sell-price.success", "%prefix% &aSell price set successfully!"),
+    ENTER_BUY_PRICE_SUCCESS("enter-buy-price.success", "%prefix% &aBuy price set successfully!"),
+    ENTER_QUANTITY("enter-quantity.prompt", "%prefix% &aEnter the quantity &7&o(Enter a &f%cancel%&7&o to cancel)"),
+    ENTER_QUANTITY_SUCCESS("enter-quantity.success", "%prefix% &aQuantity set successfully!"),
+    ENTER_QUANTITY_INVALID("enter-quantity.invalid", "%prefix% &cQuantity must be a whole number of at least &e1&c or maximum the stack size!"),
+    SHOP_MINIMUM_PURCHASE("shop.minimum-purchase", "%prefix% &cMinimum purchase is &e%quantity% &citems!"),
+    SHOP_MINIMUM_SALE("shop.minimum-sale", "%prefix% &cMinimum sale is &e%quantity% &citems!"),
 
     INVALID_NUMBER("invalid-number", "%prefix% &cInvalid number! (&e%entered%&c)"),
 
@@ -108,7 +113,10 @@ public enum Message {
     MIGRATE_NEW_STORAGE("migrate.new-storage", "%prefix% &aNew storage type: &f%storage-type%"),
     MIGRATE_CRITICAL_ERROR("migrate.critical-error", "%prefix% &cCritical error occurred during migration!"),
     MIGRATE_MYSQL_CONFIG_INCOMPLETE("migrate.mysql-config-incomplete", "%prefix% &cMySQL configuration is incomplete!"),
-    MIGRATE_ERROR_LOADING("migrate.error-loading", "%prefix% &cError occurred while loading shops!");
+    MIGRATE_ERROR_LOADING("migrate.error-loading", "%prefix% &cError occurred while loading shops!"),
+    
+    SHOP_SHULKER_PREVIEW("shop.shulker-preview", "&7Right-click to inspect contents"),
+    SHOP_SHULKER_PREVIEW_TITLE("shop.shulker-preview-title", "&8Shulker Preview");
 
     private String node;
     private String defaultMessage;

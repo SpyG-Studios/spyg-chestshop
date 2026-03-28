@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.spygstudios.chestshop.ChestShop;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.enums.ShopRemoveCause;
+import com.spygstudios.chestshop.utils.FormatUtils;
 import com.spygstudios.chestshop.events.ShopRemoveEvent;
 import com.spygstudios.spyglib.hologram.HologramItemRow;
 
@@ -45,21 +46,27 @@ public class Shop {
     private ShopHologram hologram;
     @Setter
     private boolean isSaved = false;
+    private int quantity = 1;
     private ShopTransactions shopTransactions;
 
     private static final List<Shop> SHOPS = new ArrayList<>();
     private static ChestShop plugin = ChestShop.getInstance();
 
     public Shop(Player owner, String shopName, Location chestLocation, String createdAt) {
-        this(owner.getUniqueId(), shopName, 0, 0, null, chestLocation, createdAt, false, true, false, new ArrayList<>());
+        this(owner.getUniqueId(), shopName, 0, 0, null, chestLocation, createdAt, false, true, false, new ArrayList<>(), 1);
     }
 
     public Shop(UUID ownerId, String shopName, Location chestLocation, String createdAt) {
-        this(ownerId, shopName, 0, 0, null, chestLocation, createdAt, false, true, false, new ArrayList<>());
+        this(ownerId, shopName, 0, 0, null, chestLocation, createdAt, false, true, false, new ArrayList<>(), 1);
     }
 
     public Shop(UUID ownerId, String shopName, double sellPrice, double buyPrice, ItemStack item, Location chestLocation, String createdAt, boolean isNotify, boolean canSell, boolean canBuy,
             List<UUID> addedPlayers) {
+        this(ownerId, shopName, sellPrice, buyPrice, item, chestLocation, createdAt, isNotify, canSell, canBuy, addedPlayers, 1);
+    }
+
+    public Shop(UUID ownerId, String shopName, double sellPrice, double buyPrice, ItemStack item, Location chestLocation, String createdAt, boolean isNotify, boolean canSell, boolean canBuy,
+            List<UUID> addedPlayers, int quantity) {
         synchronized (SHOPS) {
             if (Shop.getShop(ownerId, shopName) != null) {
                 return;
@@ -77,6 +84,7 @@ public class Shop {
         this.canSellToPlayers = canSell;
         this.canBuyFromPlayers = canBuy;
         this.addedPlayers = addedPlayers;
+        this.quantity = quantity;
         this.shopTransactions = new ShopTransactions(this);
         this.hologram = new ShopHologram(this, plugin);
     }
@@ -100,11 +108,11 @@ public class Shop {
     }
 
     public double getSellPrice() {
-        return ShopUtils.parsePrice(this.sellPrice);
+        return FormatUtils.parsePrice(this.sellPrice);
     }
 
     public double getBuyPrice() {
-        return ShopUtils.parsePrice(this.buyPrice);
+        return FormatUtils.parsePrice(this.buyPrice);
     }
 
     public boolean acceptsCustomerPurchases() {
@@ -208,7 +216,7 @@ public class Shop {
     }
 
     public void setBuyPrice(double buyPrice) {
-        double parsedPrice = ShopUtils.parsePrice(buyPrice);
+        double parsedPrice = FormatUtils.parsePrice(buyPrice);
         plugin.getDataManager().updateShopBuyPrice(ownerId, name, parsedPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop price for " + name);
@@ -221,13 +229,25 @@ public class Shop {
     }
 
     public void setSellPrice(double sellPrice) {
-        double parsedPrice = ShopUtils.parsePrice(sellPrice);
+        double parsedPrice = FormatUtils.parsePrice(sellPrice);
         plugin.getDataManager().updateShopSellPrice(ownerId, name, parsedPrice).thenAccept(success -> {
             if (!success) {
                 plugin.getLogger().warning("Failed to update shop price for " + name);
                 return;
             }
             this.sellPrice = parsedPrice;
+            this.hologram.updateHologramRows();
+            this.isSaved = false;
+        });
+    }
+
+    public void setQuantity(int quantity) {
+        plugin.getDataManager().updateShopQuantity(ownerId, name, quantity).thenAccept(success -> {
+            if (!success) {
+                plugin.getLogger().warning("Failed to update shop quantity for " + name);
+                return;
+            }
+            this.quantity = quantity;
             this.hologram.updateHologramRows();
             this.isSaved = false;
         });

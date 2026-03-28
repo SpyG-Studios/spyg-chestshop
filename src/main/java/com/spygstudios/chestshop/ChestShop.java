@@ -46,6 +46,7 @@ import com.spygstudios.chestshop.listeners.gui.DashboardGuiHandler;
 import com.spygstudios.chestshop.listeners.gui.InventoryCloseListener;
 import com.spygstudios.chestshop.listeners.gui.PlayerGuiHandler;
 import com.spygstudios.chestshop.listeners.gui.ShopGuiHandler;
+import com.spygstudios.chestshop.listeners.gui.ShulkerPreviewHandler;
 import com.spygstudios.spyglib.hologram.HologramManager;
 import com.spygstudios.spyglib.version.VersionChecker;
 
@@ -108,6 +109,7 @@ public class ChestShop extends JavaPlugin {
         new DashboardGuiHandler(instance);
         new PlayerGuiHandler(instance);
         new ShopGuiHandler(instance);
+        new ShulkerPreviewHandler(instance);
         new InventoryCloseListener(instance);
         new ExplosionListener(instance);
         new ChatListener(instance);
