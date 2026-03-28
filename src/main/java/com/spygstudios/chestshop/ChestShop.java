@@ -200,10 +200,9 @@ public class ChestShop extends JavaPlugin {
         }
         dataManager.close();
 
-        List<Object> guis = Arrays.asList(DashboardHolder.class, PlayersHolder.class, ShopHolder.class);
         for (Player player : Bukkit.getOnlinePlayers()) {
             InventoryHolder holder = player.getOpenInventory().getTopInventory().getHolder();
-            if (guis.contains(holder.getClass())) {
+            if (holder instanceof BaseHolder) {
                 player.closeInventory();
             }
         }

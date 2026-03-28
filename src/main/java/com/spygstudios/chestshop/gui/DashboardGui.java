@@ -273,22 +273,13 @@ public class DashboardGui {
 
     public static class DashboardHolder implements InventoryHolder {
 
-        @Getter
-        private final Player player;
-        @Getter
+    @Getter
+    public static class DashboardHolder extends BaseHolder {
         private final ItemStack item;
-        @Getter
-        private final Shop shop;
 
         public DashboardHolder(Player player, Shop shop) {
-            this.player = player;
-            this.shop = shop;
+            super(player, shop);
             this.item = shop.getItem() == null ? new ItemStack(Material.AIR) : shop.getItem();
-        }
-
-        @Override
-        public Inventory getInventory() {
-            return null;
         }
     }
 }

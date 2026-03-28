@@ -8,9 +8,7 @@ import com.spygstudios.chestshop.config.Config;
 import com.spygstudios.chestshop.config.GuiConfig;
 import com.spygstudios.chestshop.config.Message;
 import com.spygstudios.chestshop.config.MessageConfig;
-import com.spygstudios.chestshop.gui.DashboardGui.DashboardHolder;
-import com.spygstudios.chestshop.gui.PlayersGui.PlayersHolder;
-import com.spygstudios.chestshop.gui.ShopGui.ShopHolder;
+import com.spygstudios.chestshop.gui.holder.BaseHolder;
 import com.spygstudios.chestshop.shop.Shop;
 
 import dev.rollczi.litecommands.annotations.command.Command;
@@ -52,8 +50,7 @@ public class Reload {
             if (player.getOpenInventory() == null || player.getOpenInventory().getTopInventory() == null) {
                 continue;
             }
-            if (player.getOpenInventory().getTopInventory().getHolder() instanceof DashboardHolder || player.getOpenInventory().getTopInventory().getHolder() instanceof ShopHolder
-                    || player.getOpenInventory().getTopInventory().getHolder() instanceof PlayersHolder) {
+            if (player.getOpenInventory().getTopInventory().getHolder() instanceof BaseHolder) {
                 player.closeInventory();
             }
         }

@@ -116,20 +116,14 @@ public class PlayersGui {
         @Getter
         private final Shop shop;
 
+    public static class PlayersHolder extends BaseHolder {
         @Getter
         @Setter
         private int page;
 
         public PlayersHolder(Player player, Shop shop) {
-            this.player = player;
-            this.shop = shop;
+            super(player, shop);
             this.page = 1;
         }
-
-        @Override
-        public Inventory getInventory() {
-            return null;
-        }
-
     }
 }

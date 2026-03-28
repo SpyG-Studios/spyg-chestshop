@@ -171,23 +171,19 @@ public class ShopGui {
         PLAYER_MODES.remove(player.getUniqueId());
     }
 
-    public static class ShopHolder implements InventoryHolder {
+    private long getLastClick(HumanEntity player) {
 
-        @Getter
-        private final Player player;
 
-        @Getter
-        private final Shop shop;
-
+    public static class ShopHolder extends BaseHolder {
         public ShopHolder(Player player, Shop shop) {
-            this.player = player;
-            this.shop = shop;
+            super(player, shop);
         }
+    }
 
+    public static class ShulkerPreviewHolder implements InventoryHolder {
         @Override
         public Inventory getInventory() {
             return null;
         }
-
     }
 }
